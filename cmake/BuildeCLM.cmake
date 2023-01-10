@@ -1,3 +1,13 @@
+#TODO: Setting both COUP_OAS_ICON and COUP_OAS_PFL should be possible
+if(DEFINED ICON_SRC)
+    list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=True -DCOUP_OAS_ICON=True)
+elseif(DEFINED PARFLOW_SRC)
+    list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=True -DCOUP_OAS_PFL=True)
+else()
+    list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=False)
+endif()
+message(STATUS "COUP_OAS_FLAG=${COUP_OAS_FLAG}")
+
 ExternalProject_Add(eCLM
     PREFIX            eCLM
     SOURCE_DIR        ${eCLM_SRC}
@@ -7,6 +17,6 @@ ExternalProject_Add(eCLM
                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                       -DCMAKE_PREFIX_PATH=${OASIS_ROOT}
                       -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                      -DUSE_OASIS=True
+                      ${COUP_OAS_FLAGS}
     BUILD_COMMAND     ""
 )
