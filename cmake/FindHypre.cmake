@@ -1,5 +1,3 @@
-find_library(HYPRE_LIB NAMES HYPRE)
-
 find_path(HYPRE_LIB_DIR NAMES libHYPRE.a PATH_SUFFIXES lib lib64)
 
 include(FindPackageHandleStandardArgs)

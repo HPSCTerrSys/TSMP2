@@ -12,7 +12,7 @@ find_package_handle_standard_args(OASIS3MCT DEFAULT_MSG
 )
 
 if(OASIS3MCT_FOUND)
-   set(OASIS_LIBRARIES ${PSMILE_LIB} ${MCT_LIB} ${MPEU_LIB} ${SCRIP_LIB})
+   set(OASIS_LIBRARIES "-L${OASIS_ROOT}/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip")
 endif()
 
 unset(PSMILE_LIB)
