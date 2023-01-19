@@ -6,7 +6,6 @@ elseif(DEFINED PARFLOW_SRC)
 else()
     list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=False)
 endif()
-message(STATUS "COUP_OAS_FLAG=${COUP_OAS_FLAG}")
 
 ExternalProject_Add(eCLM
     PREFIX            eCLM

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.21.1)
-project(eTSMP LANGUAGES C Fortran)
+project(eTSMP LANGUAGES C CXX Fortran)
 include(ExternalProject)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
