@@ -17,5 +17,15 @@ ExternalProject_Add(eCLM
                       -DCMAKE_PREFIX_PATH=${OASIS_ROOT}
                       -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                       ${COUP_OAS_FLAGS}
-    BUILD_COMMAND     ""
+    BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
+                           # This happens because INSTALL_COMMAND triggers rebuild
+                           # which is abnormal. This is a problem in eCLM and should be fixed.
+)
+
+ExternalProject_Add_Step(eCLM install-scripts
+    COMMAND       pip3 install --user ${eCLM_SRC}/namelist_generator
+    COMMENT       "Installing clm5nl-gen ..."
+    DEPENDEES     install
+    ALWAYS        TRUE
+    USES_TERMINAL TRUE
 )

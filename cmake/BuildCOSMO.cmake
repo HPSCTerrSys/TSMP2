@@ -26,4 +26,9 @@ ExternalProject_Add(COSMO5_1
   BUILD_COMMAND     FOPTS=${COSMO_Fopts} make -f ${COSMO_SRC}/Makefile -C ${COSMO_BLD_DIR}
   BUILD_ALWAYS      YES
   INSTALL_COMMAND   ""
+  BUILD_BYPRODUCTS  ${COSMO_BLD_DIR}/lmparbin_pur
 )
+install (FILES ${COSMO_BLD_DIR}/lmparbin_pur 
+         TYPE BIN
+         PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+                     GROUP_EXECUTE GROUP_READ)

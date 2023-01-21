@@ -9,11 +9,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")
 endif()
 
-if(NOT COMPILER)
-    set(COMPILER "${CMAKE_Fortran_COMPILER_ID}" CACHE STRING "Choose compiler toolchain." FORCE)
-    set_property(CACHE COMPILER PROPERTY STRINGS "GNU" "Intel")
-endif()
-
 find_package(OASIS3MCT REQUIRED)
 find_package(MPIFortran REQUIRED)
 
