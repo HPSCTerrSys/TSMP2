@@ -20,8 +20,8 @@ ExternalProject_Add(ParFlow
                 -DHYPRE_ROOT=${HYPRE_ROOT}
                 -DPARFLOW_ENABLE_TIMING=TRUE
                 -DPARFLOW_ENABLE_SLURM=TRUE
-                -DMPIEXEC_EXECUTABLE=srun        # TODO: replace with variable!
-                -DMPIEXEC_NUMPROC_FLAG=--ntasks
+                -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
+                -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DCMAKE_C_FLAGS=${PF_CFLAGS}
                 -DCMAKE_EXE_LINKER_FLAGS=${PF_LDFLAGS}
 )

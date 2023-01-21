@@ -1,40 +1,40 @@
 find_package(NetCDF REQUIRED)
-find_package(MPI COMPONENTS Fortran REQUIRED)
-
-if (DEFINED MPI_HOME)
-  set(CLM35_MPI_INC ${MPI_HOME}/include)
-  set(CLM35_MPI_LIB ${MPI_HOME}/lib) 
-else()
-  if (DEFINED MPI_Fortran_INCLUDE_DIRS)
-    set(CLM35_MPI_INC ${MPI_Fortran_INCLUDE_DIRS})
-  endif()
-endif()
-
 string(JOIN " " CLM35_LDFLAGS ${NetCDF_LIBRARIES} ${OASIS_LIBRARIES})
 
+list(APPEND CLM35_CONFIG_OPTS -cc ${CMAKE_C_COMPILER})
+list(APPEND CLM35_CONFIG_OPTS -fc ${CMAKE_Fortran_COMPILER})
+list(APPEND CLM35_CONFIG_OPTS -clm_bld ${CMAKE_BINARY_DIR}/CLM3_5/bld)
+list(APPEND CLM35_CONFIG_OPTS -clm_exedir ${CMAKE_INSTALL_PREFIX}/bin)
+list(APPEND CLM35_CONFIG_OPTS -usr_src ${CLM35_SRC}/bld/usr.src)
+list(APPEND CLM35_CONFIG_OPTS -mpi_lib ${MPI_Fortran_LIB_DIR})
+list(APPEND CLM35_CONFIG_OPTS -mpi_inc ${MPI_Fortran_INCLUDE_DIRS})
+list(APPEND CLM35_CONFIG_OPTS -nc_inc ${NetCDF_F90_ROOT}/include)
+list(APPEND CLM35_CONFIG_OPTS -nc_lib ${NetCDF_F90_ROOT}/lib)
+list(APPEND CLM35_CONFIG_OPTS -nc_mod ${NetCDF_F90_ROOT}/include)
+list(APPEND CLM35_CONFIG_OPTS -fflags -I${OASIS_INCLUDE_DIR})
+list(APPEND CLM35_CONFIG_OPTS -ldflags ${CLM35_LDFLAGS})
+list(APPEND CLM35_CONFIG_OPTS -maxpft 1)
+list(APPEND CLM35_CONFIG_OPTS -rtm off)
+list(APPEND CLM35_CONFIG_OPTS -spmd)
+list(APPEND CLM35_CONFIG_OPTS -smp)
+
+if(DEFINED PARFLOW_SRC)
+  list(APPEND CLM35_CONFIG_OPTS -oas3_pfl)
+endif()
+if(DEFINED COSMO_SRC)
+  list(APPEND CLM35_CONFIG_OPTS -oas3_cos)
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+  list(APPEND CLM35_CONFIG_OPTS -debug)
+endif()
+
+#list(JOIN CLM35_CONFIG_OPTS " " CLM35_CONFIG_OPTS)
 ExternalProject_Add(CLM3_5
   PREFIX            CLM3_5
   SOURCE_DIR        ${CLM35_SRC}
   BUILD_IN_SOURCE   FALSE
-  CONFIGURE_COMMAND ${CLM35_SRC}/bld/configure
-                    -cc ${CMAKE_C_COMPILER}
-                    -fc ${CMAKE_Fortran_COMPILER}
-                    -clm_bld ${CMAKE_BINARY_DIR}/CLM3_5/bld
-                    -clm_exedir ${CMAKE_INSTALL_PREFIX}/bin
-                    -mpi_lib ${CLM35_MPI_LIB}
-                    -mpi_inc ${CLM35_MPI_INC}
-                    -spmd
-                    -smp
-                    -maxpft 1
-                    -rtm off
-                    -usr_src ${CLM35_SRC}/bld/usr.src
-                    -oas3_pfl
-                    -debug
-                    -nc_inc ${NetCDF_F90_ROOT}/include
-                    -nc_lib ${NetCDF_F90_ROOT}/lib
-                    -nc_mod ${NetCDF_F90_ROOT}/include
-                    -fflags -I${OASIS_ROOT}/include
-                    -ldflags ${CLM35_LDFLAGS}
+  CONFIGURE_COMMAND ${CLM35_SRC}/bld/configure ${CLM35_CONFIG_OPTS}
   BUILD_COMMAND     make -j16 -C ${CMAKE_BINARY_DIR}/CLM3_5/bld
   INSTALL_COMMAND   ""
 )

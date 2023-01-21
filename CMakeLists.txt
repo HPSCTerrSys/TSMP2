@@ -15,6 +15,7 @@ if(NOT COMPILER)
 endif()
 
 find_package(OASIS3MCT REQUIRED)
+find_package(MPIFortran REQUIRED)
 
 # TODO (for all Build*.cmake scripts):
 # - Check validity of compile flags

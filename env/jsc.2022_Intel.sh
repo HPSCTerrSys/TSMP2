@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -eo pipefail
 
 # Load modules
 module --force purge
@@ -24,7 +23,7 @@ module list
 
 # Set default compilers
 export CC=mpicc
-export FC=mpifort
+export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=$EBROOTPSMPI
 

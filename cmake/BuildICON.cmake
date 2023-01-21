@@ -36,7 +36,7 @@ ExternalProject_Add(ICON
                       FCFLAGS=${ICON_FCFLAGS}
                       LDFLAGS=${ICON_LDFLAGS}
                       LIBS=${ICON_LIBS}
-                      MPI_LAUNCH=srun  # TODO: replace with variable!
+                      MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
                       --prefix=${CMAKE_INSTALL_PREFIX}
                       ${EXTRA_CONFIG_ARGS}
     BUILD_COMMAND     make -j8 install
