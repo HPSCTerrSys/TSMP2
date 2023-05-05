@@ -23,6 +23,10 @@ find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
 list(JOIN ICON_LIBS " " ICON_LIBS)
+<<<<<<< HEAD
+
+=======
+list(APPEND EXTRA_CONFIG_ARGS --enable-intel-consistency --disable-coupling --disable-ocean --disable-jsbach --enable-oascoupling --enable-mixed-precision --enable-ecrad)
 
 
 ExternalProject_Add(ICON
