@@ -29,3 +29,6 @@ ExternalProject_Add_Step(eCLM install-scripts
     ALWAYS        TRUE
     USES_TERMINAL TRUE
 )
+
+get_model_version(${eCLM_SRC} eCLM_VERSION)
+list(APPEND eTSMP_MODEL_VERSIONS "eCLM: ${eCLM_VERSION}")

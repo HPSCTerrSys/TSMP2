@@ -39,3 +39,6 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_C_FLAGS=${PF_CFLAGS}
                 -DCMAKE_EXE_LINKER_FLAGS=${PF_LDFLAGS}
 )
+
+get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)
+list(APPEND eTSMP_MODEL_VERSIONS "ParFlow: ${PARFLOW_VERSION}")

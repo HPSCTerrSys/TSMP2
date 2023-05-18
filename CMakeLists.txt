@@ -3,6 +3,7 @@ project(eTSMP LANGUAGES C CXX Fortran)
 include(ExternalProject)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(Utils)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Choose the type of build." FORCE)
@@ -19,20 +20,27 @@ find_package(MPIFortran REQUIRED)
 
 if(DEFINED eCLM_SRC)
   include(BuildeCLM)
-endif()
-
-if(DEFINED PARFLOW_SRC)
-  include(BuildParFlow)
-endif()
-
-if(DEFINED ICON_SRC)
-  include(BuildICON)
+  list(APPEND COMPONENT_MODELS "eCLM")
 endif()
 
 if(DEFINED CLM35_SRC)
   include(BuildCLM3.5)
+  list(APPEND COMPONENT_MODELS "CLM3.5")
+endif()
+
+if(DEFINED ICON_SRC)
+  include(BuildICON)
+  list(APPEND COMPONENT_MODELS "ICON")
 endif()
 
 if(DEFINED COSMO_SRC)
   include(BuildCOSMO)
+  list(APPEND COMPONENT_MODELS "COSMO5.1")
 endif()
+
+if(DEFINED PARFLOW_SRC)
+  include(BuildParFlow)
+  list(APPEND COMPONENT_MODELS "ParFlow")
+endif()
+
+print_model_versions("${COMPONENT_MODELS}" "${eTSMP_MODEL_VERSIONS}")
