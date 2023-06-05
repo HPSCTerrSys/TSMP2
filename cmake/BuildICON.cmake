@@ -3,6 +3,7 @@
 set(ICON_CFLAGS "-gdwarf-4 -O3 -qno-opt-dynamic-align -ftz -march=native")
 set(ICON_FCFLAGS "-I${OASIS_ROOT}/include -gdwarf-4 -O3 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
 set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed")
+set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
 find_package(HDF5 REQUIRED)
 list(APPEND ICON_LIBS "${HDF5_LIBRARIES}")
@@ -23,7 +24,9 @@ find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
 list(JOIN ICON_LIBS " " ICON_LIBS)
-list(APPEND EXTRA_CONFIG_ARGS --enable-intel-consistency --disable-coupling --disable-ocean --disable-jsbach --enable-oascoupling --enable-mixed-precision --enable-ecrad)
+
+list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-oascoupling --enable-ecrad --enable-parallel-netcdf)
+
 
 ExternalProject_Add(ICON
     PREFIX            ICON
@@ -34,6 +37,7 @@ ExternalProject_Add(ICON
                       FC=${CMAKE_Fortran_COMPILER}
                       CFLAGS=${ICON_CFLAGS}
                       FCFLAGS=${ICON_FCFLAGS}
+		      ICON_ECRAD_FCFLAGS=${ICON_ECRAD_FCFLAGS}
                       LDFLAGS=${ICON_LDFLAGS}
                       LIBS=${ICON_LIBS}
                       MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
