@@ -47,3 +47,6 @@ ExternalProject_Add(ICON
     INSTALL_COMMAND   ""
     BUILD_ALWAYS      YES
 )
+
+get_model_version(${ICON_SRC} ICON_VERSION)
+list(APPEND eTSMP_MODEL_VERSIONS "ICON: ${ICON_VERSION}")

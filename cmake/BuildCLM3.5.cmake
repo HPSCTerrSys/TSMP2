@@ -39,3 +39,6 @@ ExternalProject_Add(CLM3_5
   BUILD_COMMAND     make -j16 -C ${CMAKE_BINARY_DIR}/CLM3_5/bld
   INSTALL_COMMAND   ""
 )
+
+get_model_version(${CLM35_SRC} CLM35_VERSION)
+list(APPEND eTSMP_MODEL_VERSIONS "CLM3.5: ${CLM35_VERSION}")
