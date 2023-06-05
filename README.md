@@ -72,6 +72,13 @@ cmake -S . -B ${BUILD_DIR}                  \
       -DeCLM_SRC=${eCLM_SRC}                \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
+# eCLM-ICON-ParFlow
+cmake -S . -B ${BUILD_DIR}                  \
+      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+      -DeCLM_SRC=${eCLM_SRC}                \
+      -DICON_SRC=${ICON_SRC}		      \
+      -DPARFLOW_SRC=${PARFLOW_SRC}
+
 # CLM3.5-COSMO5.01-ParFlow
 cmake -S . -B ${BUILD_DIR}                  \
       -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
