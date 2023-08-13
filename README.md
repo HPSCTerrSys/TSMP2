@@ -10,7 +10,7 @@ cd eTSMP
 2. Load the environment variables required for the build.
 
 ```bash
-source env/jsc.2022_Intel.sh
+source env/jsc.2023_Intel.sh
 ```
 
 3. Specify build and install directories.
