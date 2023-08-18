@@ -20,9 +20,11 @@ ExternalProject_Add(eCLM
                       -DCMAKE_PREFIX_PATH=${OASIS_ROOT}
                       -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                       ${COUP_OAS_FLAGS}
+    BUILD_ALWAYS      YES
     BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
                            # This happens because INSTALL_COMMAND triggers rebuild
                            # which is abnormal. This is a problem in eCLM and should be fixed.
+    DEPENDS           OASIS3_MCT
 )
 
 ExternalProject_Add_Step(eCLM install-scripts
