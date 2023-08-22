@@ -1,7 +1,7 @@
 # ICON 2.6.4
 set(ICON_CFLAGS "-gdwarf-4 -qno-opt-dynamic-align -ftz -march=native")
-set(ICON_FCFLAGS "-I${OASIS_ROOT}/include -gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
-set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed")
+set(ICON_FCFLAGS "-I${OASIS_INCLUDE_DIR} -gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
+set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed ${OASIS_LIBRARIES}")
 set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
@@ -17,6 +17,8 @@ else()
   message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by ICON")
 endif()
 
+list(APPEND ICON_LIBS "-Wl,--as-needed")
+
 find_package(HDF5 REQUIRED)
 list(APPEND ICON_LIBS "${HDF5_LIBRARIES}")
 
@@ -31,7 +33,6 @@ find_package(BLAS REQUIRED)
 list(APPEND ICON_LIBS "${BLAS_LIBRARIES}")
 
 list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
-
 find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
