@@ -59,8 +59,7 @@ ExternalProject_Add(OASIS3_MCT
   INSTALL_COMMAND   ""
 )
 
-set(OASIS_ROOT ${CMAKE_INSTALL_PREFIX})
-set(OASIS_LIBRARIES "-L${OASIS_ROOT}/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip")
-set(OASIS_INCLUDE_DIR "${OASIS_ROOT}/include")
+set(OASIS_ROOT ${CMAKE_INSTALL_PREFIX} CACHE PATH "Full path to the root directory containing OASIS3-MCT include files and libraries.")
+set(OASIS_LIBRARIES "-L${OASIS_ROOT}/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip" CACHE STRING "OASIS3-MCT linker options")
 get_model_version(${OASIS_SRC} OASIS_VERSION)
 list(APPEND eTSMP_MODEL_VERSIONS "OASIS3-MCT: ${OASIS_VERSION}")
