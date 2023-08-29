@@ -26,9 +26,3 @@ export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=$EBROOTPSMPI
-
-# Set OASIS root
-export OASIS_ROOT="/p/project/cslts/software/$STAGE/${SYSTEMNAME}/OASIS3-MCT/5.0"
-if [[ ":$CMAKE_PREFIX_PATH:" != *":${OASIS_ROOT}:"* ]]; then
-  CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:+"$CMAKE_PREFIX_PATH:"}${OASIS_ROOT}"
-fi

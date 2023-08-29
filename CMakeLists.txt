@@ -10,8 +10,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")
 endif()
 
-find_package(OASIS3MCT REQUIRED)
 find_package(MPIFortran REQUIRED)
+if(DEFINED OASIS_SRC)
+  include(BuildOASIS3MCT)
+else()
+  message(FATAL_ERROR "OASIS_SRC was not specified.")
+endif()
 
 # TODO (for all Build*.cmake scripts):
 # - Check validity of compile flags

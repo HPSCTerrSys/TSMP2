@@ -17,6 +17,6 @@ find_package_handle_standard_args(NetCDF
    VERSION_VAR NetCDF_F90_VERSION)
 
 if(NetCDF_FOUND)
-   set(NetCDF_LIBRARIES "-L${NetCDF_C_LIB_DIR} -L${NetCDF_F90_LIB_DIR} -lnetcdff -lnetcdf")
-   set(NetCDF_ROOT ${NetCDF_F90_ROOT})
+   set(NetCDF_LIBRARIES "-L${NetCDF_C_LIB_DIR} -L${NetCDF_F90_LIB_DIR} -lnetcdff -lnetcdf" CACHE STRING "NetCDF linker options")
+   set(NetCDF_ROOT ${NetCDF_F90_ROOT} CACHE PATH "Full path to the root directory containing NetCDF include files and libraries.")
 endif()

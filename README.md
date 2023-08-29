@@ -23,17 +23,21 @@ MODEL_ID="eCLM-ParFlow"
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
 
 # Model executables and libraries will be installed here
-INSTALL_DIR="./bin/${SYSTEMNAME^^}_${MODEL_ID}"
+INSTALL_DIR="./run/${SYSTEMNAME^^}_${MODEL_ID}"
 
 # Create build and install directories
 mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ```
 
-4. Download component models that you wish to build. Then store the
-path of each model to `<model-name>_SRC` variable.
+4. Download the OASIS3-MCT coupling library and the component models that you wish
+   to use. Then save the full path to each model source code to `<model-name>_SRC`.
 
 ```bash
-# NOTE: Clone only the component models that you need!
+# OASIS3-MCT (required)
+git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+OASIS_SRC=`realpath oasis3-mct`
+
+## NOTE: Download only the component models that you need! ##
 
 # eCLM
 git clone https://github.com/HPSCTerrSys/eCLM.git
@@ -56,46 +60,52 @@ git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src
 COSMO_SRC=`realpath cosmo5.01_fresh`
 ```
 
-5. Supply the build and install directories (step 2) and the paths to component models (step 3) to CMake. 
-CMake will only build the models specified by the user. Supported coupled models are listed below.
+5. Run CMake configure step for the model combination that you wish to build. The
+   examples below show different CMake configure commands for each model combination. 
 
 ```bash
 # eCLM-ICON
-cmake -S . -B ${BUILD_DIR}                  \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-      -DeCLM_SRC=${eCLM_SRC}                \
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DeCLM_SRC=${eCLM_SRC}                  \
       -DICON_SRC=${ICON_SRC}
 
 # eCLM-ParFlow
-cmake -S . -B ${BUILD_DIR}                  \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-      -DeCLM_SRC=${eCLM_SRC}                \
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DeCLM_SRC=${eCLM_SRC}                  \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
 # eCLM-ICON-ParFlow
-cmake -S . -B ${BUILD_DIR}                  \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-      -DeCLM_SRC=${eCLM_SRC}                \
-      -DICON_SRC=${ICON_SRC}		      \
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DeCLM_SRC=${eCLM_SRC}                  \
+      -DICON_SRC=${ICON_SRC}		          \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
 # CLM3.5-COSMO5.01-ParFlow
-cmake -S . -B ${BUILD_DIR}                  \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-      -DCLM35_SRC=${CLM35_SRC}              \
-      -DCOSMO_SRC=${COSMO_SRC}              \
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DCLM35_SRC=${CLM35_SRC}                \
+      -DCOSMO_SRC=${COSMO_SRC}                \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
 # CLM3.5-ParFlow
-cmake -S . -B ${BUILD_DIR}                  \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-      -DCLM35_SRC=${CLM35_SRC}              \
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DCLM35_SRC=${CLM35_SRC}                \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
 # CLM3.5-COSMO5.01
-cmake -S . -B ${BUILD_DIR}                  \
-      -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-      -DCLM35_SRC=${CLM35_SRC}              \
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DCLM35_SRC=${CLM35_SRC}                \
       -DCOSMO_SRC=${COSMO_SRC}
 ```
 
@@ -105,3 +115,43 @@ cmake -S . -B ${BUILD_DIR}                  \
 cmake --build ${BUILD_DIR}
 cmake --install ${BUILD_DIR}
 ```
+
+### Resuming a failed build
+
+When the build gets interrupted or fails for some reason, it can be resumed by simply running Step 6:
+
+```bash
+cmake --build ${BUILD_DIR}
+cmake --install ${BUILD_DIR}
+```
+
+Note that this works only if the required environment variables are already set. If you are resuming
+the build from a fresh terminal session, first you need to run `source env/jsc.2023_Intel.sh`  (Step 2)
+and specify `BUILD_DIR` (Step 3) before you can run Step 6.
+
+### Rebuilding specific component models
+
+eTSMP can rebuild a specific component model via the `cmake --build ${BUILD_DIR} --target ${MODEL}` command.
+This may be useful when you need to recompile a component model that has been modified or updated.
+
+```bash
+# Rebuilding examples
+
+cmake --build ${BUILD_DIR} --target eCLM && cmake --install ${BUILD_DIR}                  # Rebuilds eCLM
+cmake --build ${BUILD_DIR} --target ICON && cmake --install ${BUILD_DIR}                  # Rebuilds ICON
+cmake --build ${BUILD_DIR} --clean-first --target ParFlow && cmake --install ${BUILD_DIR} # Does a clean rebuild of ParFlow
+```
+
+Only component models specified during CMake configure step (see Step 5) can be rebuilt. For instance, if you
+configured eTSMP to build `eCLM-ParFlow`, then rebuilding `ICON` would of course be not possible.
+
+The list below shows all component models supported by eTSMP. To rebuild a component model(s),
+run one or more commands below, wait until the build succeeds, then finally run 
+`cmake --install ${BUILD_DIR}` so that the generated libraries and executables are copied to `${INSTALL_DIR}`.
+
+- `cmake --build ${BUILD_DIR} --target eCLM`
+- `cmake --build ${BUILD_DIR} --target ParFlow`
+- `cmake --build ${BUILD_DIR} --target ICON`
+- `cmake --build ${BUILD_DIR} --target OASIS3_MCT`
+- `cmake --build ${BUILD_DIR} --target CLM3_5`
+- `cmake --build ${BUILD_DIR} --target COSMO5_1`

@@ -26,7 +26,7 @@ function(print_model_versions COMPONENT_MODELS MODEL_VERSIONS)
   string(REPEAT "═" 50 H_SEPARATOR)
 
   message(STATUS ${H_SEPARATOR})
-  message(STATUS "Building »${MODEL_COMBINATION}«")
+  message(STATUS "Building »${MODEL_COMBINATION}« ${CMAKE_BUILD_TYPE} version")
   if(Git_FOUND)
     foreach(model IN LISTS MODEL_VERSIONS)
       message(STATUS "  ${model}")

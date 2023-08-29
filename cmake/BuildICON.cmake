@@ -1,9 +1,23 @@
 # ICON 2.6.4
-
-set(ICON_CFLAGS "-gdwarf-4 -O3 -qno-opt-dynamic-align -ftz -march=native")
-set(ICON_FCFLAGS "-I${OASIS_ROOT}/include -gdwarf-4 -O3 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
-set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed")
+set(ICON_CFLAGS "-gdwarf-4 -qno-opt-dynamic-align -ftz -march=native")
+set(ICON_FCFLAGS "-I${OASIS_ROOT}/include -gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
+set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed ${OASIS_LIBRARIES}")
 set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
+
+if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+  string(PREPEND ICON_CFLAGS "-g ")
+  string(PREPEND ICON_FCFLAGS "-g ")
+elseif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+  string(PREPEND ICON_CFLAGS "-O3 ")
+  string(PREPEND ICON_FCFLAGS "-O3 ")
+else()
+  # Assume CMAKE_BUILD_TYPE=RELEASE if CMAKE_BUILD_TYPE is unknown
+  string(PREPEND ICON_CFLAGS "-O3 ")
+  string(PREPEND ICON_FCFLAGS "-O3 ")
+  message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by ICON")
+endif()
+
+list(APPEND ICON_LIBS "-Wl,--as-needed")
 
 find_package(HDF5 REQUIRED)
 list(APPEND ICON_LIBS "${HDF5_LIBRARIES}")
@@ -19,14 +33,12 @@ find_package(BLAS REQUIRED)
 list(APPEND ICON_LIBS "${BLAS_LIBRARIES}")
 
 list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
-
 find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
 list(JOIN ICON_LIBS " " ICON_LIBS)
 
 list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-oascoupling --enable-ecrad --enable-parallel-netcdf)
-
 
 ExternalProject_Add(ICON
     PREFIX            ICON
@@ -37,7 +49,7 @@ ExternalProject_Add(ICON
                       FC=${CMAKE_Fortran_COMPILER}
                       CFLAGS=${ICON_CFLAGS}
                       FCFLAGS=${ICON_FCFLAGS}
-		      ICON_ECRAD_FCFLAGS=${ICON_ECRAD_FCFLAGS}
+                      ICON_ECRAD_FCFLAGS=${ICON_ECRAD_FCFLAGS}
                       LDFLAGS=${ICON_LDFLAGS}
                       LIBS=${ICON_LIBS}
                       MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
@@ -46,6 +58,7 @@ ExternalProject_Add(ICON
     BUILD_COMMAND     make -j8 install
     INSTALL_COMMAND   ""
     BUILD_ALWAYS      YES
+    DEPENDS           OASIS3_MCT
 )
 
 get_model_version(${ICON_SRC} ICON_VERSION)
