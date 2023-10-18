@@ -430,12 +430,55 @@ route "${cyellow}< c_compileDA${cnormal}"
 
 runCompilation(){
 # run model compilation
-  if [[ $withOAS == "true" ]] ; then ; compileOasis ; fi # must be called first bc of dependecies
+  # if [[ $withOAS == "true" ]] ; then ; compileOasis ; fi # must be called first bc of dependecies
 
-  if [[ $withCLM == "true" ]] ; then ; compileClm ; fi
-  if [[ $withCOS == "true" ]] ; then ; compileCosmo ; fi
-  if [[ $withICON == "true" ]] ; then ; compileIcon ; fi
-  if [[ $withPFL == "true" ]] ; then ; compileParflow ; fi
+  # if [[ $withCLM == "true" ]] ; then ; compileClm ; fi
+  # if [[ $withCOS == "true" ]] ; then ; compileCosmo ; fi
+  # if [[ $withICON == "true" ]] ; then ; compileIcon ; fi
+  # if [[ $withPFL == "true" ]] ; then ; compileParflow ; fi
+
+
+  # Prepare DA compilation by copying libraries
+
+  # oasis3-mct
+  if [[ $withOAS == "true" ]] ; then
+    oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/ ; fi
+    libpsmile="$oasdir/lib/libpsmile.MPI1.a $oasdir/lib/libmct.a $oasdir/lib/libmpeu.a $oasdir/lib/libscrip.a"
+
+    comment "    cp oas libs to $bindir/libs"
+    cp $libpsmile $bindir/libs >> $log_file 2>> $err_file
+    check
+  fi
+
+  # clm
+  if [[ $withCLM == "true" ]] ; then
+    clmdir=$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5
+
+    comment "    cd to clm build dir"
+      cd $clmdir/bld >> $log_file 2>> $err_file
+    check
+    comment "    ar clm libs"
+      ar rc libclm.a *.o >> $log_file 2>> $err_file
+    check
+    comment "    cp libs to $bindir/libs"
+      cp $clmdir/bld/libclm.a $bindir/libs >> $log_file 2>> $err_file
+    check
+  fi
+
+  # parflow
+  if [[ $withPFL == "true" ]] ; then
+    pfldir=$rootdir/run/JURECADC_eCLM-ParFlow
+
+    comment "    cp libs to $bindir/libs"
+      cp $pfldir/lib/* $bindir/libs >> $log_file 2>> $err_file
+    check
+    if [[ $processor == "GPU" ]]; then
+      comment "    GPU: cp rmm libs to $bindir/libs"
+        cp $pfldir/rmm/lib/* $bindir/libs >> $log_file 2>> $err_file
+      check
+    fi
+
+  fi
 
 #DA
   if [[ $withDA == "true" ]] ; then ; compileDA ; fi
