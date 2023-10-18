@@ -253,149 +253,149 @@ setCombination(){
 }
 
 
-compileClm(){
-route "${cyellow}> c_compileClm${cnormal}"
-  comment "  source clm interface script"
-    comment "intf_oas3/${mList[1]}/arch/build_interface_${mList[1]}.ksh"
-    . ${rootdir}/bldsva/intf_oas3/${mList[1]}/arch/build_interface_${mList[1]}.ksh >> $log_file 2>> $err_file
-  check
-    always_clm
-    if [[ ${options["clm"]} == "skip" ]] ; then ; route "${cyellow}< c_compileClm${cnormal}" ; return  ;fi 
-    if [[ ${options["clm"]} == "fresh" ]] ; then 
-  comment "  clear clm dir: $clmdir"
-      rm -rf $clmdir >> $log_file 2>> $err_file
-  check
-  comment "  backup clm dir to: $clmdir"
-    # remove '-icon' from the mList[1] name
-    clmicon="${mList[1]}"
-    clmicon=${clmicon%'-icon'}
-    cp -rf ${rootdir}/${clmicon} $clmdir >> $log_file 2>> $err_file
-  check
-    fi
-    if [[ ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
-      substitutions_clm
-    fi
-    if [[ ${options["clm"]} == "configure" || ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
-      configure_clm    
-    fi
+# compileClm(){
+# route "${cyellow}> c_compileClm${cnormal}"
+#   comment "  source clm interface script"
+#     comment "intf_oas3/${mList[1]}/arch/build_interface_${mList[1]}.ksh"
+#     . ${rootdir}/bldsva/intf_oas3/${mList[1]}/arch/build_interface_${mList[1]}.ksh >> $log_file 2>> $err_file
+#   check
+#     always_clm
+#     if [[ ${options["clm"]} == "skip" ]] ; then ; route "${cyellow}< c_compileClm${cnormal}" ; return  ;fi 
+#     if [[ ${options["clm"]} == "fresh" ]] ; then 
+#   comment "  clear clm dir: $clmdir"
+#       rm -rf $clmdir >> $log_file 2>> $err_file
+#   check
+#   comment "  backup clm dir to: $clmdir"
+#     # remove '-icon' from the mList[1] name
+#     clmicon="${mList[1]}"
+#     clmicon=${clmicon%'-icon'}
+#     cp -rf ${rootdir}/${clmicon} $clmdir >> $log_file 2>> $err_file
+#   check
+#     fi
+#     if [[ ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
+#       substitutions_clm
+#     fi
+#     if [[ ${options["clm"]} == "configure" || ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
+#       configure_clm    
+#     fi
 
-    if [[ ${options["clm"]} == "make" || ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
-      make_clm
-    fi
-route "${cyellow}< c_compileClm${cnormal}"
-}
+#     if [[ ${options["clm"]} == "make" || ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
+#       make_clm
+#     fi
+# route "${cyellow}< c_compileClm${cnormal}"
+# }
 
-compileIcon(){
-route "${cyellow}> c_compileIcon${cnormal}"
-  comment "  source icon interface script"
-    . ${rootdir}/bldsva/intf_oas3/${mList[2]}/arch/build_interface_${mList[2]}.ksh >> $log_file 2>> $err_file
-  check
-    always_icon
-    if [[ ${options["icon"]} == "skip" ]] ; then ; route "${cyellow}< c_compileIcon${cnormal}" ;  return  ;fi 
-    if [[ ${options["icon"]} == "fresh" ]] ; then 
-  comment "  clear icon dir: $icondir"
-      rm -rf $icondir >> $log_file 2>> $err_file
-  check
-  comment "  backup icon dir to: $icondir"
-      cp -rf ${rootdir}/${mList[2]} $icondir >> $log_file 2>> $err_file
-  check
-    fi
-    if [[ ${options["icon"]} == "build" || ${options["icon"]} == "fresh" ]] ; then
-      substitutions_icon
-    fi
-    if [[ ${options["icon"]} == "configure" || ${options["icon"]} == "build" || ${options["icon"]} == "fresh" ]] ; then
-      configure_icon
-    fi
+# compileIcon(){
+# route "${cyellow}> c_compileIcon${cnormal}"
+#   comment "  source icon interface script"
+#     . ${rootdir}/bldsva/intf_oas3/${mList[2]}/arch/build_interface_${mList[2]}.ksh >> $log_file 2>> $err_file
+#   check
+#     always_icon
+#     if [[ ${options["icon"]} == "skip" ]] ; then ; route "${cyellow}< c_compileIcon${cnormal}" ;  return  ;fi 
+#     if [[ ${options["icon"]} == "fresh" ]] ; then 
+#   comment "  clear icon dir: $icondir"
+#       rm -rf $icondir >> $log_file 2>> $err_file
+#   check
+#   comment "  backup icon dir to: $icondir"
+#       cp -rf ${rootdir}/${mList[2]} $icondir >> $log_file 2>> $err_file
+#   check
+#     fi
+#     if [[ ${options["icon"]} == "build" || ${options["icon"]} == "fresh" ]] ; then
+#       substitutions_icon
+#     fi
+#     if [[ ${options["icon"]} == "configure" || ${options["icon"]} == "build" || ${options["icon"]} == "fresh" ]] ; then
+#       configure_icon
+#     fi
 
-    if [[ ${options["icon"]} == "make" || ${options["icon"]} == "build" || ${options["icon"]} == "fresh" ]] ; then
-      make_icon
-    fi
-route "${cyellow}< c_compileIcon${cnormal}"
-}
+#     if [[ ${options["icon"]} == "make" || ${options["icon"]} == "build" || ${options["icon"]} == "fresh" ]] ; then
+#       make_icon
+#     fi
+# route "${cyellow}< c_compileIcon${cnormal}"
+# }
 
-compileCosmo(){
-route "${cyellow}> c_compileCosmo${cnormal}"
-  comment "  source cos interface script"
-    . ${rootdir}/bldsva/intf_oas3/${mList[2]}/arch/build_interface_${mList[2]}.ksh >> $log_file 2>> $err_file
-  check
-    always_cos
-    if [[ ${options["cos"]} == "skip" ]] ; then ; route "${cyellow}< c_compileCosmo${cnormal}" ;  return  ;fi 
-    if [[ ${options["cos"]} == "fresh" ]] ; then 
-  comment "  clear cos dir: $cosdir"
-      rm -rf $cosdir >> $log_file 2>> $err_file
-  check
-  comment "  backup cos dir to: $cosdir"
-      cp -rf ${rootdir}/${mList[2]} $cosdir >> $log_file 2>> $err_file
-  check
-    fi
-    if [[ ${options["cos"]} == "build" || ${options["cos"]} == "fresh" ]] ; then
-      substitutions_cos  
-    fi
-    if [[ ${options["cos"]} == "configure" || ${options["cos"]} == "build" || ${options["cos"]} == "fresh" ]] ; then
-      configure_cos    
-    fi
+# compileCosmo(){
+# route "${cyellow}> c_compileCosmo${cnormal}"
+#   comment "  source cos interface script"
+#     . ${rootdir}/bldsva/intf_oas3/${mList[2]}/arch/build_interface_${mList[2]}.ksh >> $log_file 2>> $err_file
+#   check
+#     always_cos
+#     if [[ ${options["cos"]} == "skip" ]] ; then ; route "${cyellow}< c_compileCosmo${cnormal}" ;  return  ;fi 
+#     if [[ ${options["cos"]} == "fresh" ]] ; then 
+#   comment "  clear cos dir: $cosdir"
+#       rm -rf $cosdir >> $log_file 2>> $err_file
+#   check
+#   comment "  backup cos dir to: $cosdir"
+#       cp -rf ${rootdir}/${mList[2]} $cosdir >> $log_file 2>> $err_file
+#   check
+#     fi
+#     if [[ ${options["cos"]} == "build" || ${options["cos"]} == "fresh" ]] ; then
+#       substitutions_cos  
+#     fi
+#     if [[ ${options["cos"]} == "configure" || ${options["cos"]} == "build" || ${options["cos"]} == "fresh" ]] ; then
+#       configure_cos    
+#     fi
 
-    if [[ ${options["cos"]} == "make" || ${options["cos"]} == "build" || ${options["cos"]} == "fresh" ]] ; then
-      make_cos
-    fi
-route "${cyellow}< c_compileCosmo${cnormal}"
-}
+#     if [[ ${options["cos"]} == "make" || ${options["cos"]} == "build" || ${options["cos"]} == "fresh" ]] ; then
+#       make_cos
+#     fi
+# route "${cyellow}< c_compileCosmo${cnormal}"
+# }
 
-compileOasis(){
-route "${cyellow}> c_compileOasis${cnormal}"
-  comment "  source oas interface script"
-    . ${rootdir}/bldsva/intf_oas3/${mList[0]}/arch/build_interface_${mList[0]}.ksh >> $log_file 2>> $err_file
-  check
-    always_oas
-    if [[ ${options["oas"]} == "skip" ]] ; then ; route "${cyellow}< c_compileOasis${cnormal}" ; return  ;fi 
-    if [[ ${options["oas"]} == "fresh" ]] ; then 
-  comment "  clear oas dir: $oasdir"
-      rm -rf $oasdir >> $log_file 2>> $err_file
-  check
-  comment "  backup oas dir to: $oasdir"
-      cp -rf ${rootdir}/${mList[0]} $oasdir >> $log_file 2>> $err_file
-  check
-    fi
-    if [[ ${options["oas"]} == "build" || ${options["oas"]} == "fresh" ]] ; then
-      substitutions_oas  
-    fi
-    if [[ ${options["oas"]} == "configure" || ${options["oas"]} == "build" || ${options["oas"]} == "fresh" ]] ; then
-      configure_oas    
-    fi
+# compileOasis(){
+# route "${cyellow}> c_compileOasis${cnormal}"
+#   comment "  source oas interface script"
+#     . ${rootdir}/bldsva/intf_oas3/${mList[0]}/arch/build_interface_${mList[0]}.ksh >> $log_file 2>> $err_file
+#   check
+#     always_oas
+#     if [[ ${options["oas"]} == "skip" ]] ; then ; route "${cyellow}< c_compileOasis${cnormal}" ; return  ;fi 
+#     if [[ ${options["oas"]} == "fresh" ]] ; then 
+#   comment "  clear oas dir: $oasdir"
+#       rm -rf $oasdir >> $log_file 2>> $err_file
+#   check
+#   comment "  backup oas dir to: $oasdir"
+#       cp -rf ${rootdir}/${mList[0]} $oasdir >> $log_file 2>> $err_file
+#   check
+#     fi
+#     if [[ ${options["oas"]} == "build" || ${options["oas"]} == "fresh" ]] ; then
+#       substitutions_oas  
+#     fi
+#     if [[ ${options["oas"]} == "configure" || ${options["oas"]} == "build" || ${options["oas"]} == "fresh" ]] ; then
+#       configure_oas    
+#     fi
 
-    if [[ ${options["oas"]} == "make" || ${options["oas"]} == "build" || ${options["oas"]} == "fresh" ]] ; then
-      make_oas
-    fi
-route "${cyellow}< c_compileOasis${cnormal}"
-}
+#     if [[ ${options["oas"]} == "make" || ${options["oas"]} == "build" || ${options["oas"]} == "fresh" ]] ; then
+#       make_oas
+#     fi
+# route "${cyellow}< c_compileOasis${cnormal}"
+# }
 
-compileParflow(){
-route "${cyellow}> c_compileParflow${cnormal}"
-  comment "  source pfl interface script"
-    . ${rootdir}/bldsva/intf_oas3/${mList[3]}/arch/build_interface_${mList[3]}.ksh >> $log_file 2>> $err_file
-  check
-    always_pfl
-    if [[ ${options["pfl"]} == "skip" ]] ; then ; route "${cyellow}< c_compileParflow${cnormal}" ;return  ;fi 
-    if [[ ${options["pfl"]} == "fresh" ]] ; then 
-     comment "  clear pfl dir: $pfldir"
-       if [ -d $pfldir ] ; then ; rm -rf $pfldir >> $log_file 2>> $err_file ;fi
-     check
-     comment "  copy ${rootdir}/${mList[3]} to $pfldir"
-       if [ -d ${rootdir}/${mList[3]} ] ;then ; cp -rf ${rootdir}/${mList[3]} $pfldir >> $log_file 2>> $err_file ;fi
-     check
-    fi
-    if [[ ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
-      substitutions_pfl
-    fi
-    if [[ ${options["pfl"]} == "configure" || ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
-      configure_pfl    
-    fi
+# compileParflow(){
+# route "${cyellow}> c_compileParflow${cnormal}"
+#   comment "  source pfl interface script"
+#     . ${rootdir}/bldsva/intf_oas3/${mList[3]}/arch/build_interface_${mList[3]}.ksh >> $log_file 2>> $err_file
+#   check
+#     always_pfl
+#     if [[ ${options["pfl"]} == "skip" ]] ; then ; route "${cyellow}< c_compileParflow${cnormal}" ;return  ;fi 
+#     if [[ ${options["pfl"]} == "fresh" ]] ; then 
+#      comment "  clear pfl dir: $pfldir"
+#        if [ -d $pfldir ] ; then ; rm -rf $pfldir >> $log_file 2>> $err_file ;fi
+#      check
+#      comment "  copy ${rootdir}/${mList[3]} to $pfldir"
+#        if [ -d ${rootdir}/${mList[3]} ] ;then ; cp -rf ${rootdir}/${mList[3]} $pfldir >> $log_file 2>> $err_file ;fi
+#      check
+#     fi
+#     if [[ ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
+#       substitutions_pfl
+#     fi
+#     if [[ ${options["pfl"]} == "configure" || ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
+#       configure_pfl    
+#     fi
 
-    if [[ ${options["pfl"]} == "make" || ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
-      make_pfl
-    fi
-route "${cyellow}< c_compileParflow${cnormal}"
-}
+#     if [[ ${options["pfl"]} == "make" || ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
+#       make_pfl
+#     fi
+# route "${cyellow}< c_compileParflow${cnormal}"
+# }
 
 
 #DA
@@ -442,116 +442,116 @@ runCompilation(){
 
 }
 
-interactive(){
-  clear
-  print "${cyellow}##############################################${cnormal}"
-  print "${cyellow}         Interactive installation...          ${cnormal}"
-  print "${cyellow}##############################################${cnormal}"
-  print "The following variables are needed:"
-  printState
-  print "${cyellow}##############################################${cnormal}"
-  PS3="Your selection(1-3)?"
-  select ret in "!!!start!!!" "edit" "exit"
-  do  
-    if [[ -n $ret ]]; then
-       case $ret in
-          "!!!start!!!") break ;;
-          "edit") 
-		while true
-		do
-		  print "Please select a ${cred}number${cnormal} you want to change!"
-		  print "Select '0' to go back."
-		  read numb
-		  if [[ $numb == 0 ]] ; then ; break ; fi
-		  if [[ $numb == 1 ]] ; then 
-			print "The following options are available:"
-			for a in "${!platforms[@]}" ; do
-    				printf "%-20s #%s\n" "$a" "${platforms[$a]}"
-			done
-			print "Please type in your desired value..."
-			read platform
-			comment "  source machine build interface for $platform"
-                          . ${rootdir}/bldsva/machines/config_${platform}.ksh >> $log_file 2>> $err_file
-                        check
-                        clearMachineSelection
-                        getMachineDefaults
-                        #reset features if not supported by new machine selection
-                        case "${availability[$platform]}" in
-                                *" $version "*) ;;
-                                *)
-                                set -A array ${availability[$platform]}
-                                version=${array[0]} ;;
-                        esac
-                        case "${combinations[$version]}" in
-                                *" $combination "*);;
-                                *)
-                                set -A array ${combinations[$version]}
-                                combination=${array[0]} ;;
-                        esac
+# interactive(){
+#   clear
+#   print "${cyellow}##############################################${cnormal}"
+#   print "${cyellow}         Interactive installation...          ${cnormal}"
+#   print "${cyellow}##############################################${cnormal}"
+#   print "The following variables are needed:"
+#   printState
+#   print "${cyellow}##############################################${cnormal}"
+#   PS3="Your selection(1-3)?"
+#   select ret in "!!!start!!!" "edit" "exit"
+#   do  
+#     if [[ -n $ret ]]; then
+#        case $ret in
+#           "!!!start!!!") break ;;
+#           "edit") 
+# 		while true
+# 		do
+# 		  print "Please select a ${cred}number${cnormal} you want to change!"
+# 		  print "Select '0' to go back."
+# 		  read numb
+# 		  if [[ $numb == 0 ]] ; then ; break ; fi
+# 		  if [[ $numb == 1 ]] ; then 
+# 			print "The following options are available:"
+# 			for a in "${!platforms[@]}" ; do
+#     				printf "%-20s #%s\n" "$a" "${platforms[$a]}"
+# 			done
+# 			print "Please type in your desired value..."
+# 			read platform
+# 			comment "  source machine build interface for $platform"
+#                           . ${rootdir}/bldsva/machines/config_${platform}.ksh >> $log_file 2>> $err_file
+#                         check
+#                         clearMachineSelection
+#                         getMachineDefaults
+#                         #reset features if not supported by new machine selection
+#                         case "${availability[$platform]}" in
+#                                 *" $version "*) ;;
+#                                 *)
+#                                 set -A array ${availability[$platform]}
+#                                 version=${array[0]} ;;
+#                         esac
+#                         case "${combinations[$version]}" in
+#                                 *" $combination "*);;
+#                                 *)
+#                                 set -A array ${combinations[$version]}
+#                                 combination=${array[0]} ;;
+#                         esac
 
-                        setCombination
-                        setSelection 
-		  fi
-		  if [[ $numb == 3 ]] ; then  
-                        print "The following combinations are available for $version:"
-                        for a in ${combinations[$version]} ; do
-                                printf "%-20s\n" "$a"
-                        done
-                        print "Please type in your desired value..."
-			read combination
-		        clearPathSelection
-			setCombination 
-		  fi
-		  if [[ $numb == 4 ]] ; then ; read val ;options+=(["oas"]="$val") ; fi
-		  if [[ $numb == 5 ]] ; then ; read val ;options+=(["clm"]="$val") ; fi
-		  if [[ $numb == 29 ]] ; then ; read val ;options+=(["icon"]="$val") ; fi
-		  if [[ $numb == 6 ]] ; then ; read val ;options+=(["cos"]="$val") ; fi
-		  if [[ $numb == 7 ]] ; then ; read val ;options+=(["pfl"]="$val") ; fi
-#DA
-                  if [[ $numb == 8 ]] ; then ; read val ;options+=(["da"]="$val") ; fi
-		  if [[ $numb == 9 ]] ; then ; read rootdir ;clearPathSelection; setCombination; fi
-		  if [[ $numb == 10 ]] ; then ; read bindir ; fi
-		  if [[ $numb == 11 ]] ; then ; read oasdir ; fi
-		  if [[ $numb == 12 ]] ; then ; read clmdir ; fi
-		  if [[ $numb == 13 ]] ; then ; read cosdir ; fi
-		  if [[ $numb == 30 ]] ; then ; read icondir ; fi
-		  if [[ $numb == 14 ]] ; then ; read pfldir ; fi
-#DA
-                  if [[ $numb == 15 ]] ; then ; read dadir ; fi
-		  if [[ $numb == 16 ]] ; then ; read mpiPath ; fi
-		  if [[ $numb == 17 ]] ; then ; read siloPath ; fi
-		  if [[ $numb == 18 ]] ; then ; read hyprePath ; fi
-	 	  if [[ $numb == 19 ]] ; then ; read tclPath ; fi
-		  if [[ $numb == 20 ]] ; then ; read gribPath ; fi
-		  if [[ $numb == 21 ]] ; then ; read ncdfPath ; fi
- 		  if [[ $numb == 22 ]] ; then ; read pncdfPath ; fi
-		  if [[ $numb == 23 ]] ; then ; read lapackPath ; fi
+#                         setCombination
+#                         setSelection 
+# 		  fi
+# 		  if [[ $numb == 3 ]] ; then  
+#                         print "The following combinations are available for $version:"
+#                         for a in ${combinations[$version]} ; do
+#                                 printf "%-20s\n" "$a"
+#                         done
+#                         print "Please type in your desired value..."
+# 			read combination
+# 		        clearPathSelection
+# 			setCombination 
+# 		  fi
+# 		  if [[ $numb == 4 ]] ; then ; read val ;options+=(["oas"]="$val") ; fi
+# 		  if [[ $numb == 5 ]] ; then ; read val ;options+=(["clm"]="$val") ; fi
+# 		  if [[ $numb == 29 ]] ; then ; read val ;options+=(["icon"]="$val") ; fi
+# 		  if [[ $numb == 6 ]] ; then ; read val ;options+=(["cos"]="$val") ; fi
+# 		  if [[ $numb == 7 ]] ; then ; read val ;options+=(["pfl"]="$val") ; fi
+# #DA
+#                   if [[ $numb == 8 ]] ; then ; read val ;options+=(["da"]="$val") ; fi
+# 		  if [[ $numb == 9 ]] ; then ; read rootdir ;clearPathSelection; setCombination; fi
+# 		  if [[ $numb == 10 ]] ; then ; read bindir ; fi
+# 		  if [[ $numb == 11 ]] ; then ; read oasdir ; fi
+# 		  if [[ $numb == 12 ]] ; then ; read clmdir ; fi
+# 		  if [[ $numb == 13 ]] ; then ; read cosdir ; fi
+# 		  if [[ $numb == 30 ]] ; then ; read icondir ; fi
+# 		  if [[ $numb == 14 ]] ; then ; read pfldir ; fi
+# #DA
+#                   if [[ $numb == 15 ]] ; then ; read dadir ; fi
+# 		  if [[ $numb == 16 ]] ; then ; read mpiPath ; fi
+# 		  if [[ $numb == 17 ]] ; then ; read siloPath ; fi
+# 		  if [[ $numb == 18 ]] ; then ; read hyprePath ; fi
+# 	 	  if [[ $numb == 19 ]] ; then ; read tclPath ; fi
+# 		  if [[ $numb == 20 ]] ; then ; read gribPath ; fi
+# 		  if [[ $numb == 21 ]] ; then ; read ncdfPath ; fi
+#  		  if [[ $numb == 22 ]] ; then ; read pncdfPath ; fi
+# 		  if [[ $numb == 23 ]] ; then ; read lapackPath ; fi
 
-		  if [[ $numb == 24 ]] ; then ; read optComp ; fi
-		  if [[ $numb == 25 ]] ; then  
-			print "The following profiling tools are available for $platform:"
-                        for a in ${profilingImpl} ; do
-                               printf "%-20s\n" "$a"
-                        done
-                        print "Please type in your desired value..."
-                        read profiling			
-		  fi
-		  if [[ $numb == 26 ]] ; then ; read cplscheme ; fi
+# 		  if [[ $numb == 24 ]] ; then ; read optComp ; fi
+# 		  if [[ $numb == 25 ]] ; then  
+# 			print "The following profiling tools are available for $platform:"
+#                         for a in ${profilingImpl} ; do
+#                                printf "%-20s\n" "$a"
+#                         done
+#                         print "Please type in your desired value..."
+#                         read profiling			
+# 		  fi
+# 		  if [[ $numb == 26 ]] ; then ; read cplscheme ; fi
 
-                  if [[ $numb == 27 ]] ; then ; read readCLM ; fi
-		  if [[ $numb == 28 ]] ; then ; read freeDrain ; fi
-                  if [[ $numb == 29 ]] ; then ; read compiler ; fi
-                  if [[ $numb == 30 ]] ; then ; read processor ; fi
-		done	
-		interactive
-	  ;;
-          "exit") terminate ;;
-       esac
-       break
-    fi  
-  done
+#                   if [[ $numb == 27 ]] ; then ; read readCLM ; fi
+# 		  if [[ $numb == 28 ]] ; then ; read freeDrain ; fi
+#                   if [[ $numb == 29 ]] ; then ; read compiler ; fi
+#                   if [[ $numb == 30 ]] ; then ; read processor ; fi
+# 		done	
+# 		interactive
+# 	  ;;
+#           "exit") terminate ;;
+#        esac
+#        break
+#     fi  
+#   done
 
-}
+# }
 printState(){
   print ""
   print "${cred}(1)${cnormal} platform (default=$def_platform): ${cgreen}$platform ${cnormal}"
@@ -761,81 +761,81 @@ getGitInfo(){
   check
   echo "" >> $log_file
 
-  if [[ $withOAS == "true" ]] ; then
-    echo "Git (${mList[0]}):" >> $log_file
-    comment "  Log Git information (${mList[0]})"
-    if [ -d "${rootdir}/${mList[0]}/.git" ]; then
-      echo "root dir: $(git -C ${rootdir}/${mList[0]} rev-parse --absolute-git-dir)" >> $log_file
-      echo "remote url: $(git -C ${rootdir}/${mList[0]} remote get-url origin || echo "Remote origin not set for ${mList[0]}")" >> $log_file
-      echo "commit: $(git -C ${rootdir}/${mList[0]} log --pretty=format:'%H' -n 1)" >> $log_file
-      echo "tag: $(git -C ${rootdir}/${mList[0]} describe  --tags --dirty --always)" >> $log_file
-    else
-      echo "${mList[0]} is NOT a git repo" >> $log_file
-      echo "root dir: ${rootdir}/${mList[0]}" >> $log_file
-    fi
-    check
-    echo "" >> $log_file
-  fi
-  if [[ $withCLM == "true" ]] ; then
-    echo "Git (${mList[1]}):" >> $log_file
-    comment "  Log Git information (${mList[1]})"
-    if [ -d "${rootdir}/${mList[1]}/.git" ]; then
-      echo "root dir: $(git -C ${rootdir}/${mList[1]} rev-parse --absolute-git-dir)" >> $log_file
-      echo "remote url: $(git -C ${rootdir}/${mList[1]} remote get-url origin || echo "Remote origin not set for ${mList[1]}")" >> $log_file
-      echo "commit: $(git -C ${rootdir}/${mList[1]} log --pretty=format:'%H' -n 1)" >> $log_file
-      echo "tag: $(git -C ${rootdir}/${mList[1]} describe  --tags --dirty --always)" >> $log_file
-    else
-      echo "${mList[1]} is NOT a git repo" >> $log_file
-      echo "root dir: ${rootdir}/${mList[1]}" >> $log_file
-    fi
-    check
-    echo "" >> $log_file
-  fi
-  if [[ $withCOS == "true" ]] ; then
-    echo "Git (${mList[2]}):" >> $log_file
-    comment "  Log Git information (${mList[2]})"
-    if [ -d "${rootdir}/${mList[2]}/.git" ]; then
-      echo "root dir: $(git -C ${rootdir}/${mList[2]} rev-parse --absolute-git-dir)" >> $log_file
-      echo "remote url: $(git -C ${rootdir}/${mList[2]} remote get-url origin || echo "Remote origin not set for ${mList[2]}")" >> $log_file
-      echo "commit: $(git -C ${rootdir}/${mList[2]} log --pretty=format:'%H' -n 1)" >> $log_file
-      echo "tag: $(git -C ${rootdir}/${mList[2]} describe  --tags --dirty --always)" >> $log_file
-    else
-      echo "${mList[2]} is NOT a git repo" >> $log_file
-      echo "root dir: ${rootdir}/${mList[2]}" >> $log_file
-    fi
-    check
-    echo "" >> $log_file
-  fi
-  if [[ $withICON == "true" ]] ; then
-    echo "Git (${mList[2]}):" >> $log_file
-    comment "  Log Git information (${mList[2]})"
-    if [ -d "${rootdir}/${mList[2]}/.git" ]; then
-      echo "root dir: $(git -C ${rootdir}/${mList[2]} rev-parse --absolute-git-dir)" >> $log_file
-      echo "remote url: $(git -C ${rootdir}/${mList[2]} remote get-url origin || echo "Remote origin not set for ${mList[2]}")" >> $log_file
-      echo "commit: $(git -C ${rootdir}/${mList[2]} log --pretty=format:'%H' -n 1)" >> $log_file
-      echo "tag: $(git -C ${rootdir}/${mList[2]} describe  --tags --dirty --always)" >> $log_file
-    else
-      echo "${mList[2]} is NOT a git repo" >> $log_file
-      echo "root dir: ${rootdir}/${mList[2]}" >> $log_file
-    fi
-    check
-    echo "" >> $log_file
-  fi
-  if [[ $withPFL == "true" ]] ; then
-    echo "Git (${mList[3]}):" >> $log_file
-    comment "  Log Git information (${mList[3]})"
-    if [ -d "${rootdir}/${mList[3]}/.git" ]; then
-      echo "root dir: $(git -C ${rootdir}/${mList[3]} rev-parse --absolute-git-dir)" >> $log_file
-      echo "remote url: $(git -C ${rootdir}/${mList[3]} remote get-url origin || echo "Remote origin not set for ${mList[3]}")" >> $log_file
-      echo "commit: $(git -C ${rootdir}/${mList[3]} log --pretty=format:'%H' -n 1)" >> $log_file
-      echo "tag: $(git -C ${rootdir}/${mList[3]} describe  --tags --dirty --always)" >> $log_file
-    else
-      echo "${mList[3]} is NOT a git repo" >> $log_file
-      echo "root dir: ${rootdir}/${mList[3]}" >> $log_file
-    fi
-    check
-    echo "" >> $log_file
-  fi
+  # if [[ $withOAS == "true" ]] ; then
+  #   echo "Git (${mList[0]}):" >> $log_file
+  #   comment "  Log Git information (${mList[0]})"
+  #   if [ -d "${rootdir}/${mList[0]}/.git" ]; then
+  #     echo "root dir: $(git -C ${rootdir}/${mList[0]} rev-parse --absolute-git-dir)" >> $log_file
+  #     echo "remote url: $(git -C ${rootdir}/${mList[0]} remote get-url origin || echo "Remote origin not set for ${mList[0]}")" >> $log_file
+  #     echo "commit: $(git -C ${rootdir}/${mList[0]} log --pretty=format:'%H' -n 1)" >> $log_file
+  #     echo "tag: $(git -C ${rootdir}/${mList[0]} describe  --tags --dirty --always)" >> $log_file
+  #   else
+  #     echo "${mList[0]} is NOT a git repo" >> $log_file
+  #     echo "root dir: ${rootdir}/${mList[0]}" >> $log_file
+  #   fi
+  #   check
+  #   echo "" >> $log_file
+  # fi
+  # if [[ $withCLM == "true" ]] ; then
+  #   echo "Git (${mList[1]}):" >> $log_file
+  #   comment "  Log Git information (${mList[1]})"
+  #   if [ -d "${rootdir}/${mList[1]}/.git" ]; then
+  #     echo "root dir: $(git -C ${rootdir}/${mList[1]} rev-parse --absolute-git-dir)" >> $log_file
+  #     echo "remote url: $(git -C ${rootdir}/${mList[1]} remote get-url origin || echo "Remote origin not set for ${mList[1]}")" >> $log_file
+  #     echo "commit: $(git -C ${rootdir}/${mList[1]} log --pretty=format:'%H' -n 1)" >> $log_file
+  #     echo "tag: $(git -C ${rootdir}/${mList[1]} describe  --tags --dirty --always)" >> $log_file
+  #   else
+  #     echo "${mList[1]} is NOT a git repo" >> $log_file
+  #     echo "root dir: ${rootdir}/${mList[1]}" >> $log_file
+  #   fi
+  #   check
+  #   echo "" >> $log_file
+  # fi
+  # if [[ $withCOS == "true" ]] ; then
+  #   echo "Git (${mList[2]}):" >> $log_file
+  #   comment "  Log Git information (${mList[2]})"
+  #   if [ -d "${rootdir}/${mList[2]}/.git" ]; then
+  #     echo "root dir: $(git -C ${rootdir}/${mList[2]} rev-parse --absolute-git-dir)" >> $log_file
+  #     echo "remote url: $(git -C ${rootdir}/${mList[2]} remote get-url origin || echo "Remote origin not set for ${mList[2]}")" >> $log_file
+  #     echo "commit: $(git -C ${rootdir}/${mList[2]} log --pretty=format:'%H' -n 1)" >> $log_file
+  #     echo "tag: $(git -C ${rootdir}/${mList[2]} describe  --tags --dirty --always)" >> $log_file
+  #   else
+  #     echo "${mList[2]} is NOT a git repo" >> $log_file
+  #     echo "root dir: ${rootdir}/${mList[2]}" >> $log_file
+  #   fi
+  #   check
+  #   echo "" >> $log_file
+  # fi
+  # if [[ $withICON == "true" ]] ; then
+  #   echo "Git (${mList[2]}):" >> $log_file
+  #   comment "  Log Git information (${mList[2]})"
+  #   if [ -d "${rootdir}/${mList[2]}/.git" ]; then
+  #     echo "root dir: $(git -C ${rootdir}/${mList[2]} rev-parse --absolute-git-dir)" >> $log_file
+  #     echo "remote url: $(git -C ${rootdir}/${mList[2]} remote get-url origin || echo "Remote origin not set for ${mList[2]}")" >> $log_file
+  #     echo "commit: $(git -C ${rootdir}/${mList[2]} log --pretty=format:'%H' -n 1)" >> $log_file
+  #     echo "tag: $(git -C ${rootdir}/${mList[2]} describe  --tags --dirty --always)" >> $log_file
+  #   else
+  #     echo "${mList[2]} is NOT a git repo" >> $log_file
+  #     echo "root dir: ${rootdir}/${mList[2]}" >> $log_file
+  #   fi
+  #   check
+  #   echo "" >> $log_file
+  # fi
+  # if [[ $withPFL == "true" ]] ; then
+  #   echo "Git (${mList[3]}):" >> $log_file
+  #   comment "  Log Git information (${mList[3]})"
+  #   if [ -d "${rootdir}/${mList[3]}/.git" ]; then
+  #     echo "root dir: $(git -C ${rootdir}/${mList[3]} rev-parse --absolute-git-dir)" >> $log_file
+  #     echo "remote url: $(git -C ${rootdir}/${mList[3]} remote get-url origin || echo "Remote origin not set for ${mList[3]}")" >> $log_file
+  #     echo "commit: $(git -C ${rootdir}/${mList[3]} log --pretty=format:'%H' -n 1)" >> $log_file
+  #     echo "tag: $(git -C ${rootdir}/${mList[3]} describe  --tags --dirty --always)" >> $log_file
+  #   else
+  #     echo "${mList[3]} is NOT a git repo" >> $log_file
+  #     echo "root dir: ${rootdir}/${mList[3]}" >> $log_file
+  #   fi
+  #   check
+  #   echo "" >> $log_file
+  # fi
   if [[ $withPDAF == "true" ]] ; then
     echo "Version (${mList[4]}):" >> $log_file
     comment "  Log version information (${mList[4]})"
@@ -1017,7 +1017,7 @@ printf "$platform\n$profiling\n$optComp\n$compiler\n$version\n$rootdir$bindir\n$
         mode=1
     fi  
   fi
-  if [[ $mode == 2 ]] then ; interactive ; fi
+  # if [[ $mode == 2 ]] then ; interactive ; fi
 
 
   softSanityCheck
