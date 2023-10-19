@@ -185,7 +185,7 @@ git clone -b tsmp-pdaf-patches https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
 # CLM3.5
-git clone -b tsmp-pdaf-patches https://github.com/jjokella/CLM3.5.git
+git clone https://github.com/HPSCTerrSys/CLM3.5.git
 CLM35_SRC=`realpath CLM3.5`
 
 <!-- # COSMO5.01 -->
