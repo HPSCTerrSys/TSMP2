@@ -32,6 +32,10 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 4. Download the OASIS3-MCT coupling library and the component models that you wish
    to use. Then save the full path to each model source code to `<model-name>_SRC`.
 
+   Remark: When building TSMP-PDAF, please use the
+   repositories/branches specified below under `PDAF: component
+   models`.
+
 ```bash
 # OASIS3-MCT (required)
 git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
@@ -155,3 +159,36 @@ run one or more commands below, wait until the build succeeds, then finally run
 - `cmake --build ${BUILD_DIR} --target OASIS3_MCT`
 - `cmake --build ${BUILD_DIR} --target CLM3_5`
 - `cmake --build ${BUILD_DIR} --target COSMO5_1`
+
+
+### PDAF: component models
+
+The cloning instructions may slightly change for TSMP-PDAF builds:
+
+```bash
+# OASIS3-MCT (required)
+git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/jkeller/oasis3-mct
+OASIS_SRC=`realpath oasis3-mct`
+
+## NOTE: Download only the component models that you need! ##
+
+<!-- # eCLM -->
+<!-- git clone https://github.com/HPSCTerrSys/eCLM.git -->
+<!-- eCLM_SRC=`realpath eCLM` -->
+
+<!-- # ICON -->
+<!-- git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git -->
+<!-- ICON_SRC=`realpath icon2.6.4_oascoup` -->
+
+# ParFlow
+git clone -b tsmp-pdaf-patches https://github.com/HPSCTerrSys/parflow
+PARFLOW_SRC=`realpath parflow`
+
+# CLM3.5
+git clone -b tsmp-pdaf-patches https://github.com/jjokella/CLM3.5.git
+CLM35_SRC=`realpath CLM3.5`
+
+<!-- # COSMO5.01 -->
+<!-- git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git -->
+<!-- COSMO_SRC=`realpath cosmo5.01_fresh` -->
+```
