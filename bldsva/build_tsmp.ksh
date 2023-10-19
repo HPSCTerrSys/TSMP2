@@ -442,7 +442,7 @@ runCompilation(){
 
   # oasis3-mct
   if [[ $withOAS == "true" ]] ; then
-    oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/ ; fi
+    oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/
     libpsmile="$oasdir/lib/libpsmile.MPI1.a $oasdir/lib/libmct.a $oasdir/lib/libmpeu.a $oasdir/lib/libscrip.a"
 
     comment "    cp oas libs to $bindir/libs"
