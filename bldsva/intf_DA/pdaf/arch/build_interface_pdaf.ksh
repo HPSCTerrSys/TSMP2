@@ -63,6 +63,7 @@ route "${cyellow}>> configure_da${cnormal}"
   # Oasis include dirs
   importFlagsOAS+="-I$oasdir/$platform/build/lib/psmile.MPI1 "
   importFlagsOAS+="-I$oasdir/$platform/build/lib/scrip "
+  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/include "
 
   # CLM include dirs
   importFlagsCLM+="-I$clmdir/build/ "
