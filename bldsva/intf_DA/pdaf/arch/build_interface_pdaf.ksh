@@ -66,6 +66,7 @@ route "${cyellow}>> configure_da${cnormal}"
 
   # CLM include dirs
   importFlagsCLM+="-I$clmdir/build/ "
+  importFlagsCLM+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld/ "
 
   # COSMO include dirs
   importFlagsCOS+="-I$cosdir/obj "
