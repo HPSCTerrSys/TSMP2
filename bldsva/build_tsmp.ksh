@@ -478,6 +478,9 @@ runCompilation(){
       check
     fi
 
+    # Change pfldir to bld
+    pfldir=$rootdir/parflow
+
   fi
 
 #DA
