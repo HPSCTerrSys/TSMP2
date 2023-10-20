@@ -74,6 +74,7 @@ route "${cyellow}>> configure_da${cnormal}"
   importFlagsPFL+="-I$pfldir/pfsimulator/parflow_lib "
   importFlagsPFL+="-I$pfldir/pfsimulator/amps/oas3 "
   importFlagsPFL+="-I$pfldir/pfsimulator/amps/common "
+  importFlagsPFL+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/ParFlow/src/ParFlow-build/include/ "
   if [[ ${mList[3]} == parflow ]] ; then
     importFlagsPFL+="-I$pfldir/build/include "
     if [[ $processor == "GPU" ]]; then
