@@ -91,7 +91,7 @@ warning(){
   rm -f $log_file $err_file $stdout_file $patchlog_file
 
   # Component model configuration
-  withOAS="false"
+  withOAS="true"
   withCOS="false"
   withICON="false"
   withPFL="true"
