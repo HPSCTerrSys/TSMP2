@@ -80,6 +80,13 @@ warning(){
     call="$estdir/bldsva$call"
   fi  
 
+  # Log files
+  log_file=$cpwd/log_all_${date}.txt
+  err_file=$cpwd/err_all_${date}.txt
+  stdout_file=$cpwd/stdout_all_${date}.txt
+  patchlog_file=$cpwd/patch_all_${date}.txt
+  rm -f $log_file $err_file $stdout_file $patchlog_file
+
   # Component model configuration
   withOAS="false"
   withCOS="false"
