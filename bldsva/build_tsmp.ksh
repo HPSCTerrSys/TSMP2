@@ -800,9 +800,9 @@ printf "$platform\n$profiling\n$optComp\n$compiler\n$version\n$rootdir$bindir\n$
 
 
   softSanityCheck
-  comment "  source common interface"
-    . ${rootdir}/bldsva/intf_oas3/common_build_interface.ksh >> $log_file 2>> $err_file
-  check
+  # comment "  source common interface"
+  #   . ${rootdir}/bldsva/intf_oas3/common_build_interface.ksh >> $log_file 2>> $err_file
+  # check
 
 
   finalizeSelection
