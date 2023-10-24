@@ -55,17 +55,13 @@ warning(){
 #		Main
 #######################################
 
+  # Colors
   cyellow=$(tput setaf 3)
   cnormal=$(tput sgr0)   #9
   cred=$(tput setaf 1)
   cgreen=$(tput setaf 2)
   cmagenta=$(tput setaf 5)
   ccyan=$(tput setaf 6)
-
-  typeset -A options
-  typeset -A def_options
-
-  date=`date +%d%m%y-%H%M%S`
 
   #automatically determine root dir
   cpwd=`pwd`
@@ -84,6 +80,7 @@ warning(){
     call="$estdir/bldsva$call"
   fi  
 
+  # Component model configuration
   withOAS="false"
   withCOS="false"
   withICON="false"
