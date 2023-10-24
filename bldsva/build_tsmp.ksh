@@ -299,48 +299,6 @@ runCompilation(){
 }
 
 
-printState(){
-  print ""
-  print "${cred}(1)${cnormal} platform (default=$def_platform): ${cgreen}$platform ${cnormal}"
-  print "${cred}(2)${cnormal} version (default=$def_version): ${cgreen}$version ${cnormal}"
-  print "${cred}(3)${cnormal} combination (default=$def_combination): ${cgreen}$combination ${cnormal}"
-  print ""
-  print "${cred}(4)${cnormal} oasis build option (default=${def_options["oas"]}): ${cgreen}${options["oas"]} ${cnormal}" 
-  print "${cred}(5)${cnormal} clm build option (default=${def_options["clm"]}): ${cgreen}${options["clm"]} ${cnormal}"
-  print "${cred}(6)${cnormal} cosmo build option (default=${def_options["cos"]}): ${cgreen}${options["cos"]} ${cnormal}"
-  print "${cred}(29)${cnormal} icon build option (default=${def_options["icon"]}): ${cgreen}${options["icon"]} ${cnormal}"
-  print "${cred}(7)${cnormal} parflow build option (default=${def_options["pfl"]}): ${cgreen}${options["pfl"]} ${cnormal}"
-#DA
-  print "${cred}(8)${cnormal} data assimilation build option (default=${def_options["da"]}): ${cgreen}${options["da"]} ${cnormal}"
-  print ""
-  print "${cred}(9)${cnormal} root dir (default=$def_rootdir): ${cgreen}$rootdir${cnormal}"
-  print "${cred}(10)${cnormal} bin dir (default=$def_rootdir/bin/${platform}_${version}_${combination}): ${cgreen}$bindir ${cnormal}"
-  print "${cred}(11)${cnormal} oasis dir (default=$def_rootdir/${mList[0]}_${platform}_${version}_$combination): ${cgreen}$oasdir ${cnormal}"
-  print "${cred}(12)${cnormal} clm dir (default=$def_rootdir/${mList[1]}_${platform}_${version}_$combination): ${cgreen}$clmdir ${cnormal}"
-  print "${cred}(13)${cnormal} cosmo dir (default=$def_rootdir/${mList[2]}_${platform}_${version}_$combination): ${cgreen}$cosdir ${cnormal}"
-  print "${cred}(30)${cnormal} icon dir (default=$def_rootdir/${mList[2]}_${platform}_${version}_$combination): ${cgreen}$icondir ${cnormal}"
-  print "${cred}(14)${cnormal} parflow dir (default=$def_rootdir/${mList[3]}_${platform}_${version}_$combination): ${cgreen}$pfldir ${cnormal}"
-#DA
-  print "${cred}(15)${cnormal} data assimilation dir (default=$def_rootdir/${mList[4]}_${platform}_${version}_$combination): ${cgreen}$dadir ${cnormal}"
-  print ""
-  print "${cred}(16)${cnormal} mpi path (default=$defaultMpiPath): ${cgreen}$mpiPath ${cnormal}"
-  print "${cred}(17)${cnormal} silo path (default=$defaultSiloPath): ${cgreen}$siloPath ${cnormal}"
-  print "${cred}(18)${cnormal} hypre path (default=$defaultHyprePath): ${cgreen}$hyprePath ${cnormal}"
-  print "${cred}(19)${cnormal} tcl path (default=$defaultTclPath): ${cgreen}$tclPath ${cnormal}"
-  print "${cred}(20)${cnormal} grib path (default=$defaultGribPath): ${cgreen}$gribPath ${cnormal}"
-  print "${cred}(21)${cnormal} ncdf path (default=$defaultNcdfPath): ${cgreen}$ncdfPath ${cnormal}"
-  print "${cred}(22)${cnormal} pncdf path (default=$defaultPncdfPath): ${cgreen}$pncdfPath ${cnormal}"
-  print "${cred}(23)${cnormal} lapack path (default=$defaultLapackPath): ${cgreen}$lapackPath ${cnormal}"
-  print "${cred}(24)${cnormal} optComp (default=$defaultOptComp): ${cgreen}$optComp ${cnormal}"
-  print "${cred}(25)${cnormal} profiling (default=$def_profiling): ${cgreen}$profiling ${cnormal}"
-  print "${cred}(26)${cnormal} Couple-Scheme (default=$def_cplscheme): ${cgreen}$cplscheme ${cnormal}"
-  print "${cred}(27)${cnormal} readCLM: Consistently read CLM-mask (default=$def_readCLM): ${cgreen}$readCLM ${cnormal}"
-  print "${cred}(28)${cnormal} maxpft: Set maxpft per grid cell for CLM (default=$def_maxpft): ${cgreen}$maxpft ${cnormal}"
-  print "${cred}(29)${cnormal} Compiles ParFlow with free drainage feature (default=$def_freeDrain): ${cgreen}$freeDrain ${cnormal}"
-  print "${cred}(30)${cnormal} compiler (default=$defaultcompiler): ${cgreen}$compiler ${cnormal}"
-  print "${cred}(31)${cnormal} processor (default=$defaultprocessor): ${cgreen}$processor ${cnormal}"
-}
-
 check(){
   if [[ $? == 0  ]] then
      print "    ... ${cgreen}OK!${cnormal}" | tee -a $stdout_file
@@ -660,7 +618,6 @@ printf "$platform\n$profiling\n$optComp\n$compiler\n$version\n$rootdir$bindir\n$
   
   echo "" >> $log_file 
   echo "Selection:" >> $log_file
-  printState >> $log_file
 
   #remove special charecters for coloring from logfiles
   sed -i "s,.\[32m,,g" $log_file
