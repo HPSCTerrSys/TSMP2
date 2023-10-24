@@ -37,12 +37,6 @@ route "${cyellow}>> getMachineDefaults${cnormal}"
 route "${cyellow}<< getMachineDefaults${cnormal}"
 }
 
-finalizeMachine(){
-route "${cyellow}>> finalizeMachine${cnormal}"
-route "${cyellow}<< finalizeMachine${cnormal}"
-}
-
-
 createRunscript(){
 route "${cyellow}>> createRunscript${cnormal}"
 

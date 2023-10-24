@@ -168,13 +168,6 @@ setSelection(){
   if [[ $processor == "" ]] then ; processor=$defaultprocessor ; fi
 }
 
-finalizeSelection(){
-comment "  create bindir: $bindir"
-  mkdir -p $bindir/libs >> $log_file 2>> $err_file
-check
-
-}
-
 setCombination(){
    if echo "$combination" | grep -q 'pdaf'; then
 
@@ -282,6 +275,10 @@ route "${cyellow}< c_compileDA${cnormal}"
 
 
 runCompilation(){
+
+  # libs directory
+  mkdir -p $bindir/libs >> $log_file 2>> $err_file
+
   # oasis3-mct
   if [[ $withOAS == "true" ]] ; then
     oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/
@@ -693,9 +690,6 @@ printf "$platform\n$profiling\n$optComp\n$compiler\n$version\n$rootdir$bindir\n$
   #   . ${rootdir}/bldsva/intf_oas3/common_build_interface.ksh >> $log_file 2>> $err_file
   # check
 
-
-  finalizeSelection
-  finalizeMachine
 
   runCompilation
 

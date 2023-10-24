@@ -45,11 +45,6 @@ route "${cyellow}>> getMachineDefaults${cnormal}"
 route "${cyellow}<< getMachineDefaults${cnormal}"
 }
 
-finalizeMachine(){
-route "${cyellow}>> finalizeMachine${cnormal}"
-route "${cyellow}<< finalizeMachine${cnormal}"
-}
-
 # computes nodes based on number of processors and resources
 computeNodes(){
 processes=$1
