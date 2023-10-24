@@ -11,11 +11,6 @@ getDefaults(){
   def_rootdir="$estdir" #This should be correct - change with caution
 
   def_bindir=""				#Will be set to $rootdir/bin/$platform_$version_$combination if empty
-  def_oasdir=""				#Will be set to $rootdir/XXX_$platform_$combination if empty
-  def_cosdir=""
-  def_icondir=""
-  def_clmdir=""
-  def_pfldir=""
 #DA
   def_dadir=""
   # pathes will be set to tested platform defaults if empty
@@ -74,11 +69,6 @@ setDefaults(){
   compiler=$def_compiler
   processor=$def_processor
   profiling=$def_profiling
-  oasdir=$def_oasdir
-  clmdir=$def_clmdir
-  cosdir=$def_cosdir
-  icondir=$def_icondir
-  pfldir=$def_pfldir
 #DA
   dadir=$def_dadir
   mpiPath=$def_mpiPath
@@ -183,11 +173,6 @@ setCombination(){
 
   version=$mListgen
   set -A mList ${modelVersion[$mListgen]}
-  if [[ $oasdir == "" ]] then ;  oasdir=$rootdir/${mList[0]}_${platform}_${combination} ; fi
-  if [[ $cosdir == "" ]] then ;  cosdir=$rootdir/${mList[2]}_${platform}_${combination} ; fi
-  if [[ $icondir == "" ]] then ; icondir=$rootdir/${mList[2]}_${platform}_${combination} ; fi
-  if [[ $clmdir == "" ]] then ;  clmdir=$rootdir/${mList[1]}_${platform}_${combination} ; fi
-  if [[ $pfldir == "" ]] then ;  pfldir=$rootdir/${mList[3]}_${platform}_${combination} ; fi
 #DA
   if [[ $dadir == "" ]] then ;  dadir=$rootdir/${mList[4]}_${platform}_${combination} ; fi  
   if [[ $bindir == "" ]] then ;  bindir=$rootdir/bin/${platform}_${combination} ;  fi 
@@ -508,12 +493,6 @@ getRoot(){
   USAGE+="[U:optda?Build option for Data Assimilation.]:[optda:='${def_options["da"]}']"  
   USAGE+="[u:dadir?Source directory for Data Assimilation. daV_MACHINE_VERSION_COMBINATION will be taken if ''.]:[dadir:='${def_dadir}']"   
 
-  USAGE+="[e:icondir?Source directory for ICON. iconV_MACHINE_VERSION_COMBINATION will be taken if ''.]:[icondir:='${def_icondir}']"
-  USAGE+="[w:oasdir?Source directory for Oasis3. oasisV_MACHINE_VERSION_COMBINATION will be taken if ''.]:[oasdir:='${def_oasdir}']"
-  USAGE+="[y:cosdir?Source directory for Cosmo. cosmoV_MACHINE_VERSION_COMBINATION will be taken if ''.]:[cosdir:='${def_cosdir}']"
-  USAGE+="[x:clmdir?Source directory for CLM. clmV_MACHINE_VERSION_COMBINATION will be taken if ''.]:[clmdir:='${def_clmdir}']"
-  USAGE+="[z:pfldir?Source directory for Parflow. parflowV_MACHINE_VERSION_COMBINATION will be taken if ''.]:[pfldir:='${def_pfldir}']"
-
   USAGE+="[H:hyprepath?Include Path for Hypre. The machine default will be taken if ''.]:[hyprepath:='$hyprePath']"
   USAGE+="[S:silopath?Include Path for Silo. The machine default will be taken if ''.]:[silopath:='$siloPath']"
   USAGE+="[T:tclpath?Include Path for TCL. The machine default will be taken if ''.]:[tclpath:='$tclPath']"
@@ -553,10 +532,6 @@ getRoot(){
     Z)  options+=(["pfl"]="$OPTARG") ; args=1 ;;
 #DA
     u)  dadir="$OPTARG" ; args=1 ;;
-    w)  oasdir="$OPTARG" ; args=1 ;;
-    y)  cosdir="$OPTARG"; args=1 ;;
-    x)  clmdir="$OPTARG"; args=1 ;;
-    z)  pfldir="$OPTARG"; args=1 ;;
 
     M)  mpiPath="$OPTARG" ; args=1 ;;
     N)  ncdfPath="$OPTARG" ; args=1 ;;
