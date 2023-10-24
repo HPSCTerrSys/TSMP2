@@ -78,7 +78,8 @@ warning(){
     call=`echo $call | sed "s@$curr@@"`               #remove current directory from call if absolute path was called
     estdir=`echo "/$curr$call" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
     call="$estdir/bldsva$call"
-  fi  
+  fi
+  rootdir=$estdir
 
   # Log files
   log_file=$cpwd/log_all_${date}.txt
