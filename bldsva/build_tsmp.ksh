@@ -43,8 +43,8 @@ route "${cyellow}< c_compileDA${cnormal}"
 
 runCompilation(){
 
-  bindir=$rootdir/bin/${platform}_${combination}
-  dadir=$rootdir/${mList[4]}_${platform}_${combination}
+  bindir=$rootdir/bin/
+  dadir=$rootdir/pdaf_changed/
 
   # libs directory
   mkdir -p $bindir/libs >> $log_file 2>> $err_file
@@ -196,9 +196,37 @@ getRoot(){
   withDA="true"
   withPDAF="true"
 
-  comment "  source machine build interface for $platform"
-    . ${rootdir}/bldsva/machines/config_${platform}.ksh >> $log_file 2>> $err_file
+  comment "   init lmod functionality"
+  # "jurecadc", "juwels"
+  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
   check
+
+  comment "   source and load Modules"
+  . $rootdir/env/jsc.2023_Intel.sh >> $log_file 2>> $err_file
+  check
+
+
+  defaultMpiPath="$EBROOTPSMPI"
+  defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
+  # "jureca", "juwels"
+  defaultGrib1Path="/p/project/cslts/local/jureca/DWD-libgrib1_20110128_Intel/lib/"
+  defaultGribPath="$EBROOTECCODES"
+  defaultGribapiPath="$EBROOTECCODES"
+  defaultJasperPath="$EBROOTJASPER"
+  defaultTclPath="$EBROOTTCL"
+  defaultHyprePath="$EBROOTHYPRE"
+  defaultSiloPath="$EBROOTSILO"
+  defaultLapackPath="$EBROOTIMKL"
+  defaultPncdfPath="$EBROOTPARALLELMINNETCDF"
+
+  # Default Compiler/Linker optimization
+  if [[ $compiler == "Gnu" ]] ; then
+      defaultOptC="-O2" # Gnu
+  elif [[ $compiler == "Intel" ]] ; then
+      defaultOptC="-O2 -xHost" # Intel
+  else
+      defaultOptC="-O2" # Default
+  fi
 
   getMachineDefaults
   setSelection
