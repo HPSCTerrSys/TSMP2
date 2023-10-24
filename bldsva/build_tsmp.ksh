@@ -105,7 +105,7 @@ warning(){
   check
 
   comment "   source and load Modules"
-  . $rootdir/env/jsc.2023_Intel.sh >> $log_file 2>> $err_file
+  . $rootdir/env/jsc.2023_Intel.ksh >> $log_file 2>> $err_file
   check
 
 
