@@ -242,18 +242,18 @@ route "${cyellow}>> configure_da${cnormal}"
   #     exit 1
   #   fi
 
-  #    importFlags+=$importFlagsCLM
-  #    importFlags+=$importFlagsOAS
-  #    importFlags+=$importFlagsCOS
-  #    importFlags+=$importFlagsDA
-  #    cppdefs+=" ${pf}-Duse_comm_da ${pf}-DCOUP_OAS_COS ${pf}-DGRIBDWD ${pf}-DNETCDF ${pf}-DHYMACS ${pf}-DMAXPATCH_PFT=1 "
-  #    if [[ $cplscheme == "true" ]] ; then ; cppdefs+=" ${pf}-DCPL_SCHEME_F " ; fi
-  #    if [[ $readCLM == "true" ]] ; then ; cppdefs+=" ${pf}-DREADCLM " ; fi
-  #    libs+=$libsCLM
-  #    libs+=$libsCOS
-  #    libs+=$libsOAS
-  #    obj+=' $(OBJCLM) $(OBJCOSMO) '
-  # fi
+     importFlags+=$importFlagsCLM
+     importFlags+=$importFlagsOAS
+     importFlags+=$importFlagsCOS
+     importFlags+=$importFlagsDA
+     cppdefs+=" ${pf}-Duse_comm_da ${pf}-DCOUP_OAS_COS ${pf}-DGRIBDWD ${pf}-DNETCDF ${pf}-DHYMACS ${pf}-DMAXPATCH_PFT=1 "
+     if [[ $cplscheme == "true" ]] ; then ; cppdefs+=" ${pf}-DCPL_SCHEME_F " ; fi
+     if [[ $readCLM == "true" ]] ; then ; cppdefs+=" ${pf}-DREADCLM " ; fi
+     libs+=$libsCLM
+     libs+=$libsCOS
+     libs+=$libsOAS
+     obj+=' $(OBJCLM) $(OBJCOSMO) '
+  fi
 
   if [[ $withCLM == "true" && $withCOS == "false" && $withPFL == "true" ]] ; then
     
