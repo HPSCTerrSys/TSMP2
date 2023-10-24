@@ -63,6 +63,8 @@ warning(){
   cmagenta=$(tput setaf 5)
   ccyan=$(tput setaf 6)
 
+  date=`date +%d%m%y-%H%M%S`
+
   #automatically determine root dir
   cpwd=`pwd`
   if [[ "$0" == '/'*  ]] ; then
@@ -105,7 +107,7 @@ warning(){
   . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
   check
 
-  comment "   source and load Modules"
+  comment "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.ksh >> $log_file 2>> $err_file
   check
 
