@@ -29,7 +29,6 @@ getDefaults(){
   def_pncdfPath=""
   def_lapackPath=""
 
-  def_mode="0" #0: let flags decide, 1:batch, 2:interactive
   def_cplscheme="true"
   def_readCLM="false"
   def_maxpft="1" # (CLM default is 4)
@@ -97,7 +96,6 @@ setDefaults(){
   readCLM=$def_readCLM
   maxpft=${def_maxpft}
   cplscheme=$def_cplscheme
-  mode=$def_mode
 
   log_file=$cpwd/log_all_${date}.txt
   err_file=$cpwd/err_all_${date}.txt
@@ -118,33 +116,6 @@ setDefaults(){
   profRun=""
   profVar=""
 
-}
-
-
-clearMachineSelection(){
-  mpiPath=""
-  ncdfPath=""
-  grib1Path=""
-  gribPath=""
-  tclPath=""
-  hyprePath=""
-  siloPath=""
-  optComp=""
-  compiler=""
-  processor=""
-  clearPathSelection
-}
-
-
-clearPathSelection(){
-  bindir=""
-  pfldir=""
-  oasdir=""
-  cosdir=""
-  icondir=""
-  clmdir=""
-#DA
-  dadir=""
 }
 
 
@@ -546,8 +517,6 @@ getRoot(){
   USAGE+="[-author?Fabian Gasper]"
   USAGE+="[+NAME?TerrSysMP build script]"
   USAGE+="[+DESCRIPTION?builds TSMP based on decisions for included modules]"
-  USAGE+="[b:bash?Bash mode - set command line arguments will overwrite default values (no interactive mode) (This is the default with arguments).]"
-  USAGE+="[i:interactive?Interactive mode - command line arguments and defaults will be overwritten during the interactive session (This is the default without arguments).]"
   USAGE+="[a:avail?Prints a listing of every machine with available versions. The script will exit afterwards.]"
   USAGE+="[t:tutorial?Prints a tutorial/description on how to add new versions and platforms to this script. The script will exit afterwards.]"
   USAGE+="[R:rootdir?Absolute path to TerrSysMP root directory.]:[path:='$def_rootdir']"
@@ -603,8 +572,6 @@ getRoot(){
   # parsing the command line arguments
   while getopts "$USAGE" optchar ; do
     case $optchar in
-    i)  mode=2 ;;  
-    b)  mode=1 ;;
     m)  platform="$OPTARG" ; args=1 ;;
     p)  profiling="${OPTARG}" ; args=1 ;;
     o)  optComp="${OPTARG}" ; args=1 ;; 
@@ -673,17 +640,6 @@ check
   setSelection
 
 printf "$platform\n$profiling\n$optComp\n$compiler\n$version\n$rootdir$bindir\n$combination\n$readCLM" > build_info_${date}.txt
-
-  # determine whether or not to run interactive session
-  if [[ $mode == 0 ]] then
-    if [[ $args == 0 ]] then
-        mode=2
-    else
-        mode=1
-    fi  
-  fi
-  # if [[ $mode == 2 ]] then ; interactive ; fi
-
 
   softSanityCheck
   # comment "  source common interface"
