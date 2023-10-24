@@ -7,7 +7,7 @@ route "${cyellow}>> getMachineDefaults${cnormal}"
   . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
   check
   comment "   source and load Modules on JURECA"
-  . $rootdir/bldsva/machines/loadenvs.$compiler >> $log_file 2>> $err_file
+  . $rootdir/env/jsc.2023_Intel.sh >> $log_file 2>> $err_file
   check
 
 
@@ -66,7 +66,7 @@ echo $((processes%resources?processes/resources+1:processes/resources))
 createRunscript(){
 route "${cyellow}>> createRunscript${cnormal}"
 comment "   copy JURECA module load script into rundirectory"
-  cp $rootdir/bldsva/machines/loadenvs.$compiler $rundir/loadenvs
+  cp $rootdir/env/jsc.2023_Intel.sh $rundir/jsc.2023_Intel.sh
 check
 
 mpitasks=$((numInst * ($nproc_icon + $nproc_cos + $nproc_clm + $nproc_pfl + $nproc_oas)))
@@ -106,7 +106,7 @@ cat << EOF >> $rundir/tsmp_slm_run.bsh
 #SBATCH -N $nnode_pfl--ntasks-per-node=$Ngp--gres=gpu:$Ngp -p dc-gpu-devel
 
 cd $rundir
-source $rundir/loadenvs
+source $rundir/jsc.2023_Intel.sh
 export LD_LIBRARY_PATH="$rootdir/${mList[3]}_${platform}_${combination}/rmm/lib:\$LD_LIBRARY_PATH"
 date
 echo "started" > started.txt
@@ -139,7 +139,7 @@ cat << EOF >> $rundir/tsmp_slm_run.bsh
 export PSP_RENDEZVOUS_OPENIB=-1
 
 cd $rundir
-source $rundir/loadenvs
+source $rundir/jsc.2023_Intel.sh
 date
 echo "started" > started.txt
 rm -rf YU*
