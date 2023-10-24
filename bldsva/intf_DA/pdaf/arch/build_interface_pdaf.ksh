@@ -1,11 +1,6 @@
 #! /bin/ksh
 #
 
-always_da(){
-route "${cyellow}>> always_da${cnormal}"
-route "${cyellow}<< always_da${cnormal}"
-}
-
 substitutions_da(){
 route "${cyellow}>> substitutions_da${cnormal}"
   c_substitutions_pdaf
