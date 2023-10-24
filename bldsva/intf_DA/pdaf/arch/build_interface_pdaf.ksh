@@ -104,8 +104,8 @@ route "${cyellow}>> configure_da${cnormal}"
   pf=""
 
   # Oasis include dirs
-  importFlagsOAS+="-I$oasdir/$platform/build/lib/psmile.MPI1 "
-  importFlagsOAS+="-I$oasdir/$platform/build/lib/scrip "
+  importFlagsOAS+="-I$oasdir/JURECA/build/lib/psmile.MPI1 "
+  importFlagsOAS+="-I$oasdir/JURECA/build/lib/scrip "
   importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/include "
 
   # CLM include dirs
@@ -120,19 +120,15 @@ route "${cyellow}>> configure_da${cnormal}"
   importFlagsPFL+="-I$pfldir/pfsimulator/amps/oas3 "
   importFlagsPFL+="-I$pfldir/pfsimulator/amps/common "
   importFlagsPFL+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/ParFlow/src/ParFlow-build/include/ "
-  if [[ ${mList[3]} == parflow ]] ; then
-    importFlagsPFL+="-I$pfldir/build/include "
-    if [[ $processor == "GPU" ]]; then
-      importFlagsPFL+="-I$pfldir/rmm/include/rmm "
-    fi
-  else
-    importFlagsPFL+="-I$pfldir/pfsimulator/include "
+  importFlagsPFL+="-I$pfldir/build/include "
+  if [[ $processor == "GPU" ]]; then
+    importFlagsPFL+="-I$pfldir/rmm/include/rmm "
   fi
 
   # DA include dirs
   importFlagsDA+="-I$dadir/interface/model/common "
   if [[ $withPFL == "true" ]] ; then
-    importFlagsDA+="-I$dadir/interface/model/${mList[3]} "
+    importFlagsDA+="-I$dadir/interface/model/parflow "
   fi
 
   # Oasis libraries
@@ -146,13 +142,9 @@ route "${cyellow}>> configure_da${cnormal}"
 
   # COSMO libraries
   libsCOS+="-lcosmo "
-  if [[ ${mList[2]} == "cosmo5_1" ]] ; then
-    libsCOS+="-L$gribPath/lib/ "
-    libsCOS+="-leccodes_f90 "
-    libsCOS+="-leccodes "
-  else
-    libsCOS+="$grib1Path/libgrib1.a "
-  fi
+  libsCOS+="-L$gribPath/lib/ "
+  libsCOS+="-leccodes_f90 "
+  libsCOS+="-leccodes "
 
   # ParFlow library paths and libraries
   libsPFL+="-lpfsimulator "
@@ -178,103 +170,101 @@ route "${cyellow}>> configure_da${cnormal}"
   fi
 
   if [[ $withOAS == "false" && $withCLM == "true" ]] ; then
-    if [[ ${mList[1]} == clm3_5 ]] ; then
-     importFlags+=$importFlagsCLM
-     importFlags+=$importFlagsDA
-     cppdefs+=" ${pf}-DCLMSA "
-     libs+=$libsCLM
-     obj+=' $(OBJCLM) print_update_clm.o'
-    fi
+    importFlags+=$importFlagsCLM
+    importFlags+=$importFlagsDA
+    cppdefs+=" ${pf}-DCLMSA "
+    libs+=$libsCLM
+    obj+=' $(OBJCLM) print_update_clm.o'
     
-    if [[ ${mList[1]} == clm5_0 ]] ; then
-     importFlags+=$importFlagsDA
-     importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/include "
-     importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/include "
-     importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/include "
-     importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/clm/obj "
-     importFlags+=" -I$clmdir/build/atm/obj "
-     importFlags+=" -I$clmdir/build/ice/obj "
-     importFlags+=" -I$clmdir/build/ocn/obj "
-     importFlags+=" -I$clmdir/build/glc/obj "
-     importFlags+=" -I$clmdir/build/rof/obj "
-     importFlags+=" -I$clmdir/build/wav/obj "
-     importFlags+=" -I$clmdir/build/esp/obj "
-     importFlags+=" -I$clmdir/build/cpl/obj "
-     importFlags+=" -I$clmdir/build/lib/include "
-     importFlags+=" -I$clmdir/build/ "
-     cppdefs+=" ${pf}-DCLMSA ${pf}-DCLMFIVE "
-     libs+=" -L$clmdir/build/lib/ -lcpl "
-     libs+=" -L$clmdir/build/lib/ -latm -lice "
-     libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/lib/ -lclm "
-     libs+=" -L$clmdir/build/lib/ -locn -lrof -lglc -lwav -lesp "
-     libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/lib -lcsm_share "
-     libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/lib -lpio -lgptl -lmct -lmpeu  "
-     libs+=" -lpnetcdf  -mkl -lnetcdff -lnetcdf "
-     obj+=' $(OBJCLM5)'
-    fi
-    if [[ ${mList[1]} == eclm ]] ; then
-     comment "Needs to be updated with eCLM coupling configuration, but have to have something here otherwise compilation complains about the if / fi construct "
-     #importFlags+=$importFlagsDA
-     # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/include "
-     # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/include "
-     # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/include "
-     # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/clm/obj "
-     # importFlags+=" -I$clmdir/build/atm/obj "
-     # importFlags+=" -I$clmdir/build/ice/obj "
-     # importFlags+=" -I$clmdir/build/ocn/obj "
-     # importFlags+=" -I$clmdir/build/glc/obj "
-     # importFlags+=" -I$clmdir/build/rof/obj "
-     # importFlags+=" -I$clmdir/build/wav/obj "
-     # importFlags+=" -I$clmdir/build/esp/obj "
-     # importFlags+=" -I$clmdir/build/cpl/obj "
-     # importFlags+=" -I$clmdir/build/lib/include "
-     # importFlags+=" -I$clmdir/build/ "
-     # cppdefs+=" ${pf} -DCLMFIVE"
-     # libs+=" -L$clmdir/build/lib/ -lcpl "
-     # libs+=" -L$clmdir/build/lib/ -latm -lice "
-     # libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/lib/ -lclm "
-     # libs+=" -L$clmdir/build/lib/ -locn -lrof -lglc -lwav -lesp "
-     # libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/lib -lcsm_share "
-     # libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/lib -lpio -lgptl -lmct -lmpeu  "
-     # libs+=" -lpnetcdf  -mkl -lnetcdff -lnetcdf "
-     # obj+=' $(OBJCLM5)'
-    fi
+    # if [[ ${mList[1]} == clm5_0 ]] ; then
+    #  importFlags+=$importFlagsDA
+    #  importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/include "
+    #  importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/include "
+    #  importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/include "
+    #  importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/clm/obj "
+    #  importFlags+=" -I$clmdir/build/atm/obj "
+    #  importFlags+=" -I$clmdir/build/ice/obj "
+    #  importFlags+=" -I$clmdir/build/ocn/obj "
+    #  importFlags+=" -I$clmdir/build/glc/obj "
+    #  importFlags+=" -I$clmdir/build/rof/obj "
+    #  importFlags+=" -I$clmdir/build/wav/obj "
+    #  importFlags+=" -I$clmdir/build/esp/obj "
+    #  importFlags+=" -I$clmdir/build/cpl/obj "
+    #  importFlags+=" -I$clmdir/build/lib/include "
+    #  importFlags+=" -I$clmdir/build/ "
+    #  cppdefs+=" ${pf}-DCLMSA ${pf}-DCLMFIVE "
+    #  libs+=" -L$clmdir/build/lib/ -lcpl "
+    #  libs+=" -L$clmdir/build/lib/ -latm -lice "
+    #  libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/lib/ -lclm "
+    #  libs+=" -L$clmdir/build/lib/ -locn -lrof -lglc -lwav -lesp "
+    #  libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/lib -lcsm_share "
+    #  libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/lib -lpio -lgptl -lmct -lmpeu  "
+    #  libs+=" -lpnetcdf  -mkl -lnetcdff -lnetcdf "
+    #  obj+=' $(OBJCLM5)'
+    # fi
+    # if [[ ${mList[1]} == eclm ]] ; then
+    #  comment "Needs to be updated with eCLM coupling configuration, but have to have something here otherwise compilation complains about the if / fi construct "
+    #  #importFlags+=$importFlagsDA
+    #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/include "
+    #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/include "
+    #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/include "
+    #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/clm/obj "
+    #  # importFlags+=" -I$clmdir/build/atm/obj "
+    #  # importFlags+=" -I$clmdir/build/ice/obj "
+    #  # importFlags+=" -I$clmdir/build/ocn/obj "
+    #  # importFlags+=" -I$clmdir/build/glc/obj "
+    #  # importFlags+=" -I$clmdir/build/rof/obj "
+    #  # importFlags+=" -I$clmdir/build/wav/obj "
+    #  # importFlags+=" -I$clmdir/build/esp/obj "
+    #  # importFlags+=" -I$clmdir/build/cpl/obj "
+    #  # importFlags+=" -I$clmdir/build/lib/include "
+    #  # importFlags+=" -I$clmdir/build/ "
+    #  # cppdefs+=" ${pf} -DCLMFIVE"
+    #  # libs+=" -L$clmdir/build/lib/ -lcpl "
+    #  # libs+=" -L$clmdir/build/lib/ -latm -lice "
+    #  # libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/lib/ -lclm "
+    #  # libs+=" -L$clmdir/build/lib/ -locn -lrof -lglc -lwav -lesp "
+    #  # libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/lib -lcsm_share "
+    #  # libs+=" -L$clmdir/build/intel/mpi/nodebug/nothreads/lib -lpio -lgptl -lmct -lmpeu  "
+    #  # libs+=" -lpnetcdf  -mkl -lnetcdff -lnetcdf "
+    #  # obj+=' $(OBJCLM5)'
+    # fi
   fi
 
   if [[ $withCLM == "true" && $withCOS == "true" && $withPFL == "false" ]] ; then
 
-    if [[ ${mList[1]} == clm5_0 ]] ; then
-      comment "Not yet implemented combination of pdaf and models (clm5_0)"
-      exit 1
-    fi
-    if [[ ${mList[1]} == eclm ]] ; then
-      comment "Not yet implemented combination of pdaf and models (eclm)"
-      exit 1
-    fi
+  #   if [[ ${mList[1]} == clm5_0 ]] ; then
+  #     comment "Not yet implemented combination of pdaf and models (clm5_0)"
+  #     exit 1
+  #   fi
+  #   if [[ ${mList[1]} == eclm ]] ; then
+  #     comment "Not yet implemented combination of pdaf and models (eclm)"
+  #     exit 1
+  #   fi
 
-     importFlags+=$importFlagsCLM
-     importFlags+=$importFlagsOAS
-     importFlags+=$importFlagsCOS
-     importFlags+=$importFlagsDA
-     cppdefs+=" ${pf}-Duse_comm_da ${pf}-DCOUP_OAS_COS ${pf}-DGRIBDWD ${pf}-DNETCDF ${pf}-DHYMACS ${pf}-DMAXPATCH_PFT=1 "
-     if [[ $cplscheme == "true" ]] ; then ; cppdefs+=" ${pf}-DCPL_SCHEME_F " ; fi
-     if [[ $readCLM == "true" ]] ; then ; cppdefs+=" ${pf}-DREADCLM " ; fi
-     libs+=$libsCLM
-     libs+=$libsCOS
-     libs+=$libsOAS
-     obj+=' $(OBJCLM) $(OBJCOSMO) '
-  fi
+  #    importFlags+=$importFlagsCLM
+  #    importFlags+=$importFlagsOAS
+  #    importFlags+=$importFlagsCOS
+  #    importFlags+=$importFlagsDA
+  #    cppdefs+=" ${pf}-Duse_comm_da ${pf}-DCOUP_OAS_COS ${pf}-DGRIBDWD ${pf}-DNETCDF ${pf}-DHYMACS ${pf}-DMAXPATCH_PFT=1 "
+  #    if [[ $cplscheme == "true" ]] ; then ; cppdefs+=" ${pf}-DCPL_SCHEME_F " ; fi
+  #    if [[ $readCLM == "true" ]] ; then ; cppdefs+=" ${pf}-DREADCLM " ; fi
+  #    libs+=$libsCLM
+  #    libs+=$libsCOS
+  #    libs+=$libsOAS
+  #    obj+=' $(OBJCLM) $(OBJCOSMO) '
+  # fi
 
   if [[ $withCLM == "true" && $withCOS == "false" && $withPFL == "true" ]] ; then
     
-    if [[ ${mList[1]} == clm5_0 ]] ; then
-      comment "Not yet implemented combination of pdaf and models (clm5_0)"
-      exit 1
-    fi
-    if [[ ${mList[1]} == eclm ]] ; then
-      comment "Not yet implemented combination of pdaf and models (eclm)"
-      exit 1
-    fi
+    # if [[ ${mList[1]} == clm5_0 ]] ; then
+    #   comment "Not yet implemented combination of pdaf and models (clm5_0)"
+    #   exit 1
+    # fi
+    # if [[ ${mList[1]} == eclm ]] ; then
+    #   comment "Not yet implemented combination of pdaf and models (eclm)"
+    #   exit 1
+    # fi
 
      importFlags+=$importFlagsCLM
      importFlags+=$importFlagsOAS
@@ -291,14 +281,14 @@ route "${cyellow}>> configure_da${cnormal}"
   fi
   if [[ $withCLM == "true" && $withCOS == "true" && $withPFL == "true" ]] ; then
 
-    if [[ ${mList[1]} == clm5_0 ]] ; then
-      comment "Not yet implemented combination of pdaf and models (clm5_0)"
-      exit 1
-    fi
-    if [[ ${mList[1]} == eclm ]] ; then
-      comment "Not yet implemented combination of pdaf and models (eclm)"
-      exit 1
-    fi
+    # if [[ ${mList[1]} == clm5_0 ]] ; then
+    #   comment "Not yet implemented combination of pdaf and models (clm5_0)"
+    #   exit 1
+    # fi
+    # if [[ ${mList[1]} == eclm ]] ; then
+    #   comment "Not yet implemented combination of pdaf and models (eclm)"
+    #   exit 1
+    # fi
 
      importFlags+=$importFlagsCLM
      importFlags+=$importFlagsOAS
@@ -348,13 +338,13 @@ route "${cyellow}>> configure_da${cnormal}"
     sed -i "s,__pf__,$pf," $file1 $file2 >> $log_file 2>> $err_file
   check
   comment "   sed clm directory to Makefiles"
-    sed -i "s,__clmdir__,${mList[1]}," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__clmdir__,clm3_5," $file1 $file2 >> $log_file 2>> $err_file
   check
   comment "   sed cosmo directory to Makefiles"
-    sed -i "s,__cosdir__,${mList[2]}," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__cosdir__,cosmo5_1," $file1 $file2 >> $log_file 2>> $err_file
   check
   comment "   sed parflow directory to Makefiles"
-    sed -i "s,__pfldir__,${mList[3]}," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__pfldir__,parflow," $file1 $file2 >> $log_file 2>> $err_file
   check
 
   comment "   cd to $dadir/interface/model"

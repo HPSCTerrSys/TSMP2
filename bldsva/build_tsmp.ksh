@@ -1,7 +1,131 @@
 #! /bin/ksh
 
+check(){
+  if [[ $? == 0  ]] then
+     print "    ... ${cgreen}OK!${cnormal}" | tee -a $stdout_file
+  else
+     print "    ... ${cred}error!!! - aborting...${cnormal}"  | tee -a $stdout_file
+     print "See $log_file and $err_file" | tee -a $stdout_file
+     exit 1
+   fi
+}
 
-setSelection(){
+terminate(){
+  print ""
+  print "Terminating $call. No changes were made...${cnormal}"
+  rm -f $err_file
+  rm -f $log_file
+  rm -f $stdout_file
+  exit 0
+}
+
+patch(){
+  print -n "${ccyan}\npatching $1 into $2 ${cnormal}" | tee -a $stdout_file
+  cp -r -v $1 $2 >> $patchlog_file 2>> $err_file
+}
+
+comment(){
+  print -n "$1" | tee -a $stdout_file
+}
+
+route(){
+  print "$1" | tee -a $stdout_file
+}
+
+warning(){
+  print "Warning!!! - $wmessage"
+  print "This could lead to errors or wrong behaviour. Would you like to continue anyway?"
+  PS3="Your selection(1-2)?"
+  select ret in "yes" "no, exit"
+  do
+    if [[ -n $ret ]]; then
+       case $ret in
+          "yes") break ;;
+          "no, exit") terminate ;;
+       esac
+       break
+    fi
+  done
+}
+
+
+  
+
+#######################################
+#		Main
+#######################################
+
+  cyellow=$(tput setaf 3)
+  cnormal=$(tput sgr0)   #9
+  cred=$(tput setaf 1)
+  cgreen=$(tput setaf 2)
+  cmagenta=$(tput setaf 5)
+  ccyan=$(tput setaf 6)
+
+  typeset -A options
+  typeset -A def_options
+
+  date=`date +%d%m%y-%H%M%S`
+
+  #automatically determine root dir
+  cpwd=`pwd`
+  if [[ "$0" == '/'*  ]] ; then
+    #absolute path
+    estdir=`echo "$0" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
+    call=$0
+  else
+    #relative path
+    call=`echo $0 | sed 's@^\.@@'`                    #clean call from leading dot
+    call=`echo $call | sed 's@^/@@'`                  #clean call from leading /
+    call=`echo "/$call" | sed 's@^/\./@/\.\./@'`      #if script is called without leading ./ replace /./ by /../
+    curr=`echo $cpwd | sed 's@^/@@'`                   #current directory without leading /   
+    call=`echo $call | sed "s@$curr@@"`               #remove current directory from call if absolute path was called
+    estdir=`echo "/$curr$call" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
+    call="$estdir/bldsva$call"
+  fi  
+
+  withOAS="false"
+  withCOS="false"
+  withICON="false"
+  withPFL="true"
+  withCLM="true"
+  withOASMCT="true"
+  withPCLM="false"
+#DA
+  withDA="true"
+  withPDAF="true"
+
+  comment "   init lmod functionality"
+  # "jurecadc", "juwels"
+  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
+  check
+
+  comment "   source and load Modules"
+  . $rootdir/env/jsc.2023_Intel.sh >> $log_file 2>> $err_file
+  check
+
+
+  defaultMpiPath="$EBROOTPSMPI"
+  defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
+  # "jureca", "juwels"
+  defaultGrib1Path="/p/project/cslts/local/jureca/DWD-libgrib1_20110128_Intel/lib/"
+  defaultGribPath="$EBROOTECCODES"
+  defaultGribapiPath="$EBROOTECCODES"
+  defaultJasperPath="$EBROOTJASPER"
+  defaultTclPath="$EBROOTTCL"
+  defaultHyprePath="$EBROOTHYPRE"
+  defaultSiloPath="$EBROOTSILO"
+  defaultLapackPath="$EBROOTIMKL"
+  defaultPncdfPath="$EBROOTPARALLELMINNETCDF"
+
+  # Default Compiler/Linker optimization
+  if [[ $compiler == "Gnu" ]] ; then
+      defaultOptC="-O2" # Gnu
+  elif [[ $compiler == "Intel" ]] ; then
+      defaultOptC="-O2 -xHost" # Intel
+  else
+      defaultOptC="-O2" # Default
+  fi
 
   if [[ $mpiPath == "" ]] then ; mpiPath=$defaultMpiPath ; fi
   if [[ $ncdfPath == "" ]] then ; ncdfPath=$defaultNcdfPath  ; fi
@@ -19,29 +143,6 @@ setSelection(){
   #compiler selection
   if [[ $compiler == "" ]] then ; compiler=$defaultcompiler ; fi
   if [[ $processor == "" ]] then ; processor=$defaultprocessor ; fi
-}
-
-#DA
-compileDA(){
-route "${cyellow}> c_compileDA${cnormal}"
-  comment "  source da interface script"
-    . ${rootdir}/bldsva/intf_DA/${mList[4]}/arch/build_interface_${mList[4]}.ksh >> $log_file 2>> $err_file
-  check
-  comment "  clear da dir: $dadir"
-      rm -rf $dadir >> $log_file 2>> $err_file
-  check
-  comment "  backup ${rootdir}/${mList[4]} to $dadir"
-      cp -rf ${rootdir}/${mList[4]} $dadir >> $log_file 2>> $err_file
-  check
-
-      substitutions_da
-      configure_da 
-      make_da
-route "${cyellow}< c_compileDA${cnormal}"
-}
-
-
-runCompilation(){
 
   bindir=$rootdir/bin/
   dadir=$rootdir/pdaf_changed/
@@ -92,146 +193,20 @@ runCompilation(){
 
   fi
 
-#DA
-  if [[ $withDA == "true" ]] ; then ; compileDA ; fi
-
-}
-
-
-check(){
-  if [[ $? == 0  ]] then
-     print "    ... ${cgreen}OK!${cnormal}" | tee -a $stdout_file
-  else
-     print "    ... ${cred}error!!! - aborting...${cnormal}"  | tee -a $stdout_file
-     print "See $log_file and $err_file" | tee -a $stdout_file
-     exit 1
-   fi
-}
-
-terminate(){
-  print ""
-  print "Terminating $call. No changes were made...${cnormal}"
-  rm -f $err_file
-  rm -f $log_file
-  rm -f $stdout_file
-  exit 0
-}
-
-patch(){
-  print -n "${ccyan}\npatching $1 into $2 ${cnormal}" | tee -a $stdout_file
-  cp -r -v $1 $2 >> $patchlog_file 2>> $err_file
-}
-
-comment(){
-  print -n "$1" | tee -a $stdout_file
-}
-
-route(){
-  print "$1" | tee -a $stdout_file
-}
-
-warning(){
-  print "Warning!!! - $wmessage"
-  print "This could lead to errors or wrong behaviour. Would you like to continue anyway?"
-  PS3="Your selection(1-2)?"
-  select ret in "yes" "no, exit"
-  do
-    if [[ -n $ret ]]; then
-       case $ret in
-          "yes") break ;;
-          "no, exit") terminate ;;
-       esac
-       break
-    fi
-  done
-}
-
-
-getRoot(){
-  #automatically determine root dir
-  cpwd=`pwd`
-  if [[ "$0" == '/'*  ]] ; then
-    #absolute path
-    estdir=`echo "$0" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
-    call=$0
-  else
-    #relative path
-    call=`echo $0 | sed 's@^\.@@'`                    #clean call from leading dot
-    call=`echo $call | sed 's@^/@@'`                  #clean call from leading /
-    call=`echo "/$call" | sed 's@^/\./@/\.\./@'`      #if script is called without leading ./ replace /./ by /../
-    curr=`echo $cpwd | sed 's@^/@@'`                   #current directory without leading /   
-    call=`echo $call | sed "s@$curr@@"`               #remove current directory from call if absolute path was called
-    estdir=`echo "/$curr$call" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
-    call="$estdir/bldsva$call"
-  fi  
-  
-}
-
-
-#######################################
-#		Main
-#######################################
-
-  cyellow=$(tput setaf 3)
-  cnormal=$(tput sgr0)   #9
-  cred=$(tput setaf 1)
-  cgreen=$(tput setaf 2)
-  cmagenta=$(tput setaf 5)
-  ccyan=$(tput setaf 6)
-
-  typeset -A options
-  typeset -A def_options
-
-  date=`date +%d%m%y-%H%M%S`
-  getRoot 
-
-  withOAS="false"
-  withCOS="false"
-  withICON="false"
-  withPFL="true"
-  withCLM="true"
-  withOASMCT="true"
-  withPCLM="false"
-#DA
-  withDA="true"
-  withPDAF="true"
-
-  comment "   init lmod functionality"
-  # "jurecadc", "juwels"
-  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
+#compile DA
+  comment "  source da interface script"
+    . ${rootdir}/bldsva/intf_DA/pdaf/arch/build_interface_pdaf.ksh >> $log_file 2>> $err_file
+  check
+  comment "  clear da dir: $dadir"
+      rm -rf $dadir >> $log_file 2>> $err_file
+  check
+  comment "  backup ${rootdir}/pdaf to $dadir"
+      cp -rf ${rootdir}/pdaf $dadir >> $log_file 2>> $err_file
   check
 
-  comment "   source and load Modules"
-  . $rootdir/env/jsc.2023_Intel.sh >> $log_file 2>> $err_file
-  check
-
-
-  defaultMpiPath="$EBROOTPSMPI"
-  defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
-  # "jureca", "juwels"
-  defaultGrib1Path="/p/project/cslts/local/jureca/DWD-libgrib1_20110128_Intel/lib/"
-  defaultGribPath="$EBROOTECCODES"
-  defaultGribapiPath="$EBROOTECCODES"
-  defaultJasperPath="$EBROOTJASPER"
-  defaultTclPath="$EBROOTTCL"
-  defaultHyprePath="$EBROOTHYPRE"
-  defaultSiloPath="$EBROOTSILO"
-  defaultLapackPath="$EBROOTIMKL"
-  defaultPncdfPath="$EBROOTPARALLELMINNETCDF"
-
-  # Default Compiler/Linker optimization
-  if [[ $compiler == "Gnu" ]] ; then
-      defaultOptC="-O2" # Gnu
-  elif [[ $compiler == "Intel" ]] ; then
-      defaultOptC="-O2 -xHost" # Intel
-  else
-      defaultOptC="-O2" # Default
-  fi
-
-  getMachineDefaults
-  setSelection
-
-  runCompilation
+  substitutions_da
+  configure_da 
+  make_da
 
   mv -f $err_file $bindir
   mv -f $log_file $bindir
