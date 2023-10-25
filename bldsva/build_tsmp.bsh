@@ -1,4 +1,4 @@
-#! /bin/ksh
+#!/usr/bin/env bash
 
 #######################################
 #		Main
@@ -18,11 +18,8 @@
   withDA="true"
   withPDAF="true"
 
-  print "   init lmod functionality"
-  . /p/software/jurecadc/lmod/lmod/init/ksh # "jurecadc", "juwels"
-
-  print "   source and load Modules $rootdir"
-  . $rootdir/env/jsc.2023_Intel.ksh
+  echo "   source and load Modules $rootdir"
+  . $rootdir/env/jsc.2023_Intel.sh
 
   mpiPath="$EBROOTPSMPI"
   ncdfPath="$EBROOTNETCDFMINFORTRAN"
@@ -51,7 +48,7 @@
     oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/
     libpsmile="$oasdir/lib/libpsmile.MPI1.a $oasdir/lib/libmct.a $oasdir/lib/libmpeu.a $oasdir/lib/libscrip.a"
 
-    print "    cp oas libs to $bindir/libs"
+    echo "    cp oas libs to $bindir/libs"
     cp $libpsmile $bindir/libs
   fi
 
@@ -59,11 +56,11 @@
   if [[ $withCLM == "true" ]] ; then
     clmdir=$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5
 
-    print "    cd to clm build dir"
+    echo "    cd to clm build dir"
       cd $clmdir/bld
-    print "    ar clm libs"
+    echo "    ar clm libs"
       ar rc libclm.a *.o
-    print "    cp libs to $bindir/libs"
+    echo "    cp libs to $bindir/libs"
       cp $clmdir/bld/libclm.a $bindir/libs
   fi
 
@@ -71,10 +68,10 @@
   if [[ $withPFL == "true" ]] ; then
     pfldir=$rootdir/run/JURECADC_eCLM-ParFlow
 
-    print "    cp libs to $bindir/libs"
+    echo "    cp libs to $bindir/libs"
       cp $pfldir/lib/* $bindir/libs
     if [[ $processor == "GPU" ]]; then
-      print "    GPU: cp rmm libs to $bindir/libs"
+      echo "    GPU: cp rmm libs to $bindir/libs"
         cp $pfldir/rmm/lib/* $bindir/libs
     fi
 
@@ -106,25 +103,25 @@
 #PDAF arch part
   file=$dadir/make.arch/${PDAF_ARCH}.h
 
-  print "   sed comFC dir to $file"
+  echo "   sed comFC dir to $file"
   sed -i "s@__comFC__@${comFC}@" $file
 
-  print "   sed comCC dir to $file"
+  echo "   sed comCC dir to $file"
   sed -i "s@__comCC__@${comCC}@" $file
 
-  print "   sed MPI dir to $file"
+  echo "   sed MPI dir to $file"
     sed -i "s@__MPI_INC__@-I${mpiPath}/include@" $file
 
-  print "   sed LIBS to $file"
+  echo "   sed LIBS to $file"
     sed -i "s@__LIBS__@${libs_src}@" $file
 
-  print "   sed optimizations to $file"
+  echo "   sed optimizations to $file"
     sed -i "s@__OPT__@${optComp}@" $file
 
-  print "   cd to $dadir/src"
+  echo "   cd to $dadir/src"
     cd $dadir/src
 
-  print "   make clean pdaf"
+  echo "   make clean pdaf"
     make clean
 
 #PDAF interface part configuration variables
@@ -214,7 +211,7 @@
     importFlags+=$importFlagsDA
     cppdefs+=" ${pf}-DCLMSA "
     libs+=$libsCLM
-    obj+=' $(OBJCLM) print_update_clm.o'
+    obj+=' $(OBJCLM) echo_update_clm.o'
     
     # if [[ ${mList[1]} == clm5_0 ]] ; then
     #  importFlags+=$importFlagsDA
@@ -243,7 +240,7 @@
     #  obj+=' $(OBJCLM5)'
     # fi
     # if [[ ${mList[1]} == eclm ]] ; then
-    #  print "Needs to be updated with eCLM coupling configuration, but have to have something here otherwise compilation complains about the if / fi construct "
+    #  echo "Needs to be updated with eCLM coupling configuration, but have to have something here otherwise compilation complains about the if / fi construct "
     #  #importFlags+=$importFlagsDA
     #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/include "
     #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/include "
@@ -274,11 +271,11 @@
   if [[ $withCLM == "true" && $withCOS == "true" && $withPFL == "false" ]] ; then
 
   #   if [[ ${mList[1]} == clm5_0 ]] ; then
-  #     print "Not yet implemented combination of pdaf and models (clm5_0)"
+  #     echo "Not yet implemented combination of pdaf and models (clm5_0)"
   #     exit 1
   #   fi
   #   if [[ ${mList[1]} == eclm ]] ; then
-  #     print "Not yet implemented combination of pdaf and models (eclm)"
+  #     echo "Not yet implemented combination of pdaf and models (eclm)"
   #     exit 1
   #   fi
 
@@ -298,11 +295,11 @@
   if [[ $withCLM == "true" && $withCOS == "false" && $withPFL == "true" ]] ; then
     
     # if [[ ${mList[1]} == clm5_0 ]] ; then
-    #   print "Not yet implemented combination of pdaf and models (clm5_0)"
+    #   echo "Not yet implemented combination of pdaf and models (clm5_0)"
     #   exit 1
     # fi
     # if [[ ${mList[1]} == eclm ]] ; then
-    #   print "Not yet implemented combination of pdaf and models (eclm)"
+    #   echo "Not yet implemented combination of pdaf and models (eclm)"
     #   exit 1
     # fi
 
@@ -322,11 +319,11 @@
   if [[ $withCLM == "true" && $withCOS == "true" && $withPFL == "true" ]] ; then
 
     # if [[ ${mList[1]} == clm5_0 ]] ; then
-    #   print "Not yet implemented combination of pdaf and models (clm5_0)"
+    #   echo "Not yet implemented combination of pdaf and models (clm5_0)"
     #   exit 1
     # fi
     # if [[ ${mList[1]} == eclm ]] ; then
-    #   print "Not yet implemented combination of pdaf and models (eclm)"
+    #   echo "Not yet implemented combination of pdaf and models (eclm)"
     #   exit 1
     # fi
 
@@ -349,58 +346,58 @@
 #PDAF interface part
   file1=$dadir/interface/model/Makefile
   file2=$dadir/interface/framework/Makefile
-  print "   cp pdaf interface Makefiles to $dadir"
+  echo "   cp pdaf interface Makefiles to $dadir"
     cp $rootdir/bldsva/intf_DA/pdaf/model/Makefile  $file1
     cp $rootdir/bldsva/intf_DA/pdaf/framework/Makefile  $file2
 
-  print "   sed bindir to Makefiles"
+  echo "   sed bindir to Makefiles"
     sed -i "s,__bindir__,$bindir," $file1 $file2
-  print "   sed comp flags to Makefiles"
+  echo "   sed comp flags to Makefiles"
     sed -i "s,__fflags__,-cpp -I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2
     sed -i "s,__ccflags__,-I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2
-  print "   sed preproc flags to Makefiles"
+  echo "   sed preproc flags to Makefiles"
     sed -i "s,__cpp_defs__,$cppdefs," $file1 $file2
     sed -i "s,__fcpp_defs__,$cppdefs," $file1 $file2
-  print "   sed libs to Makefiles"
+  echo "   sed libs to Makefiles"
     sed -i "s,__libs__,$libs," $file2
-  print "   sed obj to Makefiles"
+  echo "   sed obj to Makefiles"
     sed -i "s,__obj__,$obj," $file1
-  print "   sed -D prefix to Makefiles"
+  echo "   sed -D prefix to Makefiles"
     sed -i "s,__pf__,$pf," $file1 $file2
-  print "   sed clm directory to Makefiles"
+  echo "   sed clm directory to Makefiles"
     sed -i "s,__clmdir__,clm3_5," $file1 $file2
-  print "   sed cosmo directory to Makefiles"
+  echo "   sed cosmo directory to Makefiles"
     sed -i "s,__cosdir__,cosmo5_1," $file1 $file2
-  print "   sed parflow directory to Makefiles"
+  echo "   sed parflow directory to Makefiles"
     sed -i "s,__pfldir__,parflow," $file1 $file2
 
-  print "   cd to $dadir/interface/model"
+  echo "   cd to $dadir/interface/model"
     cd $dadir/interface/model
-  print "   make clean model"
+  echo "   make clean model"
     make clean
-  print "   cd to $dadir/src/interface/framework"
+  echo "   cd to $dadir/src/interface/framework"
     cd $dadir/interface/framework
-  print "   make clean framework"
+  echo "   make clean framework"
     make clean
 
 
-  print "   cd to $dadir/src"
+  echo "   cd to $dadir/src"
     cd $dadir/src
-  print "   make pdaf"
+  echo "   make pdaf"
     make
 
-  print "   cd to $dadir/interface/model"
+  echo "   cd to $dadir/interface/model"
     cd $dadir/interface/model
-  print "   make pdaf model"
+  echo "   make pdaf model"
     make
 
-  print "   cd to $dadir/interface/framework"
+  echo "   cd to $dadir/interface/framework"
     cd $dadir/interface/framework
-  print "   make pdaf framework"
+  echo "   make pdaf framework"
     make
 
-  print "build script finished sucessfully"
-  print "Rootdir: ${rootdir}"
-  print "Bindir: ${bindir}"
+  echo "build script finished sucessfully"
+  echo "Rootdir: ${rootdir}"
+  echo "Bindir: ${bindir}"
 
 
