@@ -4,22 +4,13 @@
 #		Main
 #######################################
 
-  # Colors
-  cyellow=$(tput setaf 3)
-  cnormal=$(tput sgr0)   #9
-  cred=$(tput setaf 1)
-  cgreen=$(tput setaf 2)
-  cmagenta=$(tput setaf 5)
-  ccyan=$(tput setaf 6)
-
-  date=`date +%d%m%y-%H%M%S`
-
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
   # Log files
-  log_file=$cpwd/log_all_${date}.txt
-  err_file=$cpwd/err_all_${date}.txt
-  stdout_file=$cpwd/stdout_all_${date}.txt
+  date=`date +%d%m%y-%H%M%S`
+  log_file=$rootdir/bldsva/log_all_${date}.txt
+  err_file=$rootdir/bldsva/err_all_${date}.txt
+  stdout_file=$rootdir/bldsva/stdout_all_${date}.txt
   rm -f $log_file $err_file $stdout_file
 
   # Component model configuration
@@ -35,50 +26,26 @@
   withPDAF="true"
 
   print "   init lmod functionality"
-  # "jurecadc", "juwels"
-  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
+  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file  # "jurecadc", "juwels"
 
   print "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.ksh >> $log_file 2>> $err_file
 
-  defaultMpiPath="$EBROOTPSMPI"
-  defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
-  # "jureca", "juwels"
-  defaultGrib1Path="/p/project/cslts/local/jureca/DWD-libgrib1_20110128_Intel/lib/"
-  defaultGribPath="$EBROOTECCODES"
-  defaultGribapiPath="$EBROOTECCODES"
-  defaultJasperPath="$EBROOTJASPER"
-  defaultTclPath="$EBROOTTCL"
-  defaultHyprePath="$EBROOTHYPRE"
-  defaultSiloPath="$EBROOTSILO"
-  defaultLapackPath="$EBROOTIMKL"
-  defaultPncdfPath="$EBROOTPARALLELMINNETCDF"
-
-  # Default Compiler/Linker optimization
-  if [[ $compiler == "Gnu" ]] ; then
-      defaultOptC="-O2" # Gnu
-  elif [[ $compiler == "Intel" ]] ; then
-      defaultOptC="-O2 -xHost" # Intel
-  else
-      defaultOptC="-O2" # Default
-  fi
-
-  if [[ $mpiPath == "" ]] then ; mpiPath=$defaultMpiPath ; fi
-  if [[ $ncdfPath == "" ]] then ; ncdfPath=$defaultNcdfPath  ; fi
-  if [[ $grib1Path == "" ]] then ; grib1Path=$defaultGrib1Path ; fi
-  if [[ $gribPath == "" ]] then ; gribPath=$defaultGribPath ; fi
-  if [[ $tclPath == "" ]] then ; tclPath=$defaultTclPath ; fi
-  if [[ $hyprePath == "" ]] then ; hyprePath=$defaultHyprePath ; fi
-  if [[ $siloPath == "" ]] then ; siloPath=$defaultSiloPath ; fi
-  if [[ $pnetcdfPath == "" ]] then ; pncdfPath=$defaultPncdfPath ; fi
-  if [[ $lapackPath == "" ]] then ; lapackPath=$defaultLapackPath ; fi
+  mpiPath="$EBROOTPSMPI"
+  ncdfPath="$EBROOTNETCDFMINFORTRAN"
+  grib1Path="/p/project/cslts/local/jureca/DWD-libgrib1_20110128_Intel/lib/"   # "jureca", "juwels"
+  gribPath="$EBROOTECCODES"
+  tclPath="$EBROOTTCL"
+  hyprePath="$EBROOTHYPRE"
+  siloPath="$EBROOTSILO"
+  pncdfPath="$EBROOTPARALLELMINNETCDF"
+  lapackPath="$EBROOTIMKL"
 
   #compiler optimization
-  if [[ $optComp == "" ]] then ; optComp=$defaultOptC ; fi
+  optComp="-O2 -xHost" # Intel "-O2" Gnu
   
   #compiler selection
-  if [[ $compiler == "" ]] then ; compiler=$defaultcompiler ; fi
-  if [[ $processor == "" ]] then ; processor=$defaultprocessor ; fi
+  processor="CPU" # "CPU" "GPU"
 
   #  binary directory
   bindir=$rootdir/bin/
@@ -445,7 +412,7 @@
   mv -f $log_file $bindir
   mv -f $stdout_file $bindir
 
-  print ${cgreen}"build script finished sucessfully"${cnormal}
+  print "build script finished sucessfully"
   print "Rootdir: ${rootdir}"
   print "Bindir: ${bindir}"
 
