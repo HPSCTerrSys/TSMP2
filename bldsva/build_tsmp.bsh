@@ -21,19 +21,6 @@
   echo "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.sh
 
-  mpiPath="$EBROOTPSMPI"
-  ncdfPath="$EBROOTNETCDFMINFORTRAN"
-  grib1Path="/p/project/cslts/local/jureca/DWD-libgrib1_20110128_Intel/lib/"   # "jureca", "juwels"
-  gribPath="$EBROOTECCODES"
-  tclPath="$EBROOTTCL"
-  hyprePath="$EBROOTHYPRE"
-  siloPath="$EBROOTSILO"
-  pncdfPath="$EBROOTPARALLELMINNETCDF"
-  lapackPath="$EBROOTIMKL"
-
-  #compiler optimization
-  optComp="-O2 -xHost" # Intel "-O2" Gnu
-  
   #compiler selection
   processor="CPU" # "CPU" "GPU"
 
@@ -89,35 +76,6 @@
   export PDAF_DIR=$dadir
   export PDAF_ARCH=linux_ifort # "linux_ifort", "linux_gfortran_openmpi"
 
-  comFC="${mpiPath}/bin/mpif90" # "${mpiPath}/bin/mpif90", "scorep-mpif90"
-  comCC="${mpiPath}/bin/mpicc"  # "${mpiPath}/bin/mpicc", "scorep-mpicc"
-
-#    libs_src=" -L$lapackPath -L${mpiPath}/lib64"
-#    libs_src=" -L$lapackPath -lopenblas -L${mpiPath}/lib64"
-#    libs_src=" $lapackPath/mkl/lib/intel64/libmkl_intel_lp64.a $lapackPath/mkl/lib/intel64/libmkl_intel_thread.a $lapackPath/mkl/lib/intel64/libmkl_core.a -L${mpiPath}/lib64"
-#    libs_src=" -L$lapackPath -llapack -lblas -L${mpiPath}/lib64"
-#    libs_src=" -L$lapackPath/mkl/lib/intel64 -Wl,--no-as-needed -lmkl_scalapack_ilp64 -lmkl_cdft_core -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lmkl_blacs_intelmpi_ilp64 -lm -ldl -L${mpiPath}/lib64 -lirc -lintlc"
-#    libs_src=" -ldl $lapackPath/mkl/latest/lib/intel64/libmkl_gf_lp64.a $lapackPath/mkl/latest/lib/intel64/libmkl_gnu_thread.a $lapackPath/mkl/latest/lib/intel64/libmkl_core.a -L${mpiPath}/lib64"
-  libs_src=" $lapackPath/mkl/latest/lib/intel64/libmkl_intel_lp64.a $lapackPath/mkl/latest/lib/intel64/libmkl_intel_thread.a $lapackPath/mkl/latest/lib/intel64/libmkl_core.a -L${mpiPath}/lib64"
-
-#PDAF arch part
-  file=$dadir/make.arch/${PDAF_ARCH}.h
-
-  echo "   sed comFC dir to $file"
-  sed -i "s@__comFC__@${comFC}@" $file
-
-  echo "   sed comCC dir to $file"
-  sed -i "s@__comCC__@${comCC}@" $file
-
-  echo "   sed MPI dir to $file"
-    sed -i "s@__MPI_INC__@-I${mpiPath}/include@" $file
-
-  echo "   sed LIBS to $file"
-    sed -i "s@__LIBS__@${libs_src}@" $file
-
-  echo "   sed optimizations to $file"
-    sed -i "s@__OPT__@${optComp}@" $file
-
   echo "   cd to $dadir/src"
     cd $dadir/src
 
@@ -133,7 +91,7 @@
   importFlagsDA=" "
   cppdefs=" "
   obj=' '
-  libs=" -L$mpiPath -lmpich -L$netcdfPath/lib/ -lnetcdff -lnetcdf "
+  libs=" -L$EBROOTPSMPI -lmpich -L$netcdfPath/lib/ -lnetcdff -lnetcdf "
   libsOAS=" "
   libsPFL=" "
   libsCLM=" "
@@ -179,7 +137,7 @@
 
   # COSMO libraries
   libsCOS+="-lcosmo "
-  libsCOS+="-L$gribPath/lib/ "
+  libsCOS+="-L$EBROOTECCODES/lib/ "
   libsCOS+="-leccodes_f90 "
   libsCOS+="-leccodes "
 
@@ -195,8 +153,9 @@
     libsPFL+="-lrmm "
     libsPFL+="-lnvToolsExt "
   fi
-  libsPFL+="-L$hyprePath/lib -lHYPRE "
-  libsPFL+="-L$siloPath/lib -lsilo "
+
+  libsPFL+="-L$EBROOTHYPRE/lib -lHYPRE "
+  libsPFL+="-L$EBROOTSILO/lib -lsilo "
 
   if [[ $withOAS == "false" && $withPFL == "true" ]] ; then
      importFlags+=$importFlagsPFL
@@ -367,8 +326,8 @@
   echo "   sed bindir to Makefiles"
     sed -i "s,__bindir__,$bindir," $file1 $file2
   echo "   sed comp flags to Makefiles"
-    sed -i "s,__fflags__,-cpp -I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2
-    sed -i "s,__ccflags__,-I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2
+    sed -i "s,__fflags__,-cpp -I$dadir/interface/model -I$EBROOTNETCDFMINFORTRAN/include $importFlags," $file1 $file2
+    sed -i "s,__ccflags__,-I$dadir/interface/model -I$EBROOTNETCDFMINFORTRAN/include $importFlags," $file1 $file2
   echo "   sed preproc flags to Makefiles"
     sed -i "s,__cpp_defs__,$cppdefs," $file1 $file2
     sed -i "s,__fcpp_defs__,$cppdefs," $file1 $file2
