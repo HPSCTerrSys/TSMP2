@@ -62,6 +62,10 @@ CLM35_SRC=`realpath CLM3.5`
 # COSMO5.01
 git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git
 COSMO_SRC=`realpath cosmo5.01_fresh`
+
+# PDAF
+git clone https://github.com/HPSCTerrSys/pdaf.git
+PDAF_SRC=`realpath pdaf`
 ```
 
 5. Run CMake configure step for the model combination that you wish to build. The
