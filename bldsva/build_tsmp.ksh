@@ -10,20 +10,6 @@ check(){
    fi
 }
 
-terminate(){
-  print ""
-  print "Terminating $call. No changes were made...${cnormal}"
-  rm -f $err_file
-  rm -f $log_file
-  rm -f $stdout_file
-  exit 0
-}
-
-patch(){
-  print -n "${ccyan}\npatching $1 into $2 ${cnormal}" | tee -a $stdout_file
-  cp -r -v $1 $2 >> $patchlog_file 2>> $err_file
-}
-
 comment(){
   print -n "$1" | tee -a $stdout_file
 }
@@ -32,24 +18,6 @@ route(){
   print "$1" | tee -a $stdout_file
 }
 
-warning(){
-  print "Warning!!! - $wmessage"
-  print "This could lead to errors or wrong behaviour. Would you like to continue anyway?"
-  PS3="Your selection(1-2)?"
-  select ret in "yes" "no, exit"
-  do
-    if [[ -n $ret ]]; then
-       case $ret in
-          "yes") break ;;
-          "no, exit") terminate ;;
-       esac
-       break
-    fi
-  done
-}
-
-
-  
 
 #######################################
 #		Main
@@ -87,8 +55,7 @@ warning(){
   log_file=$cpwd/log_all_${date}.txt
   err_file=$cpwd/err_all_${date}.txt
   stdout_file=$cpwd/stdout_all_${date}.txt
-  patchlog_file=$cpwd/patch_all_${date}.txt
-  rm -f $log_file $err_file $stdout_file $patchlog_file
+  rm -f $log_file $err_file $stdout_file
 
   # Component model configuration
   withOAS="true"
@@ -218,7 +185,6 @@ warning(){
   mv -f $err_file $bindir
   mv -f $log_file $bindir
   mv -f $stdout_file $bindir
-  rm -f $patchlog_file
 
   print ${cgreen}"build script finished sucessfully"${cnormal}
   print "Rootdir: ${rootdir}"

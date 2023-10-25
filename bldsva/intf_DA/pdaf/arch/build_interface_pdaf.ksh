@@ -9,11 +9,11 @@ route "${cyellow}>> substitutions_da${cnormal}"
   check
 
   comment "   cp pdaf interface model to $dadir/interface"
-    patch $rootdir/bldsva/intf_DA/pdaf/model $dadir/interface
+    cp -r -v $rootdir/bldsva/intf_DA/pdaf/model $dadir/interface >> $log_file 2>> $err_file
   check
 
   comment "   cp pdaf interface framework to $dadir/interface"
-    patch $rootdir/bldsva/intf_DA/pdaf/framework $dadir/interface
+    cp -r -v $rootdir/bldsva/intf_DA/pdaf/framework $dadir/interface >> $log_file 2>> $err_file
   check
 
   comment "   mkdir $dadir/lib"
