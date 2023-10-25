@@ -1,24 +1,5 @@
 #! /bin/ksh
 
-check(){
-  if [[ $? == 0  ]] then
-     print "    ... ${cgreen}OK!${cnormal}" | tee -a $stdout_file
-  else
-     print "    ... ${cred}error!!! - aborting...${cnormal}"  | tee -a $stdout_file
-     print "See $log_file and $err_file" | tee -a $stdout_file
-     exit 1
-   fi
-}
-
-comment(){
-  print -n "$1" | tee -a $stdout_file
-}
-
-route(){
-  print "$1" | tee -a $stdout_file
-}
-
-
 #######################################
 #		Main
 #######################################
@@ -33,23 +14,7 @@ route(){
 
   date=`date +%d%m%y-%H%M%S`
 
-  #automatically determine root dir
-  cpwd=`pwd`
-  if [[ "$0" == '/'*  ]] ; then
-    #absolute path
-    estdir=`echo "$0" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
-    call=$0
-  else
-    #relative path
-    call=`echo $0 | sed 's@^\.@@'`                    #clean call from leading dot
-    call=`echo $call | sed 's@^/@@'`                  #clean call from leading /
-    call=`echo "/$call" | sed 's@^/\./@/\.\./@'`      #if script is called without leading ./ replace /./ by /../
-    curr=`echo $cpwd | sed 's@^/@@'`                   #current directory without leading /   
-    call=`echo $call | sed "s@$curr@@"`               #remove current directory from call if absolute path was called
-    estdir=`echo "/$curr$call" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
-    call="$estdir/bldsva$call"
-  fi
-  rootdir=$estdir
+  rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
   # Log files
   log_file=$cpwd/log_all_${date}.txt
@@ -69,15 +34,12 @@ route(){
   withDA="true"
   withPDAF="true"
 
-  comment "   init lmod functionality"
+  print "   init lmod functionality"
   # "jurecadc", "juwels"
   . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
-  check
 
-  comment "   source and load Modules $rootdir"
+  print "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.ksh >> $log_file 2>> $err_file
-  check
-
 
   defaultMpiPath="$EBROOTPSMPI"
   defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
@@ -129,37 +91,31 @@ route(){
     oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/
     libpsmile="$oasdir/lib/libpsmile.MPI1.a $oasdir/lib/libmct.a $oasdir/lib/libmpeu.a $oasdir/lib/libscrip.a"
 
-    comment "    cp oas libs to $bindir/libs"
+    print "    cp oas libs to $bindir/libs"
     cp $libpsmile $bindir/libs >> $log_file 2>> $err_file
-    check
   fi
 
   # clm
   if [[ $withCLM == "true" ]] ; then
     clmdir=$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5
 
-    comment "    cd to clm build dir"
+    print "    cd to clm build dir"
       cd $clmdir/bld >> $log_file 2>> $err_file
-    check
-    comment "    ar clm libs"
+    print "    ar clm libs"
       ar rc libclm.a *.o >> $log_file 2>> $err_file
-    check
-    comment "    cp libs to $bindir/libs"
+    print "    cp libs to $bindir/libs"
       cp $clmdir/bld/libclm.a $bindir/libs >> $log_file 2>> $err_file
-    check
   fi
 
   # parflow
   if [[ $withPFL == "true" ]] ; then
     pfldir=$rootdir/run/JURECADC_eCLM-ParFlow
 
-    comment "    cp libs to $bindir/libs"
+    print "    cp libs to $bindir/libs"
       cp $pfldir/lib/* $bindir/libs >> $log_file 2>> $err_file
-    check
     if [[ $processor == "GPU" ]]; then
-      comment "    GPU: cp rmm libs to $bindir/libs"
+      print "    GPU: cp rmm libs to $bindir/libs"
         cp $pfldir/rmm/lib/* $bindir/libs >> $log_file 2>> $err_file
-      check
     fi
 
     # Change pfldir to bld
@@ -171,9 +127,8 @@ route(){
   dadir=$rootdir/pdaf/
 
   #compile DA
-  comment "  source da interface script"
+  print "  source da interface script"
     . ${rootdir}/bldsva/intf_DA/pdaf/arch/build_interface_pdaf.ksh >> $log_file 2>> $err_file
-  check
 
 #PDAF part configuration variables
   export PDAF_DIR=$dadir
@@ -193,32 +148,26 @@ route(){
 #PDAF arch part
   file=$dadir/make.arch/${PDAF_ARCH}.h
 
-  comment "   sed comFC dir to $file"
+  print "   sed comFC dir to $file"
   sed -i "s@__comFC__@${comFC}@" $file >> $log_file 2>> $err_file
-  check
 
-  comment "   sed comCC dir to $file"
+  print "   sed comCC dir to $file"
   sed -i "s@__comCC__@${comCC}@" $file >> $log_file 2>> $err_file
-  check
 
-  comment "   sed MPI dir to $file"
+  print "   sed MPI dir to $file"
     sed -i "s@__MPI_INC__@-I${mpiPath}/include@" $file >> $log_file 2>> $err_file
-  check
 
-  comment "   sed LIBS to $file"
+  print "   sed LIBS to $file"
     sed -i "s@__LIBS__@${libs_src}@" $file >> $log_file 2>> $err_file
-  check
 
-  comment "   sed optimizations to $file"
+  print "   sed optimizations to $file"
     sed -i "s@__OPT__@${optComp}@" $file >> $log_file 2>> $err_file
-  check
 
-  comment "   cd to $dadir/src"
+  print "   cd to $dadir/src"
     cd $dadir/src >> $log_file 2>> $err_file
-  check
-  comment "   make clean pdaf"
+
+  print "   make clean pdaf"
     make clean >> $log_file 2>> $err_file
-  check
 
 #PDAF interface part configuration variables
   importFlags=" "
@@ -336,7 +285,7 @@ route(){
     #  obj+=' $(OBJCLM5)'
     # fi
     # if [[ ${mList[1]} == eclm ]] ; then
-    #  comment "Needs to be updated with eCLM coupling configuration, but have to have something here otherwise compilation complains about the if / fi construct "
+    #  print "Needs to be updated with eCLM coupling configuration, but have to have something here otherwise compilation complains about the if / fi construct "
     #  #importFlags+=$importFlagsDA
     #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/include "
     #  # importFlags+=" -I$clmdir/build/intel/mpi/nodebug/nothreads/mct/noesmf/c1a1l1i1o1r1g1w1e1/include "
@@ -367,11 +316,11 @@ route(){
   if [[ $withCLM == "true" && $withCOS == "true" && $withPFL == "false" ]] ; then
 
   #   if [[ ${mList[1]} == clm5_0 ]] ; then
-  #     comment "Not yet implemented combination of pdaf and models (clm5_0)"
+  #     print "Not yet implemented combination of pdaf and models (clm5_0)"
   #     exit 1
   #   fi
   #   if [[ ${mList[1]} == eclm ]] ; then
-  #     comment "Not yet implemented combination of pdaf and models (eclm)"
+  #     print "Not yet implemented combination of pdaf and models (eclm)"
   #     exit 1
   #   fi
 
@@ -391,11 +340,11 @@ route(){
   if [[ $withCLM == "true" && $withCOS == "false" && $withPFL == "true" ]] ; then
     
     # if [[ ${mList[1]} == clm5_0 ]] ; then
-    #   comment "Not yet implemented combination of pdaf and models (clm5_0)"
+    #   print "Not yet implemented combination of pdaf and models (clm5_0)"
     #   exit 1
     # fi
     # if [[ ${mList[1]} == eclm ]] ; then
-    #   comment "Not yet implemented combination of pdaf and models (eclm)"
+    #   print "Not yet implemented combination of pdaf and models (eclm)"
     #   exit 1
     # fi
 
@@ -415,11 +364,11 @@ route(){
   if [[ $withCLM == "true" && $withCOS == "true" && $withPFL == "true" ]] ; then
 
     # if [[ ${mList[1]} == clm5_0 ]] ; then
-    #   comment "Not yet implemented combination of pdaf and models (clm5_0)"
+    #   print "Not yet implemented combination of pdaf and models (clm5_0)"
     #   exit 1
     # fi
     # if [[ ${mList[1]} == eclm ]] ; then
-    #   comment "Not yet implemented combination of pdaf and models (eclm)"
+    #   print "Not yet implemented combination of pdaf and models (eclm)"
     #   exit 1
     # fi
 
@@ -442,78 +391,55 @@ route(){
 #PDAF interface part
   file1=$dadir/interface/model/Makefile
   file2=$dadir/interface/framework/Makefile
-  comment "   cp pdaf interface Makefiles to $dadir"
+  print "   cp pdaf interface Makefiles to $dadir"
     cp $rootdir/bldsva/intf_DA/pdaf/model/Makefile  $file1 >> $log_file 2>> $err_file
-  check
     cp $rootdir/bldsva/intf_DA/pdaf/framework/Makefile  $file2 >> $log_file 2>> $err_file
-  check
 
-  comment "   sed bindir to Makefiles"
+  print "   sed bindir to Makefiles"
     sed -i "s,__bindir__,$bindir," $file1 $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed comp flags to Makefiles"
+  print "   sed comp flags to Makefiles"
     sed -i "s,__fflags__,-cpp -I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2 >> $log_file 2>> $err_file
-  check
     sed -i "s,__ccflags__,-I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed preproc flags to Makefiles"
+  print "   sed preproc flags to Makefiles"
     sed -i "s,__cpp_defs__,$cppdefs," $file1 $file2 >> $log_file 2>> $err_file
-  check
     sed -i "s,__fcpp_defs__,$cppdefs," $file1 $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed libs to Makefiles"
+  print "   sed libs to Makefiles"
     sed -i "s,__libs__,$libs," $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed obj to Makefiles"
+  print "   sed obj to Makefiles"
     sed -i "s,__obj__,$obj," $file1 >> $log_file 2>> $err_file
-  check
-  comment "   sed -D prefix to Makefiles"
+  print "   sed -D prefix to Makefiles"
     sed -i "s,__pf__,$pf," $file1 $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed clm directory to Makefiles"
+  print "   sed clm directory to Makefiles"
     sed -i "s,__clmdir__,clm3_5," $file1 $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed cosmo directory to Makefiles"
+  print "   sed cosmo directory to Makefiles"
     sed -i "s,__cosdir__,cosmo5_1," $file1 $file2 >> $log_file 2>> $err_file
-  check
-  comment "   sed parflow directory to Makefiles"
+  print "   sed parflow directory to Makefiles"
     sed -i "s,__pfldir__,parflow," $file1 $file2 >> $log_file 2>> $err_file
-  check
 
-  comment "   cd to $dadir/interface/model"
+  print "   cd to $dadir/interface/model"
     cd $dadir/interface/model >> $log_file 2>> $err_file
-  check
-  comment "   make clean model"
+  print "   make clean model"
     make clean >> $log_file 2>> $err_file
-  check
-  comment "   cd to $dadir/src/interface/framework"
+  print "   cd to $dadir/src/interface/framework"
     cd $dadir/interface/framework >> $log_file 2>> $err_file
-  check
-  comment "   make clean framework"
+  print "   make clean framework"
     make clean >> $log_file 2>> $err_file
-  check
 
 
-  comment "   cd to $dadir/src"
+  print "   cd to $dadir/src"
     cd $dadir/src >> $log_file 2>> $err_file
-  check
-  comment "   make pdaf"
+  print "   make pdaf"
     make >> $log_file 2>> $err_file
-  check
 
-  comment "   cd to $dadir/interface/model"
+  print "   cd to $dadir/interface/model"
     cd $dadir/interface/model >> $log_file 2>> $err_file
-  check
-  comment "   make pdaf model"
+  print "   make pdaf model"
     make >> $log_file 2>> $err_file
-  check
 
-  comment "   cd to $dadir/interface/framework"
+  print "   cd to $dadir/interface/framework"
     cd $dadir/interface/framework >> $log_file 2>> $err_file
-  check
-  comment "   make pdaf framework"
+  print "   make pdaf framework"
     make >> $log_file 2>> $err_file
-  check
 
   mv -f $err_file $bindir
   mv -f $log_file $bindir
