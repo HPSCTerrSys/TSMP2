@@ -87,8 +87,6 @@
   dadir=$rootdir/pdaf/
 
   #compile DA
-  print "  source da interface script"
-    . ${rootdir}/bldsva/intf_DA/pdaf/arch/build_interface_pdaf.ksh
 
 #PDAF part configuration variables
   export PDAF_DIR=$dadir
