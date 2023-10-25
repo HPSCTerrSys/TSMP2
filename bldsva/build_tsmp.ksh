@@ -6,13 +6,6 @@
 
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
-  # Log files
-  date=`date +%d%m%y-%H%M%S`
-  log_file=$rootdir/bldsva/log_all_${date}.txt
-  err_file=$rootdir/bldsva/err_all_${date}.txt
-  stdout_file=$rootdir/bldsva/stdout_all_${date}.txt
-  rm -f $log_file $err_file $stdout_file
-
   # Component model configuration
   withOAS="true"
   withCOS="false"
@@ -26,10 +19,10 @@
   withPDAF="true"
 
   print "   init lmod functionality"
-  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file  # "jurecadc", "juwels"
+  . /p/software/jurecadc/lmod/lmod/init/ksh # "jurecadc", "juwels"
 
   print "   source and load Modules $rootdir"
-  . $rootdir/env/jsc.2023_Intel.ksh >> $log_file 2>> $err_file
+  . $rootdir/env/jsc.2023_Intel.ksh
 
   mpiPath="$EBROOTPSMPI"
   ncdfPath="$EBROOTNETCDFMINFORTRAN"
@@ -51,7 +44,7 @@
   bindir=$rootdir/bin/
 
   # libs directory
-  mkdir -p $bindir/libs >> $log_file 2>> $err_file
+  mkdir -p $bindir/libs
 
   # oasis3-mct
   if [[ $withOAS == "true" ]] ; then
@@ -59,7 +52,7 @@
     libpsmile="$oasdir/lib/libpsmile.MPI1.a $oasdir/lib/libmct.a $oasdir/lib/libmpeu.a $oasdir/lib/libscrip.a"
 
     print "    cp oas libs to $bindir/libs"
-    cp $libpsmile $bindir/libs >> $log_file 2>> $err_file
+    cp $libpsmile $bindir/libs
   fi
 
   # clm
@@ -67,11 +60,11 @@
     clmdir=$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5
 
     print "    cd to clm build dir"
-      cd $clmdir/bld >> $log_file 2>> $err_file
+      cd $clmdir/bld
     print "    ar clm libs"
-      ar rc libclm.a *.o >> $log_file 2>> $err_file
+      ar rc libclm.a *.o
     print "    cp libs to $bindir/libs"
-      cp $clmdir/bld/libclm.a $bindir/libs >> $log_file 2>> $err_file
+      cp $clmdir/bld/libclm.a $bindir/libs
   fi
 
   # parflow
@@ -79,10 +72,10 @@
     pfldir=$rootdir/run/JURECADC_eCLM-ParFlow
 
     print "    cp libs to $bindir/libs"
-      cp $pfldir/lib/* $bindir/libs >> $log_file 2>> $err_file
+      cp $pfldir/lib/* $bindir/libs
     if [[ $processor == "GPU" ]]; then
       print "    GPU: cp rmm libs to $bindir/libs"
-        cp $pfldir/rmm/lib/* $bindir/libs >> $log_file 2>> $err_file
+        cp $pfldir/rmm/lib/* $bindir/libs
     fi
 
     # Change pfldir to bld
@@ -95,7 +88,7 @@
 
   #compile DA
   print "  source da interface script"
-    . ${rootdir}/bldsva/intf_DA/pdaf/arch/build_interface_pdaf.ksh >> $log_file 2>> $err_file
+    . ${rootdir}/bldsva/intf_DA/pdaf/arch/build_interface_pdaf.ksh
 
 #PDAF part configuration variables
   export PDAF_DIR=$dadir
@@ -116,25 +109,25 @@
   file=$dadir/make.arch/${PDAF_ARCH}.h
 
   print "   sed comFC dir to $file"
-  sed -i "s@__comFC__@${comFC}@" $file >> $log_file 2>> $err_file
+  sed -i "s@__comFC__@${comFC}@" $file
 
   print "   sed comCC dir to $file"
-  sed -i "s@__comCC__@${comCC}@" $file >> $log_file 2>> $err_file
+  sed -i "s@__comCC__@${comCC}@" $file
 
   print "   sed MPI dir to $file"
-    sed -i "s@__MPI_INC__@-I${mpiPath}/include@" $file >> $log_file 2>> $err_file
+    sed -i "s@__MPI_INC__@-I${mpiPath}/include@" $file
 
   print "   sed LIBS to $file"
-    sed -i "s@__LIBS__@${libs_src}@" $file >> $log_file 2>> $err_file
+    sed -i "s@__LIBS__@${libs_src}@" $file
 
   print "   sed optimizations to $file"
-    sed -i "s@__OPT__@${optComp}@" $file >> $log_file 2>> $err_file
+    sed -i "s@__OPT__@${optComp}@" $file
 
   print "   cd to $dadir/src"
-    cd $dadir/src >> $log_file 2>> $err_file
+    cd $dadir/src
 
   print "   make clean pdaf"
-    make clean >> $log_file 2>> $err_file
+    make clean
 
 #PDAF interface part configuration variables
   importFlags=" "
@@ -359,58 +352,54 @@
   file1=$dadir/interface/model/Makefile
   file2=$dadir/interface/framework/Makefile
   print "   cp pdaf interface Makefiles to $dadir"
-    cp $rootdir/bldsva/intf_DA/pdaf/model/Makefile  $file1 >> $log_file 2>> $err_file
-    cp $rootdir/bldsva/intf_DA/pdaf/framework/Makefile  $file2 >> $log_file 2>> $err_file
+    cp $rootdir/bldsva/intf_DA/pdaf/model/Makefile  $file1
+    cp $rootdir/bldsva/intf_DA/pdaf/framework/Makefile  $file2
 
   print "   sed bindir to Makefiles"
-    sed -i "s,__bindir__,$bindir," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__bindir__,$bindir," $file1 $file2
   print "   sed comp flags to Makefiles"
-    sed -i "s,__fflags__,-cpp -I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2 >> $log_file 2>> $err_file
-    sed -i "s,__ccflags__,-I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__fflags__,-cpp -I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2
+    sed -i "s,__ccflags__,-I$dadir/interface/model -I$ncdfPath/include $importFlags," $file1 $file2
   print "   sed preproc flags to Makefiles"
-    sed -i "s,__cpp_defs__,$cppdefs," $file1 $file2 >> $log_file 2>> $err_file
-    sed -i "s,__fcpp_defs__,$cppdefs," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__cpp_defs__,$cppdefs," $file1 $file2
+    sed -i "s,__fcpp_defs__,$cppdefs," $file1 $file2
   print "   sed libs to Makefiles"
-    sed -i "s,__libs__,$libs," $file2 >> $log_file 2>> $err_file
+    sed -i "s,__libs__,$libs," $file2
   print "   sed obj to Makefiles"
-    sed -i "s,__obj__,$obj," $file1 >> $log_file 2>> $err_file
+    sed -i "s,__obj__,$obj," $file1
   print "   sed -D prefix to Makefiles"
-    sed -i "s,__pf__,$pf," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__pf__,$pf," $file1 $file2
   print "   sed clm directory to Makefiles"
-    sed -i "s,__clmdir__,clm3_5," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__clmdir__,clm3_5," $file1 $file2
   print "   sed cosmo directory to Makefiles"
-    sed -i "s,__cosdir__,cosmo5_1," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__cosdir__,cosmo5_1," $file1 $file2
   print "   sed parflow directory to Makefiles"
-    sed -i "s,__pfldir__,parflow," $file1 $file2 >> $log_file 2>> $err_file
+    sed -i "s,__pfldir__,parflow," $file1 $file2
 
   print "   cd to $dadir/interface/model"
-    cd $dadir/interface/model >> $log_file 2>> $err_file
+    cd $dadir/interface/model
   print "   make clean model"
-    make clean >> $log_file 2>> $err_file
+    make clean
   print "   cd to $dadir/src/interface/framework"
-    cd $dadir/interface/framework >> $log_file 2>> $err_file
+    cd $dadir/interface/framework
   print "   make clean framework"
-    make clean >> $log_file 2>> $err_file
+    make clean
 
 
   print "   cd to $dadir/src"
-    cd $dadir/src >> $log_file 2>> $err_file
+    cd $dadir/src
   print "   make pdaf"
-    make >> $log_file 2>> $err_file
+    make
 
   print "   cd to $dadir/interface/model"
-    cd $dadir/interface/model >> $log_file 2>> $err_file
+    cd $dadir/interface/model
   print "   make pdaf model"
-    make >> $log_file 2>> $err_file
+    make
 
   print "   cd to $dadir/interface/framework"
-    cd $dadir/interface/framework >> $log_file 2>> $err_file
+    cd $dadir/interface/framework
   print "   make pdaf framework"
-    make >> $log_file 2>> $err_file
-
-  mv -f $err_file $bindir
-  mv -f $log_file $bindir
-  mv -f $stdout_file $bindir
+    make
 
   print "build script finished sucessfully"
   print "Rootdir: ${rootdir}"
