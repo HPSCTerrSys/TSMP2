@@ -11,6 +11,7 @@
   # Component model configuration
   export TSMPPDAFPFLDIR=parflow
   export TSMPPDAFCLMDIR=clm3_5
+  export TSMPPDAFCOSDIR=cosmo5_1
 
   echo "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.sh
@@ -25,78 +26,34 @@
   # libs directory
   mkdir -p $bindir/libs
 
-
-# Copy libraries for TSMP-PDAF build
-# -----------------------------------------------------
-  # oasis3-mct
-  oasdir=$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT
-  export TSMPPDAFOASDIR=$oasdir
-
-  echo "    cp oas libs to $bindir/libs"
-  cp $oasdir/lib/libpsmile.MPI1.a $bindir/libs
-  cp $oasdir/lib/libmct.a $bindir/libs
-  cp $oasdir/lib/libmpeu.a $bindir/libs
-  cp $oasdir/lib/libscrip.a $bindir/libs
-
-# -----------------------------------------------------
-  # clm
-  clmdir=$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5
-  
-  echo "    cd to clm build dir"
-  cd $clmdir/bld
-  echo "    ar clm libs"
-  ar rc libclm.a *.o
-
-  echo "    cp libs to $bindir/libs"
-  cp $clmdir/bld/libclm.a $bindir/libs
-
-# -----------------------------------------------------
-  # parflow
-  pfldir=$rootdir/run/JURECADC_eCLM-ParFlow
-
-  echo "    cp libs to $bindir/libs"
-  cp $pfldir/lib/* $bindir/libs
-  # echo "    GPU: cp rmm libs to $bindir/libs"
-  # cp $pfldir/rmm/lib/* $bindir/libs
-
-  # Change pfldir to bld
-  pfldir=$rootdir/parflow
-
-# -----------------------------------------------------
-  # directory for pdaf
-  dadir=$rootdir/pdaf/
-
-  #compile DA
-
 #PDAF interface part configuration variables
 # -----------------------------------------------------
 
   # Oasis include dirs
   importFlagsOAS=" "
-  importFlagsOAS+="-I$oasdir/JURECA/build/lib/psmile.MPI1 "
-  importFlagsOAS+="-I$oasdir/JURECA/build/lib/scrip "
+  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/JURECA/build/lib/psmile.MPI1 "
+  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/JURECA/build/lib/scrip "
   importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/include "
 
   # CLM include dirs
   importFlagsCLM=" "
-  importFlagsCLM+="-I$clmdir/build/ "
   importFlagsCLM+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld/ "
 
   # ParFlow include dirs
   importFlagsPFL=" "
-  importFlagsPFL+="-I$pfldir/pfsimulator/parflow_lib "
-  importFlagsPFL+="-I$pfldir/pfsimulator/amps/oas3 "
-  importFlagsPFL+="-I$pfldir/pfsimulator/amps/common "
+  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/pfsimulator/parflow_lib "
+  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/pfsimulator/amps/oas3 "
+  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/pfsimulator/amps/common "
   importFlagsPFL+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/ParFlow/src/ParFlow-build/include/ "
-  importFlagsPFL+="-I$pfldir/build/include "
+  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/build/include "
   if [[ $processor == "GPU" ]]; then
-    importFlagsPFL+="-I$pfldir/rmm/include/rmm "
+    importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/rmm/include/rmm "
   fi
 
   # DA include dirs
   importFlagsDA=" "
-  importFlagsDA+="-I$dadir/interface/model/common "
-  importFlagsDA+="-I$dadir/interface/model/parflow "
+  importFlagsDA+="-I$rootdir/pdaf/interface/model/common "
+  importFlagsDA+="-I$rootdir/pdaf/interface/model/parflow "
 
   # INCLUDE DIRS
   importFlags=" "
@@ -108,6 +65,7 @@
 # -----------------------------------------------------
   # Oasis libraries
   libsOAS=" "
+  libsOAS+="-L$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/lib "
   libsOAS+="-lpsmile.MPI1 "
   libsOAS+="-lmct "
   libsOAS+="-lmpeu "
@@ -115,10 +73,15 @@
 
   # CLM libraries
   libsCLM=" "
+  cd $rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld
+  ar rc libclm.a *.o
+  libsCLM+="-L$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld"
   libsCLM+="-lclm "
-
+  
   # ParFlow library paths and libraries
   libsPFL=" "
+  libsPFL+="-L$rootdir/run/JURECADC_eCLM-ParFlow/lib "
+  # libsPFL+="-L$rootdir/run/JURECADC_eCLM-ParFlow/rmm/lib " # GPU
   libsPFL+="-lpfsimulator "
   libsPFL+="-lamps "
   libsPFL+="-lpfkinsol "
@@ -155,7 +118,7 @@
 # -----------------------------------------------------
 #PDAF part configuration variables
   echo "   PDAF environment variables"
-  export PDAF_DIR=$dadir
+  export PDAF_DIR=$rootdir/pdaf
   export PDAF_ARCH=linux_ifort # "linux_ifort", "linux_gfortran_openmpi"
 
 #PDAF interface part
