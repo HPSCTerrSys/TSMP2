@@ -131,24 +131,24 @@
 # -----------------------------------------------------
 #Make clean PDAF    
   echo "   make clean pdaf"
-    cd $dadir/src
+    cd ${PDAF_DIR}/src
     make clean
   echo "   make clean model"
-    cd $dadir/interface/model
+    cd ${PDAF_DIR}/interface/model
     make clean
   echo "   make clean framework"
-    cd $dadir/interface/framework
+    cd ${PDAF_DIR}/interface/framework
     make clean
 
 #Make PDAF
   echo "   make pdaf"
-    cd $dadir/src
+    cd ${PDAF_DIR}/src
     make
   echo "   make pdaf model"
-    cd $dadir/interface/model
+    cd ${PDAF_DIR}/interface/model
     make
   echo "   make pdaf framework"
-    cd $dadir/interface/framework
+    cd ${PDAF_DIR}/interface/framework
     make
 
 # -----------------------------------------------------
