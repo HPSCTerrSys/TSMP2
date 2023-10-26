@@ -120,9 +120,9 @@ cmake --build ${BUILD_DIR}
 cmake --install ${BUILD_DIR}
 ```
 
-7. (Only for TSMP-PDAF:) Run `./blsva/build_tsmp.bsh` after building
-   and installing the component models. Be sure to check the initial
-   settings of the script.
+7. (Only for TSMP-PDAF:) Execute `./build_tsmp_pdaf.bsh` after
+   building and installing the component models. Be sure to check the
+   initial settings of the script.
 
 ### Resuming a failed build
 
