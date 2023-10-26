@@ -8,7 +8,7 @@
 # -----------------------------------------------------
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
-  cmake_model_id="eCLM-ParFlow"
+  cmake_model_id=${MODEL_ID}   # "eCLM-ParFlow"
   cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_$cmake_model_id
   cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_$cmake_model_id
 
