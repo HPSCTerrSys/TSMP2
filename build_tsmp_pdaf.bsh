@@ -90,13 +90,13 @@
   # ParFlow library paths and libraries
   libsPFL=" "
   libsPFL+="-L$cmake_install_dir/lib "
-  # libsPFL+="-L$cmake_install_dir/rmm/lib " # GPU
   libsPFL+="-lpfsimulator "
   libsPFL+="-lamps "
   libsPFL+="-lpfkinsol "
   libsPFL+="-lgfortran "
   libsPFL+="-lcjson "
   if [[ $processor == "GPU" ]]; then
+    libsPFL+="-L$cmake_install_dir/rmm/lib " # GPU
     libsPFL+="-lstdc++ "
     libsPFL+="-lcudart "
     libsPFL+="-lrmm "
