@@ -62,10 +62,6 @@ CLM35_SRC=`realpath CLM3.5`
 # COSMO5.01
 git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git
 COSMO_SRC=`realpath cosmo5.01_fresh`
-
-# PDAF
-git clone https://github.com/HPSCTerrSys/pdaf.git
-PDAF_SRC=`realpath pdaf`
 ```
 
 5. Run CMake configure step for the model combination that you wish to build. The
@@ -123,6 +119,10 @@ cmake -S . -B ${BUILD_DIR}                    \
 cmake --build ${BUILD_DIR}
 cmake --install ${BUILD_DIR}
 ```
+
+7. (Only for TSMP-PDAF:) Run `./blsva/build_tsmp.bsh` after building
+   and installing the component models. Be sure to check the initial
+   settings of the script.
 
 ### Resuming a failed build
 
@@ -195,4 +195,8 @@ CLM35_SRC=`realpath CLM3.5`
 <!-- # COSMO5.01 -->
 <!-- git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git -->
 <!-- COSMO_SRC=`realpath cosmo5.01_fresh` -->
+
+# PDAF
+git clone https://github.com/HPSCTerrSys/pdaf.git
+PDAF_SRC=`realpath pdaf`
 ```
