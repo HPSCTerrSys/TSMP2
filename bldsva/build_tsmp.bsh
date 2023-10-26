@@ -31,8 +31,8 @@
 
   # Oasis include dirs
   importFlagsOAS=" "
-  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/JURECA/build/lib/psmile.MPI1 "
-  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/JURECA/build/lib/scrip "
+  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/lib/psmile.MPI1 "
+  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/lib/scrip "
   importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/include "
 
   # CLM include dirs
