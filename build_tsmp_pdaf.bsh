@@ -29,8 +29,8 @@
   processor="CPU" # "CPU" "GPU"
 
   #  binary directory
-  bindir=$cmake_install_dir/bin/
-  export TSMPPDAFBINDIR=$bindir
+  export TSMPPDAFBINDIR=$cmake_install_dir/bin
+  export TSMPPDAFLIBDIR=$cmake_install_dir/lib
 
   # libs directory
   mkdir -p $cmake_install_dir/lib
@@ -158,6 +158,6 @@
 # -----------------------------------------------------
   echo "build script finished sucessfully"
   echo "Rootdir: ${rootdir}"
-  echo "Bindir: ${bindir}"
+  echo "Bindir: ${TSMPPDAFBINDIR}"
 
 
