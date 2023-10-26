@@ -8,52 +8,61 @@
 # -----------------------------------------------------
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
+  cmake_model_id="eCLM-ParFlow"
+  cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_$cmake_model_id
+  cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_$cmake_model_id
+
   # Component model configuration
-  export TSMPPDAFPFLDIR=parflow
-  export TSMPPDAFCLMDIR=clm3_5
-  export TSMPPDAFCOSDIR=cosmo5_1
+  export TSMPPDAFPFLDIR=$rootdir/parflow
+  export TSMPPDAFCLMDIR=$rootdir/clm3_5
+  export TSMPPDAFCOSDIR=$rootdir/cosmo5_1
 
   echo "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.sh
+
+  #PDAF part configuration variables
+  echo "   PDAF environment variables"
+  export PDAF_DIR=$rootdir/pdaf
+  export PDAF_ARCH=linux_ifort # "linux_ifort", "linux_gfortran_openmpi"
 
   #compiler selection
   processor="CPU" # "CPU" "GPU"
 
   #  binary directory
-  bindir=$rootdir/bin/
+  bindir=$cmake_install_dir/bin/
   export TSMPPDAFBINDIR=$bindir
 
   # libs directory
-  mkdir -p $bindir/libs
+  mkdir -p $cmake_install_dir/lib
 
 #PDAF interface part configuration variables
 # -----------------------------------------------------
 
   # Oasis include dirs
   importFlagsOAS=" "
-  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/lib/psmile.MPI1 "
-  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/lib/scrip "
-  importFlagsOAS+="-I$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/include "
+  importFlagsOAS+="-I$cmake_install_dir/OASIS3-MCT/lib/psmile.MPI1 "
+  importFlagsOAS+="-I$cmake_install_dir/OASIS3-MCT/lib/scrip "
+  importFlagsOAS+="-I$cmake_install_dir/OASIS3-MCT/include "
 
   # CLM include dirs
   importFlagsCLM=" "
-  importFlagsCLM+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld/ "
+  importFlagsCLM+="-I$cmake_build_dir/CLM3_5/bld/ "
 
   # ParFlow include dirs
   importFlagsPFL=" "
-  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/pfsimulator/parflow_lib "
-  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/pfsimulator/amps/oas3 "
-  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/pfsimulator/amps/common "
-  importFlagsPFL+="-I$rootdir/bld/JURECADC_eCLM-ParFlow/ParFlow/src/ParFlow-build/include/ "
-  importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/build/include "
+  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/pfsimulator/parflow_lib "
+  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/pfsimulator/amps/oas3 "
+  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/pfsimulator/amps/common "
+  importFlagsPFL+="-I$cmake_build_dir/ParFlow/src/ParFlow-build/include/ "
+  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/build/include "
   if [[ $processor == "GPU" ]]; then
     importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/rmm/include/rmm "
   fi
 
   # DA include dirs
   importFlagsDA=" "
-  importFlagsDA+="-I$rootdir/pdaf/interface/model/common "
-  importFlagsDA+="-I$rootdir/pdaf/interface/model/parflow "
+  importFlagsDA+="-I${PDAF_DIR}/interface/model/common "
+  importFlagsDA+="-I${PDAF_DIR}/interface/model/parflow "
 
   # INCLUDE DIRS
   importFlags=" "
@@ -65,7 +74,7 @@
 # -----------------------------------------------------
   # Oasis libraries
   libsOAS=" "
-  libsOAS+="-L$rootdir/run/JURECADC_eCLM-ParFlow/OASIS3-MCT/lib "
+  libsOAS+="-L$cmake_install_dir/OASIS3-MCT/lib "
   libsOAS+="-lpsmile.MPI1 "
   libsOAS+="-lmct "
   libsOAS+="-lmpeu "
@@ -73,15 +82,15 @@
 
   # CLM libraries
   libsCLM=" "
-  cd $rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld
+  cd $cmake_build_dir/CLM3_5/bld
   ar rc libclm.a *.o
-  libsCLM+="-L$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld "
+  libsCLM+="-L$cmake_build_dir/CLM3_5/bld "
   libsCLM+="-lclm "
   
   # ParFlow library paths and libraries
   libsPFL=" "
-  libsPFL+="-L$rootdir/run/JURECADC_eCLM-ParFlow/lib "
-  # libsPFL+="-L$rootdir/run/JURECADC_eCLM-ParFlow/rmm/lib " # GPU
+  libsPFL+="-L$cmake_install_dir/lib "
+  # libsPFL+="-L$cmake_install_dir/rmm/lib " # GPU
   libsPFL+="-lpfsimulator "
   libsPFL+="-lamps "
   libsPFL+="-lpfkinsol "
@@ -93,11 +102,11 @@
     libsPFL+="-lrmm "
     libsPFL+="-lnvToolsExt "
   fi
-  libsPFL+="-L$EBROOTHYPRE/lib -lHYPRE "
-  libsPFL+="-L$EBROOTSILO/lib -lsilo "
+  libsPFL+="-L${EBROOTHYPRE}/lib -lHYPRE "
+  libsPFL+="-L${EBROOTSILO}/lib -lsilo "
 
   # LIBS
-  libs=" -L$EBROOTPSMPI -lmpich -L$netcdfPath/lib/ -lnetcdff -lnetcdf "
+  libs=" -L${EBROOTPSMPI} -lmpich -L$netcdfPath/lib/ -lnetcdff -lnetcdf "
   libs+=$libsCLM
   libs+=$libsOAS
   libs+=$libsPFL
@@ -116,11 +125,6 @@
   # cppdefs+=" -DFREEDRAINAGE "
 
 # -----------------------------------------------------
-#PDAF part configuration variables
-  echo "   PDAF environment variables"
-  export PDAF_DIR=$rootdir/pdaf
-  export PDAF_ARCH=linux_ifort # "linux_ifort", "linux_gfortran_openmpi"
-
 #PDAF interface part
   echo "   PDAF interface environment variables"
     export TSMPPDAFIMPORTFLAGS=$importFlags
