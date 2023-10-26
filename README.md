@@ -167,6 +167,8 @@ run one or more commands below, wait until the build succeeds, then finally run
 
 ### PDAF: component models
 
+Currently only working for CLM3.5-ParFlow-PDAF.
+
 The cloning instructions may slightly change for TSMP-PDAF builds:
 
 ```bash
