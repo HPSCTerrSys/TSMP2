@@ -75,7 +75,7 @@
   libsCLM=" "
   cd $rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld
   ar rc libclm.a *.o
-  libsCLM+="-L$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld"
+  libsCLM+="-L$rootdir/bld/JURECADC_eCLM-ParFlow/CLM3_5/bld "
   libsCLM+="-lclm "
   
   # ParFlow library paths and libraries
