@@ -13,9 +13,9 @@
   cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_$cmake_model_id
 
   # Component model configuration
-  export TSMPPDAFPFLDIR=$rootdir/parflow
-  export TSMPPDAFCLMDIR=$rootdir/clm3_5
-  export TSMPPDAFCOSDIR=$rootdir/cosmo5_1
+  export TSMPPDAFPFLDIR=parflow
+  export TSMPPDAFCLMDIR=clm3_5
+  export TSMPPDAFCOSDIR=cosmo5_1
 
   echo "   source and load Modules $rootdir"
   . $rootdir/env/jsc.2023_Intel.sh
@@ -50,11 +50,11 @@
 
   # ParFlow include dirs
   importFlagsPFL=" "
-  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/pfsimulator/parflow_lib "
-  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/pfsimulator/amps/oas3 "
-  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/pfsimulator/amps/common "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/parflow_lib "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/amps/oas3 "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/amps/common "
   importFlagsPFL+="-I$cmake_build_dir/ParFlow/src/ParFlow-build/include/ "
-  importFlagsPFL+="-I${TSMPPDAFPFLDIR}/build/include "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/build/include "
   if [[ $processor == "GPU" ]]; then
     importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/rmm/include/rmm "
   fi
