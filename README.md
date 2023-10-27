@@ -17,7 +17,7 @@ source env/jsc.2023_Intel.sh
 
 ```bash
 # Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow)
-MODEL_ID="eCLM-ParFlow"
+MODEL_ID="CLM35-ParFlow"
 
 # For PDAF export the variable `MODEL_ID`
 export MODEL_ID="eCLM-ParFlow"
