@@ -24,7 +24,7 @@ ExternalProject_Add(eCLM
     BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
                            # This happens because INSTALL_COMMAND triggers rebuild
                            # which is abnormal. This is a problem in eCLM and should be fixed.
-    DEPENDS           OASIS3_MCT
+    DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
 ExternalProject_Add_Step(eCLM install-scripts

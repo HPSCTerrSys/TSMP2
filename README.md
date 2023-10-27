@@ -40,10 +40,6 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
    models`.
 
 ```bash
-# OASIS3-MCT (required)
-git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
-OASIS_SRC=`realpath oasis3-mct`
-
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
@@ -65,12 +61,20 @@ CLM35_SRC=`realpath CLM3.5`
 # COSMO5.01
 git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git
 COSMO_SRC=`realpath cosmo5.01_fresh`
+
+# OASIS3-MCT (required for coupled models)
+git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+OASIS_SRC=`realpath oasis3-mct`
 ```
 
 5. Run CMake configure step for the model combination that you wish to build. The
    examples below show different CMake configure commands for each model combination. 
 
 ```bash
+#
+# Coupled models requires the option -DOASIS_SRC=${OASIS_SRC}.
+#
+
 # eCLM-ICON
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
@@ -114,6 +118,26 @@ cmake -S . -B ${BUILD_DIR}                    \
       -DOASIS_SRC=${OASIS_SRC}                \
       -DCLM35_SRC=${CLM35_SRC}                \
       -DCOSMO_SRC=${COSMO_SRC}
+
+#
+# For standalone models, remove -DOASIS_SRC=${OASIS_SRC}
+# and pass the path to the component model (i.e. -D<model-name>_SRC=${<model-name>_SRC}).
+#
+
+# CLM3.5 standalone
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DCLM35_SRC=${CLM35_SRC}
+
+# eCLM standalone
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DeCLM_SRC=${eCLM_SRC}
+
+# ParFlow standalone
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DPARFLOW_SRC=${PARFLOW_SRC}
 ```
 
 6. Build and install the models.

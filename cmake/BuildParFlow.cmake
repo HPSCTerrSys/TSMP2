@@ -38,7 +38,7 @@ ExternalProject_Add(ParFlow
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DCMAKE_C_FLAGS=${PF_CFLAGS}
                 -DCMAKE_EXE_LINKER_FLAGS=${PF_LDFLAGS}
-    DEPENDS     OASIS3_MCT
+    DEPENDS     ${MODEL_DEPENDENCIES}
 )
 
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)

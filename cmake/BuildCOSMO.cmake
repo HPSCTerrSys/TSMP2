@@ -27,7 +27,7 @@ ExternalProject_Add(COSMO5_1
   BUILD_ALWAYS      YES
   INSTALL_COMMAND   ""
   BUILD_BYPRODUCTS  ${COSMO_BLD_DIR}/lmparbin_pur
-  DEPENDS           OASIS3_MCT
+  DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
 install (FILES ${COSMO_BLD_DIR}/lmparbin_pur 
