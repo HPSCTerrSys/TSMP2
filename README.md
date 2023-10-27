@@ -3,7 +3,7 @@
 1. Clone this repository.
 
 ```bash
-git clone https://github.com/HPSCTerrSys/eTSMP.git
+git clone -p pdaf https://github.com/jjokella/eTSMP.git
 cd eTSMP
 ```
 
@@ -18,6 +18,9 @@ source env/jsc.2023_Intel.sh
 ```bash
 # Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow)
 MODEL_ID="eCLM-ParFlow"
+
+# For PDAF export the variable `MODEL_ID`
+export MODEL_ID="eCLM-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
