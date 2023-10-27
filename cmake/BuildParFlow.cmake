@@ -33,7 +33,7 @@ ExternalProject_Add(ParFlow
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=on
                 -DHYPRE_ROOT=${HYPRE_ROOT}
                 -DPARFLOW_ENABLE_TIMING=TRUE
-                -DPARFLOW_ENABLE_SLURM=FALSE
+                -DPARFLOW_ENABLE_SLURM=TRUE
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DCMAKE_C_FLAGS=${PF_CFLAGS}

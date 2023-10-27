@@ -55,6 +55,7 @@
   importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/amps/common "
   importFlagsPFL+="-I$cmake_build_dir/ParFlow/src/ParFlow-build/include/ "
   importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/build/include "
+  importFlagsPFL+="-I/usr/include "
   if [[ $processor == "GPU" ]]; then
     importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/rmm/include/rmm "
   fi
@@ -104,6 +105,7 @@
   fi
   libsPFL+="-L${EBROOTHYPRE}/lib -lHYPRE "
   libsPFL+="-L${EBROOTSILO}/lib -lsilo "
+  libsPFL+="-L/lib64 -lslurm "
 
   # LIBS
   libs=" -L${EBROOTPSMPI} -lmpich -L$netcdfPath/lib/ -lnetcdff -lnetcdf "
