@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+
+#######################################
+#		Main
+#######################################
+
+# Initial settings
+# -----------------------------------------------------
+  rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
+
+  cmake_model_id=${MODEL_ID}   # "eCLM-ParFlow"
+  cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_$cmake_model_id
+  cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_$cmake_model_id
+
+  # Component model configuration
+  export TSMPPDAFPFLDIR=parflow
+  export TSMPPDAFCLMDIR=clm3_5
+  export TSMPPDAFCOSDIR=cosmo5_1
+
+  echo "   source and load Modules $rootdir"
+  . $rootdir/env/jsc.2023_Intel.sh
+
+  #PDAF part configuration variables
+  echo "   PDAF environment variables"
+  export PDAF_DIR=$rootdir/pdaf
+  export PDAF_ARCH=linux_ifort # "linux_ifort", "linux_gfortran_openmpi"
+
+  #compiler selection
+  processor="CPU" # "CPU" "GPU"
+
+  #  binary directory
+  export TSMPPDAFBINDIR=$cmake_install_dir/bin
+  export TSMPPDAFLIBDIR=$cmake_install_dir/lib
+
+  # libs directory
+  mkdir -p $cmake_install_dir/lib
+
+#PDAF interface part configuration variables
+# -----------------------------------------------------
+
+  # Oasis include dirs
+  importFlagsOAS=" "
+  importFlagsOAS+="-I$cmake_install_dir/OASIS3-MCT/lib/psmile.MPI1 "
+  importFlagsOAS+="-I$cmake_install_dir/OASIS3-MCT/lib/scrip "
+  importFlagsOAS+="-I$cmake_install_dir/OASIS3-MCT/include "
+
+  # CLM include dirs
+  importFlagsCLM=" "
+  importFlagsCLM+="-I$cmake_build_dir/CLM3_5/bld/ "
+
+  # ParFlow include dirs
+  importFlagsPFL=" "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/parflow_lib "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/amps/oas3 "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/pfsimulator/amps/common "
+  importFlagsPFL+="-I$cmake_build_dir/ParFlow/src/ParFlow-build/include/ "
+  importFlagsPFL+="-I$rootdir/${TSMPPDAFPFLDIR}/build/include "
+  importFlagsPFL+="-I/usr/include "
+  if [[ $processor == "GPU" ]]; then
+    importFlagsPFL+="-I$rootdir/$TSMPPDAFPFLDIR/rmm/include/rmm "
+  fi
+
+  # DA include dirs
+  importFlagsDA=" "
+  importFlagsDA+="-I${PDAF_DIR}/interface/model/common "
+  importFlagsDA+="-I${PDAF_DIR}/interface/model/parflow "
+
+  # INCLUDE DIRS
+  importFlags=" "
+  importFlags+=$importFlagsCLM
+  importFlags+=$importFlagsOAS
+  importFlags+=$importFlagsPFL
+  importFlags+=$importFlagsDA
+
+# -----------------------------------------------------
+  # Oasis libraries
+  libsOAS=" "
+  libsOAS+="-L$cmake_install_dir/OASIS3-MCT/lib "
+  libsOAS+="-lpsmile.MPI1 "
+  libsOAS+="-lmct "
+  libsOAS+="-lmpeu "
+  libsOAS+="-lscrip "
+
+  # CLM libraries
+  libsCLM=" "
+  cd $cmake_build_dir/CLM3_5/bld
+  ar rc libclm.a *.o
+  libsCLM+="-L$cmake_build_dir/CLM3_5/bld "
+  libsCLM+="-lclm "
+  
+  # ParFlow library paths and libraries
+  libsPFL=" "
+  libsPFL+="-L$cmake_install_dir/lib "
+  libsPFL+="-lpfsimulator "
+  libsPFL+="-lamps "
+  libsPFL+="-lpfkinsol "
+  libsPFL+="-lgfortran "
+  libsPFL+="-lcjson "
+  if [[ $processor == "GPU" ]]; then
+    libsPFL+="-L$cmake_install_dir/rmm/lib " # GPU
+    libsPFL+="-lstdc++ "
+    libsPFL+="-lcudart "
+    libsPFL+="-lrmm "
+    libsPFL+="-lnvToolsExt "
+  fi
+  libsPFL+="-L${EBROOTHYPRE}/lib -lHYPRE "
+  libsPFL+="-L${EBROOTSILO}/lib -lsilo "
+  libsPFL+="-L/lib64 -lslurm "
+
+  # LIBS
+  libs=" -L${EBROOTPSMPI} -lmpich -L$netcdfPath/lib/ -lnetcdff -lnetcdf "
+  libs+=$libsCLM
+  libs+=$libsOAS
+  libs+=$libsPFL
+
+# -----------------------------------------------------
+  # CPPDEFS
+  cppdefs=" "
+  # cppdefs+=" -DPARFLOW_STAND_ALONE "
+  # cppdefs+=" -DCLMSA "
+  cppdefs+=" -Duse_comm_da "
+  cppdefs+=" -DMAXPATCH_PFT=1 "
+  cppdefs+=" -DCOUP_OAS_PFL "
+  cppdefs+=" -DOBS_ONLY_PARFLOW " # Remove for observations from both ParFlow + CLM
+  # cppdefs+=" -DCPL_SCHEME_F "
+  # cppdefs+=" -DREADCLM "
+  # cppdefs+=" -DFREEDRAINAGE "
+
+# -----------------------------------------------------
+#PDAF interface part
+  echo "   PDAF interface environment variables"
+    export TSMPPDAFIMPORTFLAGS=$importFlags
+    export TSMPPDAFCPPDEFS=$cppdefs
+    export TSMPPDAFLIBS=$libs
+
+
+# -----------------------------------------------------
+#Make clean PDAF    
+  echo "   make clean pdaf"
+    cd ${PDAF_DIR}/src
+    make clean
+  echo "   make clean model"
+    cd ${PDAF_DIR}/interface/model
+    make clean
+  echo "   make clean framework"
+    cd ${PDAF_DIR}/interface/framework
+    make clean
+
+#Make PDAF
+  echo "   make pdaf"
+    cd ${PDAF_DIR}/src
+    make
+  echo "   make pdaf model"
+    cd ${PDAF_DIR}/interface/model
+    make
+  echo "   make pdaf framework"
+    cd ${PDAF_DIR}/interface/framework
+    make
+
+# -----------------------------------------------------
+  echo "build script finished sucessfully"
+  echo "Rootdir: ${rootdir}"
+  echo "Bindir: ${TSMPPDAFBINDIR}"
+
+
