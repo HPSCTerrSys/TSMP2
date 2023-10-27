@@ -58,7 +58,7 @@ ExternalProject_Add(ICON
     BUILD_COMMAND     make -j8 install
     INSTALL_COMMAND   ""
     BUILD_ALWAYS      YES
-    DEPENDS           OASIS3_MCT
+    DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
 get_model_version(${ICON_SRC} ICON_VERSION)
