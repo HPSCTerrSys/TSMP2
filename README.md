@@ -214,7 +214,7 @@ OASIS_SRC=`realpath oasis3-mct`
 <!-- ICON_SRC=`realpath icon2.6.4_oascoup` -->
 
 # ParFlow
-git clone -b tsmp-pdaf-patches https://github.com/HPSCTerrSys/parflow
+git clone -b tsmp-pdaf-patched https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
 # CLM3.5
