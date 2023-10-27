@@ -3,7 +3,7 @@
 1. Clone this repository.
 
 ```bash
-git clone -p pdaf https://github.com/jjokella/eTSMP.git
+git clone -b pdaf https://github.com/jjokella/eTSMP.git
 cd eTSMP
 ```
 
