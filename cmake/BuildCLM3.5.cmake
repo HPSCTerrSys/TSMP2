@@ -37,7 +37,7 @@ ExternalProject_Add(CLM3_5
   CONFIGURE_COMMAND ${CLM35_SRC}/bld/configure ${CLM35_CONFIG_OPTS}
   BUILD_COMMAND     make -j8 -C ${CMAKE_BINARY_DIR}/CLM3_5/bld
   INSTALL_COMMAND   ""
-  DEPENDS           OASIS3_MCT
+  DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
 get_model_version(${CLM35_SRC} CLM35_VERSION)
