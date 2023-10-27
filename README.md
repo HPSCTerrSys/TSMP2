@@ -20,7 +20,7 @@ source env/jsc.2023_Intel.sh
 MODEL_ID="CLM35-ParFlow"
 
 # For PDAF export the variable `MODEL_ID`
-export MODEL_ID="eCLM-ParFlow"
+export MODEL_ID="CLM35-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
