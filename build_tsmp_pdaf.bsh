@@ -4,6 +4,9 @@
 #		Main
 #######################################
 
+# Leave script on error
+  set -e
+
 # Initial settings
 # -----------------------------------------------------
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
