@@ -151,13 +151,16 @@ cmake --build ${BUILD_DIR}
 cmake --install ${BUILD_DIR}
 ```
 
-7. (Only for TSMP-PDAF:) Execute `./build_tsmp_pdaf.bsh` after
-   building and installing the component models. Be sure to check the
-   initial settings of the script.
+7. (Only for TSMP-PDAF:) Run the script for building PDAF and the interface to PDAF. 
+   Be sure to check the initial settings of the script.
+```bash
+./build_tsmp_pdaf.bsh
+```
 
 ### Resuming a failed build
 
-When the build gets interrupted or fails for some reason, it can be resumed by simply running Step 6:
+When the build gets interrupted or fails for some reason, it can be
+resumed by simply running Step 6:
 
 ```bash
 cmake --build ${BUILD_DIR}
