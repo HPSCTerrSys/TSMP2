@@ -51,7 +51,7 @@ git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git
 ICON_SRC=`realpath icon2.6.4_oascoup`
 
 # ParFlow
-git clone -b v3.12.0 https://github.com/parflow/parflow.git
+git clone -b tsmp-pdaf-patched https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
 # CLM3.5
@@ -62,9 +62,13 @@ CLM35_SRC=`realpath CLM3.5`
 git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git
 COSMO_SRC=`realpath cosmo5.01_fresh`
 
-# OASIS3-MCT (required for coupled models)
-git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+# OASIS3-MCT (required)
+git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/jkeller/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
+
+# PDAF
+git clone https://github.com/HPSCTerrSys/pdaf.git
+PDAF_SRC=`realpath pdaf`
 ```
 
 5. Run CMake configure step for the model combination that you wish to build. The
@@ -191,41 +195,3 @@ run one or more commands below, wait until the build succeeds, then finally run
 - `cmake --build ${BUILD_DIR} --target CLM3_5`
 - `cmake --build ${BUILD_DIR} --target COSMO5_1`
 
-
-### PDAF: component models
-
-Currently only working for CLM3.5-ParFlow-PDAF.
-
-The cloning instructions may slightly change for TSMP-PDAF builds:
-
-```bash
-# OASIS3-MCT (required)
-git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/jkeller/oasis3-mct
-OASIS_SRC=`realpath oasis3-mct`
-
-## NOTE: Download only the component models that you need! ##
-
-<!-- # eCLM -->
-<!-- git clone https://github.com/HPSCTerrSys/eCLM.git -->
-<!-- eCLM_SRC=`realpath eCLM` -->
-
-<!-- # ICON -->
-<!-- git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git -->
-<!-- ICON_SRC=`realpath icon2.6.4_oascoup` -->
-
-# ParFlow
-git clone -b tsmp-pdaf-patched https://github.com/HPSCTerrSys/parflow
-PARFLOW_SRC=`realpath parflow`
-
-# CLM3.5
-git clone https://github.com/HPSCTerrSys/CLM3.5.git
-CLM35_SRC=`realpath CLM3.5`
-
-<!-- # COSMO5.01 -->
-<!-- git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git -->
-<!-- COSMO_SRC=`realpath cosmo5.01_fresh` -->
-
-# PDAF
-git clone https://github.com/HPSCTerrSys/pdaf.git
-PDAF_SRC=`realpath pdaf`
-```
