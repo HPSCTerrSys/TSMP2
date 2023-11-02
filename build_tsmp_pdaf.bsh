@@ -124,9 +124,9 @@
   # Common object files
   objects_common=" "
   objects_common+="dictionary.o "
-  objects_common++="iniparser.o "
-  objects_common+++="read_enkfpar.o "
-  objects_common++++="wrapper_tsmp.o "
+  objects_common+="iniparser.o "
+  objects_common+="read_enkfpar.o "
+  objects_common+="wrapper_tsmp.o "
 
   # CLM object files
   objects_clm=" "
