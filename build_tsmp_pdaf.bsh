@@ -179,7 +179,7 @@
     export TSMPPDAFIMPORTFLAGS=$importFlags
     export TSMPPDAFCPPDEFS=$cppdefs
     export TSMPPDAFLIBS=$libs
-    export TSMPPDAFOBS=$objects
+    export TSMPPDAFOBJ=$objects
 
 
 # -----------------------------------------------------
