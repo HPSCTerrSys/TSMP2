@@ -41,5 +41,16 @@ ExternalProject_Add(ParFlow
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
 
+#TODO-PDAF: Check include dirs & link flags
+if(DEFINED PDAF_SRC)
+  add_library(ParFlow-LIB INTERFACE IMPORTED GLOBAL)
+  target_include_directories(ParFlow-LIB INTERFACE ${CMAKE_INSTALL_PREFIX}/include)
+  target_link_directories(ParFlow-LIB INTERFACE ${CMAKE_INSTALL_PREFIX}/lib)
+  target_link_libraries(ParFlow-LIB INTERFACE pfsimulator amps pfkinsol gfortran cjson)
+
+  add_dependencies(ParFlow-LIB ParFlow)
+  list(APPEND PDAF_DEPENDENCIES ParFlow-LIB)
+endif()
+
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)
 list(APPEND eTSMP_MODEL_VERSIONS "ParFlow: ${PARFLOW_VERSION}")

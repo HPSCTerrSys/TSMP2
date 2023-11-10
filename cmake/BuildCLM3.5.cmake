@@ -40,5 +40,17 @@ ExternalProject_Add(CLM3_5
   DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
+#TODO-PDAF
+if(DEFINED PDAF_SRC)
+  add_library(CLM3_5-LIB INTERFACE IMPORTED GLOBAL)
+  target_include_directories(CLM3_5-LIB INTERFACE ${CMAKE_BINARY_DIR}/CLM3_5/bld)
+  target_link_directories(CLM3_5-LIB INTERFACE ${CMAKE_BINARY_DIR}/CLM3_5/bld)
+  target_link_libraries(CLM3_5-LIB INTERFACE libclm.a)
+  #TODO: ar rc libclm.a *.o
+  add_dependencies(CLM3_5-LIB CLM3_5)
+  install (FILES ${CMAKE_BINARY_DIR}/CLM3_5/bld/libclm.a TYPE LIB)
+  list(APPEND PDAF_DEPENDENCIES CLM3_5-LIB)
+endif()
+
 get_model_version(${CLM35_SRC} CLM35_VERSION)
 list(APPEND eTSMP_MODEL_VERSIONS "CLM3.5: ${CLM35_VERSION}")

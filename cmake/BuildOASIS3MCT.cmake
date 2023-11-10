@@ -1,14 +1,14 @@
 find_package(NetCDF REQUIRED)
 
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-  set(OMPTIM_FLAG "-g")
+  set(OPTIM "-g")
   set(MCT_DEBUGFLAG "--enable-debugging")
 elseif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-  set(OMPTIM_FLAG "-O2")
+  set(OPTIM "-O2")
   set(MCT_DEBUGFLAG "")
 else()
   # Assume CMAKE_BUILD_TYPE=RELEASE if CMAKE_BUILD_TYPE is unknown
-  set(OMPTIM_FLAG "-O2")
+  set(OPTIM "-O2")
   message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by OASIS3-MCT")
 endif()
 
@@ -35,8 +35,8 @@ file(APPEND  ${OASIS_MAKE_INC} "ARFLAGS         = -ruv\n")
 file(APPEND  ${OASIS_MAKE_INC} "DYNOPT          = -fPIC\n")
 file(APPEND  ${OASIS_MAKE_INC} "LDDYNOPT        = -shared\n")
 file(APPEND  ${OASIS_MAKE_INC} "CPPDEF          = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY\n")
-file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OMPTIM_FLAG} -xCORE-AVX2 -I. -assume byterecl -mt_mpi -qopenmp\n")
-file(APPEND  ${OASIS_MAKE_INC} "CCBASEFLAGS     = ${OMPTIM_FLAG} -qopenmp\n")
+file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OPTIM} -xCORE-AVX2 -I. -assume byterecl -mt_mpi -qopenmp\n")
+file(APPEND  ${OASIS_MAKE_INC} "CCBASEFLAGS     = ${OPTIM} -qopenmp\n")
 file(APPEND  ${OASIS_MAKE_INC} "MCT_DEBUGFLAG   = ${MCT_DEBUGFLAG}\n")
 file(APPEND  ${OASIS_MAKE_INC} "FLIBS           = ${NetCDF_LIBRARIES}\n")
 file(APPEND  ${OASIS_MAKE_INC} "INC_DIRS        = -I$(ARCHDIR)/include -I$(NETCDF_INCLUDE)\n")
@@ -60,6 +60,17 @@ ExternalProject_Add(OASIS3_MCT
   BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 realclean static-libs -C ${OASIS_BLD_DIR}
   INSTALL_COMMAND   ""
 )
+
+#TODO-PDAF: Check include dirs & link flags
+if(DEFINED PDAF_SRC)
+  add_library(OASIS3_MCT-LIB INTERFACE IMPORTED GLOBAL)
+  target_include_directories(OASIS3_MCT-LIB INTERFACE ${OASIS_INSTALL_PREFIX}/include)
+  target_link_directories(OASIS3_MCT-LIB INTERFACE ${OASIS_INSTALL_PREFIX}/lib)
+  target_link_libraries(OASIS3_MCT-LIB INTERFACE psmile.MPI1 mct mpeu scrip)
+
+  add_dependencies(OASIS3_MCT-LIB OASIS3_MCT)
+  list(APPEND PDAF_DEPENDENCIES OASIS3_MCT-LIB)
+endif()
 
 set(OASIS_ROOT ${OASIS_INSTALL_PREFIX} CACHE PATH "Full path to the root directory containing OASIS3-MCT include files and libraries.")
 set(OASIS_LIBRARIES "-L${OASIS_ROOT}/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip" CACHE STRING "OASIS3-MCT linker options")
