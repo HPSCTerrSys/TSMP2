@@ -11,13 +11,13 @@
 # -----------------------------------------------------
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
-  cmake_model_id=${MODEL_ID}   # "eCLM-ParFlow"
+  # Check that MODEL_ID is non-empty
   if [ -z "$MODEL_ID" ]; then
     echo "MODEL_ID is empty."
     exit 1
   fi
-  cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_$cmake_model_id
-  cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_$cmake_model_id
+  cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_${MODEL_ID}
+  cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_${MODEL_ID}
 
   # Component model configuration
   export TSMPPDAFPFLDIR=parflow
