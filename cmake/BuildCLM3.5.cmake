@@ -5,6 +5,13 @@ list(APPEND CLM35_CONFIG_OPTS -cc ${CMAKE_C_COMPILER})
 list(APPEND CLM35_CONFIG_OPTS -fc ${CMAKE_Fortran_COMPILER})
 list(APPEND CLM35_CONFIG_OPTS -clm_bld ${CMAKE_BINARY_DIR}/CLM3_5/bld)
 list(APPEND CLM35_CONFIG_OPTS -clm_exedir ${CMAKE_INSTALL_PREFIX}/bin)
+if(DEFINED PDAF_SRC)
+  list(APPEND CLM35_CONFIG_OPTS -clm_libdir ${CMAKE_INSTALL_PREFIX}/lib)
+  list(APPEND CLM35_CONFIG_OPTS -clm_incdir ${CMAKE_INSTALL_PREFIX}/include/clm3.5)
+  set(CLM35_MAKE_TARGET "all")
+else()
+  set(CLM35_MAKE_TARGET "default")
+endif()
 list(APPEND CLM35_CONFIG_OPTS -usr_src ${CLM35_SRC}/bld/usr.src)
 list(APPEND CLM35_CONFIG_OPTS -mpi_lib ${MPI_Fortran_LIB_DIR})
 list(APPEND CLM35_CONFIG_OPTS -mpi_inc ${MPI_Fortran_INCLUDE_DIRS})
@@ -35,7 +42,7 @@ ExternalProject_Add(CLM3_5
   SOURCE_DIR        ${CLM35_SRC}
   BUILD_IN_SOURCE   FALSE
   CONFIGURE_COMMAND ${CLM35_SRC}/bld/configure ${CLM35_CONFIG_OPTS}
-  BUILD_COMMAND     make -j8 -C ${CMAKE_BINARY_DIR}/CLM3_5/bld
+  BUILD_COMMAND     make -j8 ${CLM35_MAKE_TARGET} -C ${CMAKE_BINARY_DIR}/CLM3_5/bld
   INSTALL_COMMAND   ""
   DEPENDS           ${MODEL_DEPENDENCIES}
 )
@@ -43,12 +50,10 @@ ExternalProject_Add(CLM3_5
 #TODO-PDAF
 if(DEFINED PDAF_SRC)
   add_library(CLM3_5-LIB INTERFACE IMPORTED GLOBAL)
-  target_include_directories(CLM3_5-LIB INTERFACE ${CMAKE_BINARY_DIR}/CLM3_5/bld)
-  target_link_directories(CLM3_5-LIB INTERFACE ${CMAKE_BINARY_DIR}/CLM3_5/bld)
+  target_include_directories(CLM3_5-LIB INTERFACE ${CMAKE_INSTALL_PREFIX}/include/clm3.5)
+  target_link_directories(CLM3_5-LIB INTERFACE ${CMAKE_INSTALL_PREFIX}/lib)
   target_link_libraries(CLM3_5-LIB INTERFACE libclm.a)
-  #TODO: ar rc libclm.a *.o
   add_dependencies(CLM3_5-LIB CLM3_5)
-  install (FILES ${CMAKE_BINARY_DIR}/CLM3_5/bld/libclm.a TYPE LIB)
   list(APPEND PDAF_DEPENDENCIES CLM3_5-LIB)
 endif()
 
