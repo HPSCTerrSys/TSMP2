@@ -47,14 +47,10 @@ ExternalProject_Add(CLM3_5
   DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
-#TODO-PDAF
 if(DEFINED PDAF_SRC)
-  add_library(CLM3_5-LIB INTERFACE IMPORTED GLOBAL)
-  target_include_directories(CLM3_5-LIB INTERFACE ${CMAKE_INSTALL_PREFIX}/include/clm3.5)
-  target_link_directories(CLM3_5-LIB INTERFACE ${CMAKE_INSTALL_PREFIX}/lib)
-  target_link_libraries(CLM3_5-LIB INTERFACE libclm.a)
-  add_dependencies(CLM3_5-LIB CLM3_5)
-  list(APPEND PDAF_DEPENDENCIES CLM3_5-LIB)
+  list(APPEND PDAF_DEPENDENCIES CLM3_5)
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/clm3.5")
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lclm")
 endif()
 
 get_model_version(${CLM35_SRC} CLM35_VERSION)

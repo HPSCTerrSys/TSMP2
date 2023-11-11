@@ -61,18 +61,15 @@ ExternalProject_Add(OASIS3_MCT
   INSTALL_COMMAND   ""
 )
 
-#TODO-PDAF: Check include dirs & link flags
-if(DEFINED PDAF_SRC)
-  add_library(OASIS3_MCT-LIB INTERFACE IMPORTED GLOBAL)
-  target_include_directories(OASIS3_MCT-LIB INTERFACE ${OASIS_INSTALL_PREFIX}/include)
-  target_link_directories(OASIS3_MCT-LIB INTERFACE ${OASIS_INSTALL_PREFIX}/lib)
-  target_link_libraries(OASIS3_MCT-LIB INTERFACE psmile.MPI1 mct mpeu scrip)
-
-  add_dependencies(OASIS3_MCT-LIB OASIS3_MCT)
-  list(APPEND PDAF_DEPENDENCIES OASIS3_MCT-LIB)
-endif()
-
 set(OASIS_ROOT ${OASIS_INSTALL_PREFIX} CACHE PATH "Full path to the root directory containing OASIS3-MCT include files and libraries.")
 set(OASIS_LIBRARIES "-L${OASIS_ROOT}/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip" CACHE STRING "OASIS3-MCT linker options")
 get_model_version(${OASIS_SRC} OASIS_VERSION)
 list(APPEND eTSMP_MODEL_VERSIONS "OASIS3-MCT: ${OASIS_VERSION}")
+
+if(DEFINED PDAF_SRC)
+  list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
+  list(APPEND PDAF_INCLUDES "-I${OASIS_INSTALL_PREFIX}/lib/psmile.MPI1")
+  list(APPEND PDAF_INCLUDES "-I${OASIS_INSTALL_PREFIX}/lib/scrip")
+  list(APPEND PDAF_INCLUDES "-I${OASIS_INSTALL_PREFIX}/lib/include")
+  list(APPEND PDAF_LIBS "${OASIS_LIBRARIES}")
+endif()
