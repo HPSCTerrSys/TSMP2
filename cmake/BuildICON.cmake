@@ -1,7 +1,6 @@
 # ICON 2.6.4
 set(ICON_CFLAGS "-gdwarf-4 -qno-opt-dynamic-align -ftz -march=native")
 set(ICON_FCFLAGS "-I${OASIS_ROOT}/include -gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
-set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed ${OASIS_LIBRARIES}")
 set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
@@ -38,6 +37,7 @@ list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
 list(JOIN ICON_LIBS " " ICON_LIBS)
 
+set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed ${OASIS_LIBRARIES} -l${HDF5_LIBRARIES}")
 list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-oascoupling --enable-ecrad --enable-parallel-netcdf)
 
 ExternalProject_Add(ICON
