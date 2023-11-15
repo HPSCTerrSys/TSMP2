@@ -4,13 +4,20 @@
 #		Main
 #######################################
 
+# Leave script on error
+  set -e
+
 # Initial settings
 # -----------------------------------------------------
   rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
 
-  cmake_model_id=${MODEL_ID}   # "eCLM-ParFlow"
-  cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_$cmake_model_id
-  cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_$cmake_model_id
+  # Check that MODEL_ID is non-empty
+  if [ -z "$MODEL_ID" ]; then
+    echo "MODEL_ID is empty."
+    exit 1
+  fi
+  cmake_build_dir=$rootdir/bld/${SYSTEMNAME^^}_${MODEL_ID}
+  cmake_install_dir=$rootdir/run/${SYSTEMNAME^^}_${MODEL_ID}
 
   # Component model configuration
   export TSMPPDAFPFLDIR=parflow
@@ -113,6 +120,46 @@
   libs+=$libsOAS
   libs+=$libsPFL
 
+
+  # Common object files
+  objects_common=" "
+  objects_common+="dictionary.o "
+  objects_common+="iniparser.o "
+  objects_common+="read_enkfpar.o "
+  objects_common+="wrapper_tsmp.o "
+
+  # CLM object files
+  objects_clm=" "
+  objects_clm+="enkf_clm_mod.o "
+  objects_clm+="mod_clm_statistics.o "
+  objects_clm+="print_update_clm.o "
+  objects_clm+="enkf_clm.o "
+
+  # CLM5 object files
+  objects_clm5=" "
+  objects_clm5+="enkf_clm_mod_5.o "
+  objects_clm5+="mod_clm_statistics_5.o "
+  objects_clm5+="print_update_clm_5.o "
+  objects_clm5+="enkf_clm_5.o "
+
+  # ParFlow object files
+  objects_parflow=" "
+  objects_parflow+="enkf_parflow.o "
+  objects_parflow+="enkf_ensemblestatistics.o "
+  objects_parflow+="problem_saturationtopressure.o "
+
+  # Cosmo object files
+  objects_cosmo=" "
+  objects_cosmo+="enkf_cosmo_mod.o "
+  objects_cosmo+="enkf_cosmo.o "
+
+  objects=" "
+  objects+=$objects_common
+  objects+=$objects_clm
+  # objects+=$objects_clm5
+  objects+=$objects_parflow
+  # objects+=$objects_cosmo
+
 # -----------------------------------------------------
   # CPPDEFS
   cppdefs=" "
@@ -132,6 +179,7 @@
     export TSMPPDAFIMPORTFLAGS=$importFlags
     export TSMPPDAFCPPDEFS=$cppdefs
     export TSMPPDAFLIBS=$libs
+    export TSMPPDAFOBJ=$objects
 
 
 # -----------------------------------------------------
