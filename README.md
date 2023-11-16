@@ -51,7 +51,7 @@ git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git
 ICON_SRC=`realpath icon2.6.4_oascoup`
 
 # ParFlow
-git clone -b tsmp-pdaf-patched https://github.com/HPSCTerrSys/parflow
+git clone https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
 # CLM3.5
