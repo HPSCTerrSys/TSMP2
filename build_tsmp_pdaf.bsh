@@ -9,7 +9,7 @@
 
 # Initial settings
 # -----------------------------------------------------
-  rootdir=/p/scratch/cjibg36/jibg3683/DATAASSIMILATION/TSMP-PDAF/eTSMP
+  rootdir=`realpath .`
 
   # Check that MODEL_ID is non-empty
   if [ -z "$MODEL_ID" ]; then
