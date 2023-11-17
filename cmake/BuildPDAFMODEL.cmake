@@ -15,22 +15,28 @@ list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/common")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/parflow")
 
 # OASIS include dirs
-list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib/psmile.MPI1")
-list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib/scrip")
-list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/include")
+if(DEFINED OASIS_SRC)
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib/psmile.MPI1")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib/scrip")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/include")
+endif()
 
 # CLM include dirs
-list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld")
+if(DEFINED CLM35_SRC)
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld")
+endif()
 
 # ParFlow include dirs
-# list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
-list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib")
-list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3")
-list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common")
-list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/ParFlow-build/include")
-list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/build/include")
-list(APPEND PDAF_INCLUDES "-I/usr/include")
-# list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
+if(DEFINED PARFLOW_SRC)
+  # list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
+  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib")
+  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3")
+  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/ParFlow-build/include")
+  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/build/include")
+  list(APPEND PDAF_INCLUDES "-I/usr/include")
+  # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
+endif()
 
 # Join list of include dirs
 list(JOIN PDAF_INCLUDES " " PDAF_INCLUDES)
@@ -42,18 +48,24 @@ list(APPEND PDAF_LIBS "-L${MPI_Fortran_LIB_DIR} -lmpich")
 list(APPEND PDAF_LIBS "${NetCDF_LIBRARIES}")
 
 # OASIS libraries
-list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip")
+if(DEFINED OASIS_SRC)
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip")
+endif()
 
 # CLM libraries
-list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lclm")
+if(DEFINED CLM35_SRC)
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lclm")
+endif()
 
 # ParFlow libraries
-list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
-# GPU
-# list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
-list(APPEND PDAF_LIBS "-L${EBROOTHYPRE}/lib -lHYPRE")
-list(APPEND PDAF_LIBS "-L${EBROOTSILO}/lib -lsilo")
-list(APPEND PDAF_LIBS "-L/lib64 -lslurm")
+if(DEFINED PARFLOW_SRC)
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
+  # GPU
+  # list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
+  list(APPEND PDAF_LIBS "-L${EBROOTHYPRE}/lib -lHYPRE")
+  list(APPEND PDAF_LIBS "-L${EBROOTSILO}/lib -lsilo")
+  list(APPEND PDAF_LIBS "-L/lib64 -lslurm")
+endif()
 
 # Join list of libraries
 list(JOIN PDAF_LIBS " " PDAF_LIBS)
@@ -61,10 +73,18 @@ list(JOIN PDAF_LIBS " " PDAF_LIBS)
 
 # Precompiler definitions
 # -----------------------
-list(APPEND PDAF_DEFS "-Duse_comm_da")
-list(APPEND PDAF_DEFS "-DMAXPATCH_PFT=1")
-list(APPEND PDAF_DEFS "-DCOUP_OAS_PFL")
-list(APPEND PDAF_DEFS "-DOBS_ONLY_PARFLOW")
+if(DEFINED OASIS_SRC)
+  list(APPEND PDAF_DEFS "-Duse_comm_da")
+  list(APPEND PDAF_DEFS "-DMAXPATCH_PFT=1")
+  if(DEFINED PARFLOW_SRC)
+    list(APPEND PDAF_DEFS "-DCOUP_OAS_PFL")
+    list(APPEND PDAF_DEFS "-DOBS_ONLY_PARFLOW")
+  endif()
+else()
+  if(DEFINED CLM35_SRC)
+    list(APPEND PDAF_DEFS "-DCLMSA")
+  endif()
+endif()
 
 # Join list of precompiler definitions
 list(JOIN PDAF_DEFS " " PDAF_DEFS)

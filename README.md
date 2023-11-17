@@ -140,6 +140,12 @@ cmake -S . -B ${BUILD_DIR}                    \
 # For TSMP-PDAF builds, add -PDAF_SRC=${PDAF_SRC}
 #
 
+# CLM3.5-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DCLM35_SRC=${CLM35_SRC}                \
+      -DPDAF_SRC=${PDAF_SRC}
+
 # CLM3.5-ParFlow-PDAF
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
