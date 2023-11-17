@@ -154,6 +154,19 @@ cmake -S . -B ${BUILD_DIR}                    \
       -DPARFLOW_SRC=${PARFLOW_SRC}            \
       -DPDAF_SRC=${PDAF_SRC}
 
+# eCLM-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DeCLM_SRC=${eCLM_SRC}                \
+      -DPDAF_SRC=${PDAF_SRC}
+
+# eCLM-ParFlow-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DeCLM_SRC=${eCLM_SRC}                \
+      -DPARFLOW_SRC=${PARFLOW_SRC}            \
+      -DPDAF_SRC=${PDAF_SRC}
 
 ```
 
