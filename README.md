@@ -56,7 +56,7 @@ git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src
 COSMO_SRC=`realpath cosmo5.01_fresh`
 
 # OASIS3-MCT (required for coupled models)
-git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/jkeller/oasis3-mct
+git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
 
 # PDAF
