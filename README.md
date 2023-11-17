@@ -36,7 +36,7 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone https://github.com/HPSCTerrSys/eCLM.git
+git clone -b devel-pdaf https://github.com/HPSCTerrSys/eCLM.git
 eCLM_SRC=`realpath eCLM`
 
 # ICON
@@ -55,7 +55,7 @@ CLM35_SRC=`realpath CLM3.5`
 git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git
 COSMO_SRC=`realpath cosmo5.01_fresh`
 
-# OASIS3-MCT (required)
+# OASIS3-MCT (required for coupled models)
 git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/jkeller/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
 
