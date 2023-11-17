@@ -67,10 +67,6 @@ COSMO_SRC=`realpath cosmo5.01_fresh`
 git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
 
-# OASIS3-MCT (required for coupled models, PDAF-patched)
-git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
-OASIS_SRC=`realpath oasis3-mct`
-
 # PDAF
 git clone https://github.com/HPSCTerrSys/pdaf.git
 PDAF_SRC=`realpath pdaf`
