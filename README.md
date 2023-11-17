@@ -16,7 +16,7 @@ source env/jsc.2023_Intel.sh
 3. Specify build and install directories.
 
 ```bash
-# Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow)
+# Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
 MODEL_ID="CLM35-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
