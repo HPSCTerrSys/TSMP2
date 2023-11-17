@@ -179,8 +179,7 @@ cmake --install ${BUILD_DIR}
 
 ### Resuming a failed build
 
-When the build gets interrupted or fails for some reason, it can be
-resumed by simply running Step 6:
+When the build gets interrupted or fails for some reason, it can be resumed by simply running Step 6:
 
 ```bash
 cmake --build ${BUILD_DIR}
@@ -217,4 +216,3 @@ run one or more commands below, wait until the build succeeds, then finally run
 - `cmake --build ${BUILD_DIR} --target OASIS3_MCT`
 - `cmake --build ${BUILD_DIR} --target CLM3_5`
 - `cmake --build ${BUILD_DIR} --target COSMO5_1`
-
