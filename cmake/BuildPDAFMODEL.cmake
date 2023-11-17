@@ -3,7 +3,12 @@
 
 # PDAF-Model: Set subdirectories of source code
 set(TSMPPDAFPFLDIR "parflow")
+if(DEFINED CLM35_SRC)
 set(TSMPPDAFCLMDIR "clm3_5")
+endif()
+if(DEFINED eCLM_SRC)
+set(TSMPPDAFCLMDIR "eclm")
+endif()
 
 # PDAF-Model: Directory for copying static library `libmodel.a`
 set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
