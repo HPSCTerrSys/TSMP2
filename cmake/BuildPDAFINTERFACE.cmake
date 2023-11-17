@@ -1,22 +1,12 @@
 # PDAFINTERFACE variables
 # -----------------------
 
-# Set environment header/include file for PDAF-library compilation
-set(PDAF_ARCH "linux_ifort")
-
-# Set PDAF source directory
-set(PDAF_DIR "${PDAF_SRC}")
-
 # PDAF-Model: Set subdirectories of source code
 set(TSMPPDAFPFLDIR "parflow")
 set(TSMPPDAFCLMDIR "clm3_5")
 
 # PDAF-Model: Directory for copying static library `libmodel.a`
 set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
-
-# PDAF-Framework: Directory for copying executable `tsmp-pdaf`
-set(TSMPPDAFBINDIR "${CMAKE_INSTALL_PREFIX}/bin")
-
 
 # Include directories
 # -------------------
@@ -90,7 +80,6 @@ list(APPEND PDAFINTERFACE_ENV_VARS TSMPPDAFLIBS=${PDAF_LIBS})
 list(APPEND PDAFINTERFACE_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
 list(APPEND PDAFINTERFACE_ENV_VARS PDAF_DIR=${PDAF_DIR})
 list(APPEND PDAFINTERFACE_ENV_VARS TSMPPDAFLIBDIR=${TSMPPDAFLIBDIR})
-list(APPEND PDAFINTERFACE_ENV_VARS TSMPPDAFBINDIR=${TSMPPDAFBINDIR})
 list(APPEND PDAFINTERFACE_ENV_VARS TSMPPDAFPFLDIR=${TSMPPDAFPFLDIR})
 list(APPEND PDAFINTERFACE_ENV_VARS TSMPPDAFCLMDIR=${TSMPPDAFCLMDIR})
 
@@ -119,15 +108,4 @@ ExternalProject_Add(PDAF-Model
   BUILD_COMMAND     make ${PDAFINTERFACE_ENV_VARS} clean all
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES} PDAF
-)
-
-# make pdaf framework
-ExternalProject_Add(PDAF-Framework
-  PREFIX            PDAF-Framework
-  SOURCE_DIR        ${PDAF_SRC}/interface/framework
-  BUILD_IN_SOURCE   TRUE
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAFINTERFACE_ENV_VARS} clean all
-  INSTALL_COMMAND   ""
-  DEPENDS           ${PDAF_DEPENDENCIES} PDAF PDAF-Model
 )

@@ -51,6 +51,7 @@ endif()
 if(DEFINED PDAF_SRC)
   include(BuildPDAF)
   include(BuildPDAFINTERFACE)
+  include(BuildPDAFFRAMEWORK)
   list(APPEND COMPONENT_MODELS "PDAF")
 endif()
 
