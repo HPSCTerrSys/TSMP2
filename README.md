@@ -19,9 +19,6 @@ source env/jsc.2023_Intel.sh
 # Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow)
 MODEL_ID="CLM35-ParFlow"
 
-# For PDAF export the variable `MODEL_ID`
-export MODEL_ID="CLM35-ParFlow"
-
 # Build artifacts will be generated in this folder. It can be deleted after build.
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
 
@@ -34,10 +31,6 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 
 4. Download the OASIS3-MCT coupling library and the component models that you wish
    to use. Then save the full path to each model source code to `<model-name>_SRC`.
-
-   Remark: When building TSMP-PDAF, please use the
-   repositories/branches specified below under `PDAF: component
-   models`.
 
 ```bash
 ## NOTE: Download only the component models that you need! ##
@@ -142,6 +135,20 @@ cmake -S . -B ${BUILD_DIR}                    \
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DPARFLOW_SRC=${PARFLOW_SRC}
+
+#
+# For TSMP-PDAF builds, add -PDAF_SRC=${PDAF_SRC}
+#
+
+# CLM3.5-ParFlow-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DCLM35_SRC=${CLM35_SRC}                \
+      -DPARFLOW_SRC=${PARFLOW_SRC}            \
+      -DPDAF_SRC=${PDAF_SRC}
+
+
 ```
 
 6. Build and install the models.
@@ -149,12 +156,6 @@ cmake -S . -B ${BUILD_DIR}                    \
 ```bash
 cmake --build ${BUILD_DIR}
 cmake --install ${BUILD_DIR}
-```
-
-7. (Only for TSMP-PDAF:) Run the script for building PDAF and the interface to PDAF. 
-   Be sure to check the initial settings of the script.
-```bash
-./build_tsmp_pdaf.bsh
 ```
 
 ### Resuming a failed build

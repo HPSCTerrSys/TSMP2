@@ -2,38 +2,123 @@
 set(PDAF_TARGET "pdaf" CACHE STRING "PDAF component to build.")
 set_property(CACHE PDAF_TARGET PROPERTY STRINGS pdaf model framework)
 
-#TODO: Populate include file (see BuildOASIS3MCT.cmake)
-set(PDAF_MAKE_INC ${PDAF_SRC}/make.arch/include.h)
-file(WRITE  ${PDAF_MAKE_INC} "key1      = value1\n")
-file(APPEND ${PDAF_MAKE_INC} "key2      = value2\n")
-file(APPEND ${PDAF_MAKE_INC} "key3      = value3\n")
+# PDAF variables
+# --------------
 
-# Set additional build options
+# Set environment header/include file for PDAF-library compilation
+set(PDAF_ARCH "linux_ifort")
+
+# Set PDAF source directory
+set(PDAF_DIR "${PDAF_SRC}")
+
+# PDAF-Model: Set subdirectories of source code
+set(TSMPPDAFPFLDIR "parflow")
+set(TSMPPDAFCLMDIR "clm3_5")
+
+# PDAF-Model: Directory for copying static library `libmodel.a`
+set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
+
+# PDAF-Framework: Directory for copying executable `tsmp-pdaf`
+set(TSMPPDAFBINDIR "${CMAKE_INSTALL_PREFIX}/bin")
+
+
+# Include directories
+# -------------------
+# DA include dirs
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/common")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/parflow")
+
+# OASIS include dirs
+list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib/psmile.MPI1")
+list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib/scrip")
+list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/include")
+
+# CLM include dirs
+list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld")
+
+# ParFlow include dirs
+# list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
+list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib")
+list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3")
+list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common")
+list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/ParFlow-build/include")
+list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/build/include")
+list(APPEND PDAF_INCLUDES "-I/usr/include")
+# list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
+
+# Join list of include dirs
+list(JOIN PDAF_INCLUDES " " PDAF_INCLUDES)
+
+
+# Libraries
+# ---------
 list(APPEND PDAF_LIBS "-L${MPI_Fortran_LIB_DIR} -lmpich")
 list(APPEND PDAF_LIBS "${NetCDF_LIBRARIES}")
+
+# OASIS libraries
+list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip")
+
+# CLM libraries
+list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lclm")
+
+# ParFlow libraries
+list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
+# GPU
+# list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
+list(APPEND PDAF_LIBS "-L${EBROOTHYPRE}/lib -lHYPRE")
+list(APPEND PDAF_LIBS "-L${EBROOTSILO}/lib -lsilo")
+list(APPEND PDAF_LIBS "-L/lib64 -lslurm")
+
+# Join list of libraries
+list(JOIN PDAF_LIBS " " PDAF_LIBS)
+
+
+# Precompiler definitions
+# -----------------------
 list(APPEND PDAF_DEFS "-Duse_comm_da")
 list(APPEND PDAF_DEFS "-DMAXPATCH_PFT=1")
 list(APPEND PDAF_DEFS "-DCOUP_OAS_PFL")
 list(APPEND PDAF_DEFS "-DOBS_ONLY_PARFLOW")
 
-# Set env vars required by PDAF Makefiles
-list(JOIN PDAF_INCLUDES " " PDAF_INCLUDES)
-list(JOIN PDAF_LIBS " " PDAF_LIBS)
+# Join list of precompiler definitions
 list(JOIN PDAF_DEFS " " PDAF_DEFS)
-list(APPEND PDAF_ENV_VARS TSMPPDAFIMPORTFLAGS="${PDAF_INCLUDES}")
-list(APPEND PDAF_ENV_VARS TSMPPDAFCPPDEFS="${PDAF_DEFS}")
-list(APPEND PDAF_ENV_VARS TSMPPDAFLIBS="${PDAF_LIBS}")
 
-# TODO: Remove debug statements when everything works
-message(STATUS " *** PDAF_INCLUDES=${PDAF_INCLUDES}")
-message(STATUS " *** PDAF_DEFS=${PDAF_DEFS}")
-message(STATUS " *** PDAF_LIBS=${PDAF_LIBS}")
-message(STATUS " *** PDAF_ENV_VARS:")
+
+# Set env vars required by PDAF Makefiles
+# ---------------------------------------
+# Additionally system environment variables are used by the Makefiles
+# f.e. `EBROOTHYPRE`, etc, or `MKLROOT`
+list(APPEND PDAF_ENV_VARS TSMPPDAFIMPORTFLAGS=${PDAF_INCLUDES})
+list(APPEND PDAF_ENV_VARS TSMPPDAFCPPDEFS=${PDAF_DEFS})
+list(APPEND PDAF_ENV_VARS TSMPPDAFLIBS=${PDAF_LIBS})
+list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
+list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
+list(APPEND PDAF_ENV_VARS TSMPPDAFLIBDIR=${TSMPPDAFLIBDIR})
+list(APPEND PDAF_ENV_VARS TSMPPDAFBINDIR=${TSMPPDAFBINDIR})
+list(APPEND PDAF_ENV_VARS TSMPPDAFPFLDIR=${TSMPPDAFPFLDIR})
+list(APPEND PDAF_ENV_VARS TSMPPDAFCLMDIR=${TSMPPDAFCLMDIR})
+
+# PDAF-Model: Append variables for checking existing component models
+if(DEFINED eCLM_SRC)
+  list(APPEND PDAF_ENV_VARS eCLM_SRC="${eCLM_SRC}")
+endif()
+if(DEFINED CLM35_SRC)
+  list(APPEND PDAF_ENV_VARS CLM35_SRC="${CLM35_SRC}")
+endif()
+if(DEFINED ICON_SRC)
+  list(APPEND PDAF_ENV_VARS ICON_SRC="${ICON_SRC}")
+endif()
+if(DEFINED COSMO_SRC)
+  list(APPEND PDAF_ENV_VARS COSMO_SRC="${COSMO_SRC}")
+endif()
+if(DEFINED PARFLOW_SRC)
+  list(APPEND PDAF_ENV_VARS PARFLOW_SRC="${PARFLOW_SRC}")
+endif()
+
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
-message(WARNING "${PDAF_ENV_VARS_STR}")
-#message(FATAL_ERROR "${PDAF_ENV_VARS}")  # uncomment to force stop CMake @ Configure step
+# message(STATUS "${PDAF_ENV_VARS_STR}")
+# message(WARNING "${PDAF_ENV_VARS_STR}")
+# message(FATAL_ERROR "${PDAF_ENV_VARS}")  # uncomment to force stop CMake @ Configure step
 
 # make pdaf
 ExternalProject_Add(PDAF
@@ -41,7 +126,7 @@ ExternalProject_Add(PDAF
   SOURCE_DIR        ${PDAF_SRC}/src
   BUILD_IN_SOURCE   TRUE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean pdaf-var
+  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean ../lib/libpdaf-d.a
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES}
 )
