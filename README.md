@@ -3,7 +3,7 @@
 1. Clone this repository.
 
 ```bash
-git clone -b pdaf https://github.com/HPSCTerrSys/eTSMP.git
+git clone https://github.com/HPSCTerrSys/eTSMP.git
 cd eTSMP
 ```
 
@@ -36,6 +36,10 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
+git clone https://github.com/HPSCTerrSys/eCLM.git
+eCLM_SRC=`realpath eCLM`
+
+# eCLM (PDAF-patched)
 git clone -b devel-pdaf https://github.com/HPSCTerrSys/eCLM.git
 eCLM_SRC=`realpath eCLM`
 
@@ -44,6 +48,10 @@ git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git
 ICON_SRC=`realpath icon2.6.4_oascoup`
 
 # ParFlow
+git clone -b v3.12.0 https://github.com/parflow/parflow.git
+PARFLOW_SRC=`realpath parflow`
+
+# ParFlow (PDAF-patched)
 git clone https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
@@ -56,6 +64,10 @@ git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src
 COSMO_SRC=`realpath cosmo5.01_fresh`
 
 # OASIS3-MCT (required for coupled models)
+git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+OASIS_SRC=`realpath oasis3-mct`
+
+# OASIS3-MCT (required for coupled models, PDAF-patched)
 git clone -b tsmp-pdaf-patched https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
 
