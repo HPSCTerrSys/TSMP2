@@ -15,7 +15,8 @@ list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # message(STATUS "${PDAF_ENV_VARS_STR}")
 # message(WARNING "${PDAF_ENV_VARS_STR}")
-# message(FATAL_ERROR "${PDAF_ENV_VARS}")  # uncomment to force stop CMake @ Configure step
+# message(FATAL_ERROR "${PDAF_ENV_VARS}")
+# # uncomment to force stop CMake @ Configure step
 
 # make pdaf
 ExternalProject_Add(PDAF
