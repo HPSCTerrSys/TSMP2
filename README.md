@@ -17,7 +17,7 @@ source env/jsc.2023_Intel.sh
 
 ```bash
 # Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
-MODEL_ID="CLM35-ParFlow"
+MODEL_ID="eCLM-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
