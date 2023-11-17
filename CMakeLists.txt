@@ -50,7 +50,7 @@ endif()
 
 if(DEFINED PDAF_SRC)
   include(BuildPDAF)
-  include(BuildPDAFINTERFACE)
+  include(BuildPDAFMODEL)
   include(BuildPDAFFRAMEWORK)
   list(APPEND COMPONENT_MODELS "PDAF")
 endif()
