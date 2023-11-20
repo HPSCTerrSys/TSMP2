@@ -26,5 +26,5 @@ ExternalProject_Add(PDAF-Framework
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     make ${PDAFFRAMEWORK_ENV_VARS} clean all
   INSTALL_COMMAND   ""
-  DEPENDS           ${PDAF_DEPENDENCIES} PDAF PDAF-Model
+  DEPENDS           PDAF-Model
 )

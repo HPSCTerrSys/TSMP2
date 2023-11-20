@@ -41,16 +41,5 @@ ExternalProject_Add(ParFlow
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
 
-if(DEFINED PDAF_SRC)
-  #TODO: Make implementation more robust by automatically detecting linker flags. This requires
-  #      modifying ParFlow CMake scripts such that it exports targets.
-  #      https://cmake.org/cmake/help/v3.27/guide/tutorial/Adding%20Export%20Configuration.html#step-11-adding-export-configuration 
-  list(APPEND PDAF_DEPENDENCIES ParFlow)
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
-  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
-  list(APPEND PDAF_LIBS "-L${HYPRE_ROOT}/lib -lHYPRE")
-  list(APPEND PDAF_LIBS "-L/lib64 -lslurm")   #TODO: Replace hardcoded path!
-endif()
-
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)
 list(APPEND eTSMP_MODEL_VERSIONS "ParFlow: ${PARFLOW_VERSION}")

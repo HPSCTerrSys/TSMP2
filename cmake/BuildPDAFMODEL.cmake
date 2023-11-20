@@ -4,10 +4,10 @@
 # PDAF-Model: Set subdirectories of source code
 set(TSMPPDAFPFLDIR "parflow")
 if(DEFINED CLM35_SRC)
-set(TSMPPDAFCLMDIR "clm3_5")
+  set(TSMPPDAFCLMDIR "clm3_5")
 endif()
 if(DEFINED eCLM_SRC)
-set(TSMPPDAFCLMDIR "eclm")
+  set(TSMPPDAFCLMDIR "eclm")
 endif()
 
 # PDAF-Model: Directory for copying static library `libmodel.a`
@@ -28,7 +28,7 @@ endif()
 
 # CLM include dirs
 if(DEFINED CLM35_SRC)
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/clm3.5")
 endif()
 if(DEFINED eCLM_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/clm5")
@@ -44,12 +44,7 @@ endif()
 
 # ParFlow include dirs
 if(DEFINED PARFLOW_SRC)
-  # list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
-  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib")
-  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3")
-  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/ParFlow-build/include")
-  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/build/include")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
   list(APPEND PDAF_INCLUDES "-I/usr/include")
   # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
 endif()
@@ -65,7 +60,7 @@ list(APPEND PDAF_LIBS "${NetCDF_LIBRARIES}")
 
 # OASIS libraries
 if(DEFINED OASIS_SRC)
-  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/OASIS3-MCT/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip")
+  list(APPEND PDAF_LIBS "${OASIS_LIBRARIES}")
 endif()
 
 # CLM libraries
@@ -118,8 +113,7 @@ if(DEFINED PARFLOW_SRC)
   list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
   # GPU
   # list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
-  list(APPEND PDAF_LIBS "-L${EBROOTHYPRE}/lib -lHYPRE")
-  list(APPEND PDAF_LIBS "-L${EBROOTSILO}/lib -lsilo")
+  list(APPEND PDAF_LIBS "-L${HYPRE_ROOT}/lib -lHYPRE")
   list(APPEND PDAF_LIBS "-L/lib64 -lslurm")
 endif()
 
@@ -190,5 +184,5 @@ ExternalProject_Add(PDAF-Model
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     make ${PDAFMODEL_ENV_VARS} clean all
   INSTALL_COMMAND   ""
-  DEPENDS           ${PDAF_DEPENDENCIES} PDAF
+  DEPENDS           PDAF
 )

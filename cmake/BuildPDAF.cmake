@@ -1,6 +1,17 @@
 # PDAF variables
 # --------------
 
+list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
+if(DEFINED eCLM_SRC)
+  list(APPEND PDAF_DEPENDENCIES eCLM)
+endif()
+if(DEFINED CLM35_SRC)
+  list(APPEND PDAF_DEPENDENCIES CLM3_5)
+endif()
+if(DEFINED PARFLOW_SRC)
+  list(APPEND PDAF_DEPENDENCIES ParFlow)
+endif()
+
 # Set environment header/include file for PDAF-library compilation
 set(PDAF_ARCH "linux_ifort")
 
@@ -28,4 +39,7 @@ ExternalProject_Add(PDAF
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES}
 )
+
+get_model_version(${PDAF_SRC} PDAF_VERSION)
+list(APPEND eTSMP_MODEL_VERSIONS "PDAF: ${PDAF_VERSION}")
 
