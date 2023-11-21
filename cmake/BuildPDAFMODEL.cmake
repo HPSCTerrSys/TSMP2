@@ -84,7 +84,7 @@ if(DEFINED eCLM_SRC)
   # list(APPEND PDAF_LIBS "-lrof")
   list(APPEND PDAF_LIBS "-lesp")
 
-  list(APPEND PDAF_LIBS "-lmct_eclm")
+  list(APPEND PDAF_LIBS "-lmct")
   list(APPEND PDAF_LIBS "-lmpeu")
 
   list(APPEND PDAF_LIBS "-lpnetcdf")
