@@ -1,6 +1,10 @@
 # PDAF variables
 # --------------
 
+# NetCDF is required
+# For eCLM-PDAF, it will not be loaded
+find_package(NetCDF REQUIRED)
+
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
 endif()
