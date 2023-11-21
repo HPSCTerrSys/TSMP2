@@ -6,11 +6,12 @@ if(DEFINED ICON_SRC OR DEFINED PARFLOW_SRC)
     if(DEFINED ICON_SRC)
         list(APPEND COUP_OAS_FLAGS  -DCOUP_OAS_ICON=True)
     endif()
-    if(DEFINED PDAF_SRC)
-        list(APPEND COUP_OAS_FLAGS  -DUSE_PDAF=True)
-    endif()
 else()
     list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=False)
+endif()
+
+if(DEFINED PDAF_SRC)
+  list(APPEND PDAF_FLAGS  -DUSE_PDAF=True)
 endif()
 
 ExternalProject_Add(eCLM
@@ -23,6 +24,7 @@ ExternalProject_Add(eCLM
                       -DCMAKE_PREFIX_PATH=${OASIS_ROOT}
                       -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                       ${COUP_OAS_FLAGS}
+		      ${PDAF_FLAGS}
     BUILD_ALWAYS      YES
     BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
                            # This happens because INSTALL_COMMAND triggers rebuild
