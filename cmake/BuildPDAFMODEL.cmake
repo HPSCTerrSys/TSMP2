@@ -83,19 +83,6 @@ if(DEFINED eCLM_SRC)
   # list(APPEND PDAF_LIBS "-lrof")
   list(APPEND PDAF_LIBS "-lesp")
 
-  # BIG WORKAROUND for duplicate "-lmct" (OASIS / eCLM both generate this library)
-  # We rename the eCLM-library
-  execute_process(
-    COMMAND mv "${CMAKE_INSTALL_PREFIX}/lib/libmct.a" "${CMAKE_INSTALL_PREFIX}/lib/libmct_eclm.a"
-    RESULT_VARIABLE result
-  )
-
-  if(result EQUAL 0)
-    message(STATUS "File libmct.a renamed successfully to libmct_eclm.a")
-  else()
-    message(FATAL_ERROR "Failed to rename file libmct.a")
-  endif()
-
   list(APPEND PDAF_LIBS "-lmct_eclm")
   list(APPEND PDAF_LIBS "-lmpeu")
 
