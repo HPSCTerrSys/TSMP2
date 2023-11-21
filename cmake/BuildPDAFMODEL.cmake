@@ -30,6 +30,7 @@ endif()
 # CLM include dirs
 if(DEFINED CLM35_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/clm3.5")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld") # for *.h and *.mod files
 endif()
 if(DEFINED eCLM_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/clm5")
