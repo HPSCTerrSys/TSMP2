@@ -62,11 +62,6 @@ list(JOIN PDAF_INCLUDES " " PDAF_INCLUDES)
 list(APPEND PDAF_LIBS "-L${MPI_Fortran_LIB_DIR} -lmpich")
 list(APPEND PDAF_LIBS "${NetCDF_LIBRARIES}")
 
-# OASIS libraries
-if(DEFINED OASIS_SRC)
-  list(APPEND PDAF_LIBS "${OASIS_LIBRARIES}")
-endif()
-
 # CLM libraries
 if(DEFINED CLM35_SRC)
   list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib")
@@ -98,6 +93,13 @@ if(DEFINED eCLM_SRC)
 
   # Important for linking that it is at the end
   list(APPEND PDAF_LIBS "-lcsm_share")
+endif()
+
+# OASIS libraries
+# OASIS libraries Should be set after eCLM libraries, otherwise an
+# error occurred during linking
+if(DEFINED OASIS_SRC)
+  list(APPEND PDAF_LIBS "${OASIS_LIBRARIES}")
 endif()
 
 # ParFlow libraries
