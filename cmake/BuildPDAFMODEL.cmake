@@ -68,10 +68,11 @@ endif()
 
 # CLM libraries
 if(DEFINED CLM35_SRC)
-  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lclm")
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib")
+  list(APPEND PDAF_LIBS "-lclm")
 endif()
 if(DEFINED eCLM_SRC)
-  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -leclm")
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib")
   list(APPEND PDAF_LIBS "-leclm")
   list(APPEND PDAF_LIBS "-lclm")
   list(APPEND PDAF_LIBS "-ldatm")
