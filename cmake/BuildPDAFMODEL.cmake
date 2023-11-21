@@ -2,6 +2,7 @@
 # -----------------------
 
 # PDAF-Model: Set subdirectories of source code
+# The source code inside `parflow` is always used, even for CLM-standalone builds
 set(TSMPPDAFPFLDIR "parflow")
 if(DEFINED CLM35_SRC)
   set(TSMPPDAFCLMDIR "clm3_5")
