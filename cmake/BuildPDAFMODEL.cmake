@@ -33,15 +33,7 @@ if(DEFINED CLM35_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld") # for *.h and *.mod files
 endif()
 if(DEFINED eCLM_SRC)
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/clm5")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/csm_share")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/datm")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/eclm")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/mosart")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/stub_comps")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/externals/gptl/include")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/externals/mct/include")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/pio1")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM")
 endif()
 
 # ParFlow include dirs

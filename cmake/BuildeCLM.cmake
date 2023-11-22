@@ -24,7 +24,7 @@ ExternalProject_Add(eCLM
                       -DCMAKE_PREFIX_PATH=${OASIS_ROOT}
                       -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                       ${COUP_OAS_FLAGS}
-		      ${PDAF_FLAGS}
+		              ${PDAF_FLAGS}
     BUILD_ALWAYS      YES
     BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
                            # This happens because INSTALL_COMMAND triggers rebuild
@@ -39,6 +39,16 @@ ExternalProject_Add_Step(eCLM install-scripts
     ALWAYS        TRUE
     USES_TERMINAL TRUE
 )
+
+if(DEFINED PDAF_SRC)
+    ExternalProject_Add_Step(eCLM pdaf-workaround
+        COMMAND       mv ${CMAKE_INSTALL_PREFIX}/lib/libmct.a ${CMAKE_INSTALL_PREFIX}/lib/libmct2.a
+        COMMENT       "Workaround for PDAF: Renaming libmct.a to libmct2.a ..."
+        DEPENDEES     install
+        ALWAYS        TRUE
+        USES_TERMINAL TRUE
+    )
+endif()
 
 get_model_version(${eCLM_SRC} eCLM_VERSION)
 list(APPEND eTSMP_MODEL_VERSIONS "eCLM: ${eCLM_VERSION}")
