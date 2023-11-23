@@ -30,7 +30,7 @@ endif()
 # CLM include dirs
 if(DEFINED CLM35_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/clm3.5")
-  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld") # for *.h and *.mod files
+  # list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/CLM3_5/bld") # for *.h and *.mod files
 endif()
 if(DEFINED eCLM_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM")
@@ -39,12 +39,12 @@ endif()
 # ParFlow include dirs
 if(DEFINED PARFLOW_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
-  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3") # for "oas3_external.h"
-  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib/") # for "Parflow.hxx"
-  if(DEFINED CLM35_SRC)
-    list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common") # for "amps_common.h"
-    list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/src/ParFlow-build/include") # for "parflow_config.h"
-  endif()
+  # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3") # for "oas3_external.h"
+  # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib/") # for "Parflow.hxx"
+  # if(DEFINED CLM35_SRC)
+  #   list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common") # for "amps_common.h"
+  #   list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/src/ParFlow-build/include") # for "parflow_config.h"
+  # endif()
   list(APPEND PDAF_INCLUDES "-I/usr/include")
   # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
 endif()
