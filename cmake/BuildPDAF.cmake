@@ -28,6 +28,7 @@ set(PDAF_DIR "${PDAF_SRC}")
 # ---------------------------------------
 list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
 list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
+list(APPEND PDAF_ENV_VARS MPI_HOME=${MPI_HOME})
 
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # message(STATUS "${PDAF_ENV_VARS_STR}")
