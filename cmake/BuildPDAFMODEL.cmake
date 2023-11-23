@@ -33,6 +33,8 @@ if(DEFINED CLM35_SRC)
 endif()
 if(DEFINED eCLM_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM")
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/externals/mct/include") # m_mctworld.mod
+  list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/eCLM/src/eCLM-build/externals/gptl/include") # perf_mod.mod
 endif()
 
 # ParFlow include dirs
