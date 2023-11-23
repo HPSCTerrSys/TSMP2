@@ -40,8 +40,7 @@ endif()
 # ParFlow include dirs
 if(DEFINED PARFLOW_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
-  # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3") # for "oas3_external.h"
-  # list(APPEND PDAF_INCLUDES "-I/usr/include")
+  # GPU:
   # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
 endif()
 
