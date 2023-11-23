@@ -87,7 +87,7 @@ if(DEFINED eCLM_SRC)
   # list(APPEND PDAF_LIBS "-lnetcdff")
   # list(APPEND PDAF_LIBS "-lnetcdf")
 
-  # list(APPEND PDAF_LIBS "-qmkl")
+  list(APPEND PDAF_LIBS "-qmkl")
 
   # Important for linking that it is at the end
   list(APPEND PDAF_LIBS "-lcsm_share")
