@@ -39,12 +39,7 @@ endif()
 # ParFlow include dirs
 if(DEFINED PARFLOW_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/parflow")
-  # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3") # for "oas3_external.h"
-  # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/parflow_lib/") # for "Parflow.hxx"
-  # if(DEFINED CLM35_SRC)
-  #   list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/common") # for "amps_common.h"
-  #   list(APPEND PDAF_INCLUDES "-I${CMAKE_BINARY_DIR}/ParFlow/src/ParFlow-build/include") # for "parflow_config.h"
-  # endif()
+  list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/pfsimulator/amps/oas3") # for "oas3_external.h"
   list(APPEND PDAF_INCLUDES "-I/usr/include")
   # list(APPEND PDAF_INCLUDES "-I${PARFLOW_SRC}/rmm/include/rmm")
 endif()
