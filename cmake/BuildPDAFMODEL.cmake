@@ -81,13 +81,13 @@ if(DEFINED eCLM_SRC)
   list(APPEND PDAF_LIBS "-lmct2")
   list(APPEND PDAF_LIBS "-lmpeu")
 
-  list(APPEND PDAF_LIBS "-lpnetcdf")
+  # list(APPEND PDAF_LIBS "-lpnetcdf")
 
   # Additional netcdf libraries used in CLM5-PDAF
   # list(APPEND PDAF_LIBS "-lnetcdff")
   # list(APPEND PDAF_LIBS "-lnetcdf")
 
-  list(APPEND PDAF_LIBS "-qmkl")
+  # list(APPEND PDAF_LIBS "-qmkl")
 
   # Important for linking that it is at the end
   list(APPEND PDAF_LIBS "-lcsm_share")
