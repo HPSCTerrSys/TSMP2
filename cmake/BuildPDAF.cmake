@@ -8,7 +8,6 @@ find_package(NetCDF REQUIRED)
 # Find oneMKL from
 find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
 message(STATUS "Imported oneMKL targets: ${MKL_IMPORTED_TARGETS}")
-message(STATUS "MKL:mkl_intel_ilp64: ${MKL::mkl_intel_ilp64}")
 
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
