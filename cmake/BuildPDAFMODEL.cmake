@@ -16,7 +16,11 @@ set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
 
 # Include directories
 # -------------------
+# General include dirs
+list(APPEND PDAF_INCLUDES "-I${NetCDF_ROOT}/include")
+
 # DA include dirs
+list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/common")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/parflow")
 
@@ -115,6 +119,19 @@ list(JOIN PDAF_LIBS " " PDAF_LIBS)
 
 # Precompiler definitions
 # -----------------------
+
+# General cpps
+list(APPEND PDAF_DEFS "-Duse_libMPI")
+list(APPEND PDAF_DEFS "-Duse_netCDF")
+list(APPEND PDAF_DEFS "-Duse_comm_MPI1")
+list(APPEND PDAF_DEFS "-DVERBOSE")
+list(APPEND PDAF_DEFS "-DDEBUG")
+list(APPEND PDAF_DEFS "-DTREAT_OVERLAY")
+list(APPEND PDAF_DEFS "-DFORTRANUNDERSCORE")
+list(APPEND PDAF_DEFS "-DOFFLINE")
+list(APPEND PDAF_DEFS "-DSPMD")
+list(APPEND PDAF_DEFS "-DLINUX")
+
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEFS "-Duse_comm_da")
   list(APPEND PDAF_DEFS "-DMAXPATCH_PFT=1")
