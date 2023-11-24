@@ -39,10 +39,6 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 git clone https://github.com/HPSCTerrSys/eCLM.git
 eCLM_SRC=`realpath eCLM`
 
-# eCLM (PDAF-patched)
-git clone -b devel-pdaf https://github.com/HPSCTerrSys/eCLM.git
-eCLM_SRC=`realpath eCLM`
-
 # ICON
 git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git
 ICON_SRC=`realpath icon2.6.4_oascoup`
