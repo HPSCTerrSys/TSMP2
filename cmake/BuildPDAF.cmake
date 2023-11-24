@@ -5,6 +5,11 @@
 # For eCLM-PDAF, it will not be loaded
 find_package(NetCDF REQUIRED)
 
+# Find oneMKL from
+find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+message(STATUS "Imported oneMKL targets: ${MKL_IMPORTED_TARGETS}")
+message(STATUS "MKL:mkl_intel_ilp64: ${MKL::mkl_intel_ilp64}")
+
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
 endif()
@@ -29,10 +34,10 @@ set(PDAF_DIR "${PDAF_SRC}")
 # Set PDAF_LINK_LIBS for Makefile header
 # --------------------------------------
 list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
-list(APPEND PDAF_LINK_LIBS "${EBROOTIMKL}/mkl/latest/lib/intel64/libmkl_intel_lp64.a")
-list(APPEND PDAF_LINK_LIBS "${EBROOTIMKL}/mkl/latest/lib/intel64/libmkl_intel_thread.a")
-list(APPEND PDAF_LINK_LIBS "${EBROOTIMKL}/mkl/latest/lib/intel64/libmkl_core.a")
-list(APPEND PDAF_LINK_LIBS "-L${MPI_HOME}/lib64")
+list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
+list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
+list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
+list(APPEND PDAF_LINK_LIBS "-L${MPICH_Fortran_LIBDIR}")
 list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 
 list(APPEND PDAF_LINK_LIBS "-qopenmp")
@@ -61,7 +66,7 @@ list(JOIN PDAF_OPTIM " " PDAF_OPTIM)
 
 # Set PDAF_MPI_INC for Makefile header
 # ----------------------------------
-list(APPEND PDAF_MPI_INC "-I${MPI_HOME}/include")
+list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
 
 # Join list
 list(JOIN PDAF_MPI_INC " " PDAF_MPI_INC)
