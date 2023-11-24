@@ -19,6 +19,9 @@ if(MKL_FOUND)
   set(MKL_LINK static CACHE STRING "Choose MKL_LINK options: static;dynamic;sdl")
 endif()
 
+# OpenMP is required
+find_package(OpenMP REQUIRED)
+
 # Set PDAF_DEPENDENCIES: component models / OASIS
 # -----------------------------------------------
 if(DEFINED OASIS_SRC)
@@ -51,7 +54,7 @@ list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
 list(APPEND PDAF_LINK_LIBS "-L${MPICH_Fortran_LIBDIR}")
 list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 
-list(APPEND PDAF_LINK_LIBS "-qopenmp")
+list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}")
 list(APPEND PDAF_LINK_LIBS "-lpthread")
 list(APPEND PDAF_LINK_LIBS "-lm")
 
