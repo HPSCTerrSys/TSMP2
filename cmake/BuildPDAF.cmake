@@ -36,7 +36,7 @@ endif()
 
 # Set environment header/include file for PDAF-library compilation
 # ----------------------------------------------------------------
-set(PDAF_ARCH "linux_ifort")
+set(PDAF_ARCH "cmake")
 
 # Set PDAF source directory
 # -------------------------
