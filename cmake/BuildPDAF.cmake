@@ -58,11 +58,6 @@ list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}")
 list(APPEND PDAF_LINK_LIBS "-lpthread")
 list(APPEND PDAF_LINK_LIBS "-lm")
 
-# Possible adaptions for JUWELS
-# list(APPEND PDAF_LINK_LIBS "-lmkl_intel_lp64")
-# list(APPEND PDAF_LINK_LIBS "-lmkl_sequential")
-# list(APPEND PDAF_LINK_LIBS "-lmkl_core")
-
 # Join list
 list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
 
