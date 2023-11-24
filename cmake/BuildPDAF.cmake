@@ -1,14 +1,26 @@
 # PDAF variables
 # --------------
 
+# Required packages
+# -----------------
+
 # NetCDF is required
 # For eCLM-PDAF, it will not be loaded
 find_package(NetCDF REQUIRED)
 
+# MKL is required
 # Find oneMKL from
 find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
 message(STATUS "Imported oneMKL targets: ${MKL_IMPORTED_TARGETS}")
 
+# Switching to static libraries
+if(MKL_FOUND)
+  unset(MKL_LINK CACHE)
+  set(MKL_LINK static CACHE STRING "Choose MKL_LINK options: static;dynamic;sdl")
+endif()
+
+# Set PDAF_DEPENDENCIES: component models / OASIS
+# -----------------------------------------------
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
 endif()
