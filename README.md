@@ -16,7 +16,7 @@ source env/jsc.2023_Intel.sh
 3. Specify build and install directories.
 
 ```bash
-# Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow)
+# Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
 MODEL_ID="eCLM-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
@@ -47,6 +47,10 @@ ICON_SRC=`realpath icon2.6.4_oascoup`
 git clone -b v3.12.0 https://github.com/parflow/parflow.git
 PARFLOW_SRC=`realpath parflow`
 
+# ParFlow (PDAF-patched)
+git clone https://github.com/HPSCTerrSys/parflow
+PARFLOW_SRC=`realpath parflow`
+
 # CLM3.5
 git clone https://github.com/HPSCTerrSys/CLM3.5.git
 CLM35_SRC=`realpath CLM3.5`
@@ -58,6 +62,10 @@ COSMO_SRC=`realpath cosmo5.01_fresh`
 # OASIS3-MCT (required for coupled models)
 git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
+
+# PDAF
+git clone https://github.com/HPSCTerrSys/pdaf.git
+PDAF_SRC=`realpath pdaf`
 ```
 
 5. Run CMake configure step for the model combination that you wish to build. The
@@ -131,6 +139,39 @@ cmake -S . -B ${BUILD_DIR}                    \
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DPARFLOW_SRC=${PARFLOW_SRC}
+
+#
+# For TSMP-PDAF builds, add -PDAF_SRC=${PDAF_SRC}
+#
+
+# CLM3.5-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DCLM35_SRC=${CLM35_SRC}                \
+      -DPDAF_SRC=${PDAF_SRC}
+
+# CLM3.5-ParFlow-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DCLM35_SRC=${CLM35_SRC}                \
+      -DPARFLOW_SRC=${PARFLOW_SRC}            \
+      -DPDAF_SRC=${PDAF_SRC}
+
+# eCLM-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DeCLM_SRC=${eCLM_SRC}                \
+      -DPDAF_SRC=${PDAF_SRC}
+
+# eCLM-ParFlow-PDAF
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DeCLM_SRC=${eCLM_SRC}                \
+      -DPARFLOW_SRC=${PARFLOW_SRC}            \
+      -DPDAF_SRC=${PDAF_SRC}
+
 ```
 
 6. Build and install the models.
