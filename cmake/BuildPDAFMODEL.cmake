@@ -54,8 +54,6 @@ list(JOIN PDAF_INCLUDES " " PDAF_INCLUDES)
 
 # Libraries
 # ---------
-list(APPEND PDAF_LIBS "-L${MPI_Fortran_LIB_DIR} -lmpich")
-list(APPEND PDAF_LIBS "${NetCDF_LIBRARIES}")
 
 # CLM libraries
 if(DEFINED CLM35_SRC)
@@ -84,14 +82,6 @@ if(DEFINED eCLM_SRC)
   # OASIS3-MCT generates a `libmct.a` as well
   list(APPEND PDAF_LIBS "-lmct2")
   list(APPEND PDAF_LIBS "-lmpeu")
-
-  list(APPEND PDAF_LIBS "-lpnetcdf")
-
-  # Additional netcdf libraries used in CLM5-PDAF
-  # list(APPEND PDAF_LIBS "-lnetcdff")
-  # list(APPEND PDAF_LIBS "-lnetcdf")
-
-  list(APPEND PDAF_LIBS "-qmkl")
 
   # Important for linking that it is at the end
   list(APPEND PDAF_LIBS "-lcsm_share")
