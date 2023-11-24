@@ -9,7 +9,7 @@
 find_package(NetCDF REQUIRED)
 
 # MKL is required
-# Find oneMKL from
+# Find oneMKL from https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-windows/2024-0/cmake-config-for-onemkl.html
 find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
 message(STATUS "Imported oneMKL targets: ${MKL_IMPORTED_TARGETS}")
 
