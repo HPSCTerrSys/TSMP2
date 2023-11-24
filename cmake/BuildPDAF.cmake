@@ -5,7 +5,7 @@
 # -----------------
 
 # NetCDF is required
-# For eCLM-PDAF, it will not be loaded
+# For eCLM-PDAF, NetCDF is not loaded by other component models
 find_package(NetCDF REQUIRED)
 
 # MKL is required
