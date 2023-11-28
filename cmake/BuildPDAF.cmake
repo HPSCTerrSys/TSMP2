@@ -1,10 +1,29 @@
 # PDAF variables
 # --------------
 
+# Required packages
+# -----------------
+
 # NetCDF is required
-# For eCLM-PDAF, it will not be loaded
+# For eCLM-PDAF, NetCDF is not loaded by other component models
 find_package(NetCDF REQUIRED)
 
+# MKL is required
+# `find_package`command for oneMKL from https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-windows/2024-0/cmake-config-for-onemkl.html
+set(MKL_LINK static) # Switching to static MKL libraries
+find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+
+# OpenMP is required
+find_package(OpenMP REQUIRED)
+
+# # TODO: Insert CMake-finding of "-lm"
+# find_library(M_LIB NAMES m)
+# if(M_LIB)
+#   message(STATUS "M_LIB: ${M_LIB}")
+# endif()
+
+# Set PDAF_DEPENDENCIES: component models / OASIS
+# -----------------------------------------------
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEPENDENCIES OASIS3_MCT)
 endif()
@@ -19,15 +38,60 @@ if(DEFINED PARFLOW_SRC)
 endif()
 
 # Set environment header/include file for PDAF-library compilation
-set(PDAF_ARCH "linux_ifort")
+# ----------------------------------------------------------------
+set(PDAF_ARCH "cmake")
 
 # Set PDAF source directory
+# -------------------------
 set(PDAF_DIR "${PDAF_SRC}")
+
+# Set PDAF_LINK_LIBS for Makefile header
+# --------------------------------------
+# --start-group: libraries inside the group are recalled until, such
+# --that order does not matter in the linking command
+list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
+list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
+list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
+list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
+list(APPEND PDAF_LINK_LIBS "-qmkl")
+list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
+
+# Explicit libraries named in comments should be handed over by the
+# variables. For checking this, search `$BUILD_DIR/CMakeCache.txt`.
+list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
+list(APPEND PDAF_LINK_LIBS "-lmpich")
+list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
+list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+
+# Join list
+list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
+
+# Set PDAF_OPTIM for Makefile header
+# ----------------------------------
+list(APPEND PDAF_OPTIM "-O2")
+list(APPEND PDAF_OPTIM "-xHost")
+list(APPEND PDAF_OPTIM "-r8")
+
+# For Gnu-compiler
+# list(APPEND PDAF_OPTIM "-O2 -xHost -fbacktrace -fdefault-real-8 -falign-commons -fno-automatic -finit-local-zero -mcmodel=large")
+
+# Join list
+list(JOIN PDAF_OPTIM " " PDAF_OPTIM)
+
+# Set PDAF_MPI_INC for Makefile header
+# ----------------------------------
+list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+
+# Join list
+list(JOIN PDAF_MPI_INC " " PDAF_MPI_INC)
 
 # Set env vars required by PDAF Makefiles
 # ---------------------------------------
 list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
 list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
+list(APPEND PDAF_ENV_VARS TSMPPDAFLINK_LIBS=${PDAF_LINK_LIBS})
+list(APPEND PDAF_ENV_VARS TSMPPDAFOPTIM=${PDAF_OPTIM})
+list(APPEND PDAF_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
 
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # message(STATUS "${PDAF_ENV_VARS_STR}")

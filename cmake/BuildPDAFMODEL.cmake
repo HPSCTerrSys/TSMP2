@@ -16,7 +16,11 @@ set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
 
 # Include directories
 # -------------------
+# General include dirs
+list(APPEND PDAF_INCLUDES "-I${NetCDF_ROOT}/include")
+
 # DA include dirs
+list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/common")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/parflow")
 
@@ -50,8 +54,6 @@ list(JOIN PDAF_INCLUDES " " PDAF_INCLUDES)
 
 # Libraries
 # ---------
-list(APPEND PDAF_LIBS "-L${MPI_Fortran_LIB_DIR} -lmpich")
-list(APPEND PDAF_LIBS "${NetCDF_LIBRARIES}")
 
 # CLM libraries
 if(DEFINED CLM35_SRC)
@@ -81,14 +83,6 @@ if(DEFINED eCLM_SRC)
   list(APPEND PDAF_LIBS "-lmct2")
   list(APPEND PDAF_LIBS "-lmpeu")
 
-  list(APPEND PDAF_LIBS "-lpnetcdf")
-
-  # Additional netcdf libraries used in CLM5-PDAF
-  # list(APPEND PDAF_LIBS "-lnetcdff")
-  # list(APPEND PDAF_LIBS "-lnetcdf")
-
-  list(APPEND PDAF_LIBS "-qmkl")
-
   # Important for linking that it is at the end
   list(APPEND PDAF_LIBS "-lcsm_share")
 endif()
@@ -115,6 +109,19 @@ list(JOIN PDAF_LIBS " " PDAF_LIBS)
 
 # Precompiler definitions
 # -----------------------
+
+# General cpps
+list(APPEND PDAF_DEFS "-Duse_libMPI")
+list(APPEND PDAF_DEFS "-Duse_netCDF")
+list(APPEND PDAF_DEFS "-Duse_comm_MPI1")
+list(APPEND PDAF_DEFS "-DVERBOSE")
+list(APPEND PDAF_DEFS "-DDEBUG")
+list(APPEND PDAF_DEFS "-DTREAT_OVERLAY")
+list(APPEND PDAF_DEFS "-DFORTRANUNDERSCORE")
+list(APPEND PDAF_DEFS "-DOFFLINE")
+list(APPEND PDAF_DEFS "-DSPMD")
+list(APPEND PDAF_DEFS "-DLINUX")
+
 if(DEFINED OASIS_SRC)
   list(APPEND PDAF_DEFS "-Duse_comm_da")
   list(APPEND PDAF_DEFS "-DMAXPATCH_PFT=1")
@@ -145,6 +152,9 @@ list(JOIN PDAF_DEFS " " PDAF_DEFS)
 # f.e. `EBROOTHYPRE`, etc, or `MKLROOT`
 list(APPEND PDAFMODEL_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
 list(APPEND PDAFMODEL_ENV_VARS PDAF_DIR=${PDAF_DIR})
+list(APPEND PDAFMODEL_ENV_VARS TSMPPDAFLINK_LIBS=${PDAF_LINK_LIBS})
+list(APPEND PDAFMODEL_ENV_VARS TSMPPDAFOPTIM=${PDAF_OPTIM})
+list(APPEND PDAFMODEL_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
 list(APPEND PDAFMODEL_ENV_VARS TSMPPDAFIMPORTFLAGS=${PDAF_INCLUDES})
 list(APPEND PDAFMODEL_ENV_VARS TSMPPDAFCPPDEFS=${PDAF_DEFS})
 list(APPEND PDAFMODEL_ENV_VARS TSMPPDAFLIBS=${PDAF_LIBS})
