@@ -22,6 +22,12 @@ endif()
 # OpenMP is required
 find_package(OpenMP REQUIRED)
 
+# # TODO: Insert CMake-finding of "-lm"
+# find_library(M_LIB NAMES m)
+# if(M_LIB)
+#   message(STATUS "M_LIB: ${M_LIB}")
+# endif()
+
 # Set PDAF_DEPENDENCIES: component models / OASIS
 # -----------------------------------------------
 if(DEFINED OASIS_SRC)
