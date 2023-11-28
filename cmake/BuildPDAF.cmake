@@ -9,15 +9,9 @@
 find_package(NetCDF REQUIRED)
 
 # MKL is required
-# Find oneMKL from https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-windows/2024-0/cmake-config-for-onemkl.html
+# `find_package`command for oneMKL from https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-windows/2024-0/cmake-config-for-onemkl.html
+set(MKL_LINK static) # Switching to static MKL libraries
 find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
-message(STATUS "Imported oneMKL targets: ${MKL_IMPORTED_TARGETS}")
-
-# Switching to static libraries
-if(MKL_FOUND)
-  unset(MKL_LINK CACHE)
-  set(MKL_LINK static CACHE STRING "Choose MKL_LINK options: static;dynamic;sdl")
-endif()
 
 # OpenMP is required
 find_package(OpenMP REQUIRED)
