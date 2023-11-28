@@ -53,22 +53,21 @@ set(PDAF_DIR "${PDAF_SRC}")
 
 # Set PDAF_LINK_LIBS for Makefile header
 # --------------------------------------
+# --start-group: libraries inside the group are recalled until, such
+# --that order does not matter in the linking command
 list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
 list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
 list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
 list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
 list(APPEND PDAF_LINK_LIBS "-qmkl")
-# list(APPEND PDAF_LINK_LIBS "-L${MPICH_Fortran_LIBDIR}") # part of libs below
 list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 
-list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}")
+# Explicit libraries named in comments should be handed over by the
+# variables. For checking this, search `$BUILD_DIR/CMakeCache.txt`.
+list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
 list(APPEND PDAF_LINK_LIBS "-lmpich")
-list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}")
-list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}")
-
-# Explicit flags that should part of the above
-# list(APPEND PDAF_LINK_LIBS "-lpthread")
-# list(APPEND PDAF_LINK_LIBS "-lm")
+list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
+list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
 
 # Join list
 list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
