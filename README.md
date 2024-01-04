@@ -3,8 +3,8 @@
 1. Clone this repository.
 
 ```bash
-git clone https://github.com/HPSCTerrSys/eTSMP.git
-cd eTSMP
+git clone https://github.com/HPSCTerrSys/TSMP2.git
+cd TSMP2
 ```
 
 2. Load the environment variables required for the build.
@@ -196,7 +196,7 @@ and specify `BUILD_DIR` (Step 3) before you can run Step 6.
 
 ### Rebuilding specific component models
 
-eTSMP can rebuild a specific component model via the `cmake --build ${BUILD_DIR} --target ${MODEL}` command.
+TSMP2 can rebuild a specific component model via the `cmake --build ${BUILD_DIR} --target ${MODEL}` command.
 This may be useful when you need to recompile a component model that has been modified or updated.
 
 ```bash
@@ -208,9 +208,9 @@ cmake --build ${BUILD_DIR} --clean-first --target ParFlow && cmake --install ${B
 ```
 
 Only component models specified during CMake configure step (see Step 5) can be rebuilt. For instance, if you
-configured eTSMP to build `eCLM-ParFlow`, then rebuilding `ICON` would of course be not possible.
+configured TSMP2 to build `eCLM-ParFlow`, then rebuilding `ICON` would of course be not possible.
 
-The list below shows all component models supported by eTSMP. To rebuild a component model(s),
+The list below shows all component models supported by TSMP2. To rebuild a component model(s),
 run one or more commands below, wait until the build succeeds, then finally run 
 `cmake --install ${BUILD_DIR}` so that the generated libraries and executables are copied to `${INSTALL_DIR}`.
 
