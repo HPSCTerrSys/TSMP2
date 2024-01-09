@@ -3,8 +3,8 @@
 1. Clone this repository.
 
 ```bash
-git clone https://github.com/HPSCTerrSys/eTSMP.git
-cd eTSMP
+git clone https://github.com/HPSCTerrSys/TSMP2.git
+cd TSMP2
 ```
 
 2. Load the environment variables required for the build.
