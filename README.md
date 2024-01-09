@@ -17,8 +17,8 @@ source env/jsc.2023_Intel.sh
 3. Specify build and install directories.
 
 ```bash
-# Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
-MODEL_ID="eCLM-ParFlow"
+# Name of the coupled model (e.g. ICON-eCLM, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
+MODEL_ID="ICON-eCLM-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
@@ -77,7 +77,7 @@ PDAF_SRC=`realpath pdaf`
 # Coupled models requires the option -DOASIS_SRC=${OASIS_SRC}.
 #
 
-# eCLM-ICON
+# ICON-eCLM
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DOASIS_SRC=${OASIS_SRC}                \
@@ -91,7 +91,7 @@ cmake -S . -B ${BUILD_DIR}                    \
       -DeCLM_SRC=${eCLM_SRC}                  \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
-# eCLM-ICON-ParFlow
+# ICON-eCLM-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DOASIS_SRC=${OASIS_SRC}                \
