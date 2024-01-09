@@ -4,7 +4,8 @@
 
 ```bash
 git clone https://github.com/HPSCTerrSys/TSMP2.git
-cd TSMP2
+export TSMP2_DIR=$(realpath TSMP2)
+cd $TSMP2_DIR
 ```
 
 2. Load the environment variables required for the build.
@@ -191,8 +192,7 @@ cmake --install ${BUILD_DIR}
 ```
 
 Note that this works only if the required environment variables are already set. If you are resuming
-the build from a fresh terminal session, first you need to run `source env/jsc.2023_Intel.sh`  (Step 2)
-and specify `BUILD_DIR` (Step 3) before you can run Step 6.
+the build from a fresh terminal session, first you need to run `source env/jsc.2023_Intel.sh`  (Step 2), specify `BUILD_DIR` (Step 3) and set `<model-name>_SRC` (Step 4) before you can run Step 6.
 
 ### Rebuilding specific component models
 
