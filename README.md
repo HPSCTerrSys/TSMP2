@@ -4,7 +4,8 @@
 
 ```bash
 git clone https://github.com/HPSCTerrSys/TSMP2.git
-cd TSMP2
+export TSMP2_DIR=$(realpath TSMP2)
+cd $TSMP2_DIR
 ```
 
 2. Load the environment variables required for the build.
@@ -16,8 +17,8 @@ source env/jsc.2023_Intel.sh
 3. Specify build and install directories.
 
 ```bash
-# Name of the coupled model (e.g. eCLM-ICON, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
-MODEL_ID="eCLM-ParFlow"
+# Name of the coupled model (e.g. ICON-eCLM, CLM3.5-COSMO-ParFlow, CLM3.5-ParFlow, CLM3.5-ParFlow-PDAF)
+MODEL_ID="ICON-eCLM-ParFlow"
 
 # Build artifacts will be generated in this folder. It can be deleted after build.
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
@@ -76,7 +77,7 @@ PDAF_SRC=`realpath pdaf`
 # Coupled models requires the option -DOASIS_SRC=${OASIS_SRC}.
 #
 
-# eCLM-ICON
+# ICON-eCLM
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DOASIS_SRC=${OASIS_SRC}                \
@@ -90,7 +91,7 @@ cmake -S . -B ${BUILD_DIR}                    \
       -DeCLM_SRC=${eCLM_SRC}                  \
       -DPARFLOW_SRC=${PARFLOW_SRC}
 
-# eCLM-ICON-ParFlow
+# ICON-eCLM-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DOASIS_SRC=${OASIS_SRC}                \
@@ -191,8 +192,7 @@ cmake --install ${BUILD_DIR}
 ```
 
 Note that this works only if the required environment variables are already set. If you are resuming
-the build from a fresh terminal session, first you need to run `source env/jsc.2023_Intel.sh`  (Step 2)
-and specify `BUILD_DIR` (Step 3) before you can run Step 6.
+the build from a fresh terminal session, first you need to run `source env/jsc.2023_Intel.sh`  (Step 2), specify `BUILD_DIR` (Step 3) and set `<model-name>_SRC` (Step 4) before you can run Step 6.
 
 ### Rebuilding specific component models
 
