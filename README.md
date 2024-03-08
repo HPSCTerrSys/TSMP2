@@ -49,7 +49,7 @@ git clone -b v3.12.0 https://github.com/parflow/parflow.git
 PARFLOW_SRC=`realpath parflow`
 
 # ParFlow (PDAF-patched)
-git clone https://github.com/HPSCTerrSys/parflow
+git clone -b v3.12.0-pdaf https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
 # CLM3.5
