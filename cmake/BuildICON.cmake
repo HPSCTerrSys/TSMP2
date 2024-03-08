@@ -38,7 +38,10 @@ list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
 list(JOIN ICON_LIBS " " ICON_LIBS)
 
-list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-oascoupling --enable-ecrad --enable-parallel-netcdf)
+list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-ecrad --enable-parallel-netcdf)
+if(DEFINED eCLM_SRC OR DEFINED CLM35_SRC)
+  list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
+endif()
 
 ExternalProject_Add(ICON
     PREFIX            ICON

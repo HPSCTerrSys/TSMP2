@@ -14,8 +14,6 @@ find_package(MPIFortran REQUIRED)
 if(DEFINED OASIS_SRC)
   include(BuildOASIS3MCT)
   list(APPEND MODEL_DEPENDENCIES OASIS3_MCT)
-else()
-  message(WARNING "OASIS_SRC was not specified.")
 endif()
 
 # TODO (for all Build*.cmake scripts):
