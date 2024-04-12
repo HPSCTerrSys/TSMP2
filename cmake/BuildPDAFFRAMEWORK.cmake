@@ -1,7 +1,9 @@
 # PDAFFRAMEWORK variables
 # -----------------------
 
-# PDAF-Framework: Directory for copying executable `tsmp-pdaf`
+# PDAF-Framework: Make directory for copying executable `tsmp-pdaf`
+# and save in system environment variable
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 set(TSMPPDAFBINDIR "${CMAKE_INSTALL_PREFIX}/bin")
 
 # Set env vars required by PDAF Makefiles
