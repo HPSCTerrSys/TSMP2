@@ -26,7 +26,7 @@ source ${TSMP2_ENV}
 # Set build parameters
 BUILD_CONFIG="Debug" # "Release"
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}" # Build artifacts will be generated in this folder.
-INSTALL_DIR="./run/${SYSTEMNAME^^}_${MODEL_ID}" # Model executables and libraries will be installed here
+INSTALL_DIR="./bin/${SYSTEMNAME^^}_${MODEL_ID}" # Model executables and libraries will be installed here
 
 BUILD_LOG="$(dirname ${BUILD_DIR})/${MODEL_ID}_$(date +%Y.%m.%d_%H.%M).log"
 

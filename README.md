@@ -88,7 +88,7 @@ MODEL_ID="ICON-eCLM-ParFlow"
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
 
 # Model executables and libraries will be installed here
-INSTALL_DIR="./run/${SYSTEMNAME^^}_${MODEL_ID}"
+INSTALL_DIR="./bin/${SYSTEMNAME^^}_${MODEL_ID}"
 
 # Create build and install directories
 mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
