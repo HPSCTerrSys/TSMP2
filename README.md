@@ -1,3 +1,67 @@
+# Terrestrial System Modeling Platform v2 - TSMP2
+
+## Getting Started
+
+1. Clone the code and set path to the codes
+
+```bash
+# TSMP2
+git clone https://github.com/HPSCTerrSys/TSMP2.git
+export TSMP2_DIR=$(realpath TSMP2)
+cd $TSMP2_DIR
+
+## NOTE: Download only the component models that you need! ##
+
+# OASIS3-MCT
+git clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+OASIS_SRC=`realpath oasis3-mct`
+
+# eCLM
+git clone https://github.com/HPSCTerrSys/eCLM.git
+eCLM_SRC=`realpath eCLM`
+
+# ICON
+git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git
+ICON_SRC=`realpath icon2.6.4_oascoup`
+
+# ParFlow
+git clone -b v3.12.0 https://github.com/parflow/parflow.git
+PARFLOW_SRC=`realpath parflow`
+```
+
+2. Choose environment of TSMP2 and define `TSMP2_PATHS`.
+
+Set path to the environment variables required for the build.
+```bash
+TSMP2_ENV=${TSMP2_DIR}/env/jsc.2022_Intel.sh
+```
+
+Set and define `TSMP2_PATHS`
+```bash
+export TSMP2_PATHS=${TSMP2_DIR}/tsmp2_paths.env
+tee ${TSMP2_PATHS} <<EOF
+TSMP2_DIR=${TSMP2_DIR}
+TSMP2_ENV=${TSMP2_ENV}
+OASIS_SRC=${OASIS_SRC}
+eCLM_SRC=${eCLM_SRC}
+ICON_SRC=${ICON_SRC}
+PARFLOW_SRC=${PARFLOW_SRC}
+EOF
+```
+
+3. Install model component
+
+```bash
+# Name of the coupled model (e.g. ICON-eCLM-ParFlow, ICON-eCLM, eCLM-ParFlow )
+export MODEL_ID="ICON-eCLM-ParFlow"
+```
+
+Compile the code
+```bash
+./${TSMP2_DIR}/build_tsmp2.sh
+```
+
+
 ## Quickstart
 
 1. Clone this repository.
