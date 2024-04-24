@@ -8,10 +8,15 @@
 # For eCLM-PDAF, NetCDF is not loaded by other component models
 find_package(NetCDF REQUIRED)
 
-# MKL is required
+# MKL is required (error: https://gitlab.jsc.fz-juelich.de/HPSCTerrSys/tsmp-internal-development-tracking/-/issues/87)
 # `find_package`command for oneMKL from https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-windows/2024-0/cmake-config-for-onemkl.html
-set(MKL_LINK static) # Switching to static MKL libraries
-find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+# set(MKL_LINK static) # Switching to static MKL libraries
+# find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+
+# LAPACK is required
+# For eCLM-PDAF, this setting has to be consistent with MKL/LAPACK
+# loading in `eCLM/src/clm5/CMakelists.txt`
+find_package(LAPACK REQUIRED)
 
 # OpenMP is required
 find_package(OpenMP REQUIRED)
