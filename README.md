@@ -65,7 +65,7 @@ git -b tsmp-patches-v0.1 clone https://icg4geo.icg.kfa-juelich.de/ExternalReposP
 OASIS_SRC=`realpath oasis3-mct`
 
 # PDAF
-git clone -b PDAF_V2.2-tsmp https://github.com/HPSCTerrSys/pdaf.git
+git clone -b PDAF_V2.2.1-tsmp https://github.com/HPSCTerrSys/pdaf.git
 PDAF_SRC=`realpath pdaf`
 ```
 
