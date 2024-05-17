@@ -90,6 +90,18 @@ list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
 # Join list
 list(JOIN PDAF_MPI_INC " " PDAF_MPI_INC)
 
+# Set PDAF_CPP_DEFS for Makefile header
+# ----------------------------------
+# `-DUSE_PDAF` is always needed in the PDAF header file
+list(APPEND PDAF_CPP_DEFS "-DUSE_PDAF")
+if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+  # For debugging runs, turn on `-DPDAF_DEBUG`
+  list(APPEND PDAF_CPP_DEFS "-DPDAF_DEBUG")
+endif()
+
+# Join list
+list(JOIN PDAF_CPP_DEFS " " PDAF_CPP_DEFS)
+
 # Set env vars required by PDAF Makefiles
 # ---------------------------------------
 list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
@@ -97,6 +109,7 @@ list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
 list(APPEND PDAF_ENV_VARS TSMPPDAFLINK_LIBS=${PDAF_LINK_LIBS})
 list(APPEND PDAF_ENV_VARS TSMPPDAFOPTIM=${PDAF_OPTIM})
 list(APPEND PDAF_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
+list(APPEND PDAF_ENV_VARS TSMPPDAFCPP_DEFS=${PDAF_CPP_DEFS})
 
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # message(STATUS "${PDAF_ENV_VARS_STR}")
