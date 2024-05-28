@@ -53,7 +53,7 @@ git clone -b v3.12.0-tsmp https://github.com/HPSCTerrSys/parflow
 PARFLOW_SRC=`realpath parflow`
 
 # CLM3.5
-git -b tsmp-patches-v0.1 clone https://github.com/HPSCTerrSys/CLM3.5.git
+git clone -b tsmp-patches-v0.1 https://github.com/HPSCTerrSys/CLM3.5.git
 CLM35_SRC=`realpath CLM3.5`
 
 # COSMO5.01
@@ -61,7 +61,7 @@ git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src
 COSMO_SRC=`realpath cosmo5.01_fresh`
 
 # OASIS3-MCT (required for coupled models)
-git -b tsmp-patches-v0.1 clone https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+git clone -b tsmp-patches-v0.1 https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
 OASIS_SRC=`realpath oasis3-mct`
 
 # PDAF
