@@ -61,7 +61,7 @@ ExternalProject_Add(OASIS3_MCT
   SOURCE_DIR        ${OASIS_SRC}
   BUILD_IN_SOURCE   FALSE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 realclean static-libs -C ${OASIS_BLD_DIR}
+  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
   INSTALL_COMMAND   ""
 )
 
