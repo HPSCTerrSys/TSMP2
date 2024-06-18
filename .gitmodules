@@ -1,0 +1,15 @@
+[submodule "models/icon"]
+	path = models/icon
+	url = https://gitlab.jsc.fz-juelich.de/sdlts/tsmp_components_mirrors/icon2.6.4_oascoup
+[submodule "models/parflow"]
+	path = models/parflow
+	url = https://github.com/parflow/parflow.git
+[submodule "models/parflow_pdaf"]
+	path = models/parflow_pdaf
+	url = https://github.com/HPSCTerrSys/parflow
+[submodule "models/pdaf"]
+	path = models/pdaf
+	url = https://github.com/HPSCTerrSys/pdaf.git
+[submodule "models/eCLM"]
+	path = models/eCLM
+	url = https://github.com/HPSCTerrSys/eCLM.git
