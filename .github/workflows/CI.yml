@@ -1,0 +1,100 @@
+name: eCLM CI Test
+
+# Controls when the action will run.
+on: [push, pull_request]
+
+jobs:
+  eclm_build_job:
+    name: ${{ matrix.config.name }}
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        config:
+        - {
+            name: "eCLM-ParFlow",
+          }
+
+    env:
+      CC: mpicc
+      FC: mpifort
+      BUILD_DIR: bld
+      INSTALL_DIR: install
+      OASIS_SRC: oasis3-mct
+      OASIS_TAG: tsmp-patches-v0.1
+      eCLM_SRC: eCLM
+      PARFLOW_SRC: parflow
+      PARFLOW_TAG: v3.12.0
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libxml2-utils pylint wget cmake netcdf-bin libnetcdf-dev libnetcdff-dev libpnetcdf-dev
+          version: 1.0
+          execute_install_scripts: true
+
+      - name: Download MPI Fortran compiler
+        run: sudo apt-get install gfortran openmpi-bin libopenmpi-dev
+
+      - name: Cache OASIS3-MCT ${{ env.OASIS_TAG }}
+        uses: actions/cache@v4
+        id: cache-oasis
+        env:
+          cache-name: cache-oasis
+        with:
+          path: "~/$OASIS_SRC"
+          key: cache-${{ matrix.config.name }}
+
+      - if: steps.cache-oasis.outputs.cache-hit != 'true'
+        name: Download OASIS3-MCT ${{ env.OASIS_TAG }}
+        run: |
+          git clone -b $OASIS_TAG https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
+
+      - name: Cache eCLM
+        uses: actions/cache@v4
+        id: cache-eclm
+        env:
+          cache-name: cache-eclm
+        with:
+          path: "~/$eCLM_SRC"
+          key: cache-${{ matrix.config.name }}
+
+      - if: steps.cache-eclm.outputs.cache-hit != 'true'
+        name: Download eCLM
+        run: |
+          git clone https://github.com/HPSCTerrSys/eCLM.git
+
+      - name: Cache ParFlow ${{ env.PARFLOW_TAG }}
+        uses: actions/cache@v4
+        id: cache-parflow
+        env:
+          cache-name: cache-parflow
+        with:
+          path: "~/$PARFLOW_SRC"
+          key: cache-${{ matrix.config.name }}
+
+      - if: steps.cache-parflow.outputs.cache-hit != 'true'
+        name: Download ParFlow ${{ env.PARFLOW_TAG }}
+        run: |
+          git clone -b $PARFLOW_TAG https://github.com/parflow/parflow.git
+
+      - name: Configure TSMP2
+        run: |
+          cmake -S . -B $BUILD_DIR
+                -DCMAKE_BUILD_TYPE="RELEASE"
+                -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+                -DCMAKE_C_COMPILER=$CC
+                -DCMAKE_Fortran_COMPILER=$FC
+                -DOASIS_SRC=${OASIS_SRC}
+                -DeCLM_SRC=${eCLM_SRC}
+                -DPARFLOW_SRC=${PARFLOW_SRC}
+
+      - name: Build TSMP2
+        run: |
+          cmake --build $BUILD_DIR
+
+      - name: Install TSMP2
+        run: |
+          cmake --install $BUILD_DIR
