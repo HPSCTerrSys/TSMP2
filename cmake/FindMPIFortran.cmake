@@ -10,18 +10,20 @@ find_package(MPI REQUIRED)
 find_package(PkgConfig QUIET)
 include(FindPackageHandleStandardArgs)
 
-if (NOT MPI_Fortran_INCLUDE_DIRS)
-  pkg_check_modules(MPICH_Fortran REQUIRED mpich)
-  if (MPICH_Fortran_FOUND)
-    pkg_get_variable(MPI_Fortran_INCLUDE_DIRS mpich includedir)
-    pkg_get_variable(MPI_Fortran_LIB_DIR mpich libdir)
-  endif()
+if (MPI_Fortran_MODULE_DIR)
+  message(STATUS "MPI_Fortran_MODULE_DIR=${MPI_Fortran_MODULE_DIR}")
+endif()
+
+if (MPI_mpi_LIBRARY)
+  message(STATUS "MPI_mpi_LIBRARY=${MPI_mpi_LIBRARY}")
+  get_filename_component(MPI_Fortran_LIB_DIR ${MPI_mpi_LIBRARY} DIRECTORY)
+  message(STATUS "MPI_Fortran_LIB_DIR=${MPI_Fortran_LIB_DIR}")
 endif()
 
 find_package_handle_standard_args(MPIFortran
    REQUIRED_VARS MPI_Fortran_FOUND
                  MPI_Fortran_COMPILER 
-                 MPI_Fortran_INCLUDE_DIRS
+                 MPI_Fortran_MODULE_DIR
                  MPI_Fortran_LIB_DIR
                  MPIEXEC_EXECUTABLE
                  MPIEXEC_NUMPROC_FLAG
