@@ -169,7 +169,7 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 ## source environment
 message "source environment"
 if [ -n ${tsmp2_env} ]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
+  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2022_Intel.sh"
 else
   tsmp2_env="${tsmp2_env}"
 fi # tsmp2_env
@@ -212,5 +212,5 @@ cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 
 ## message
 message "Log can be found in: ${build_log}"
-message "Model environment used: ${tsmp_env}"
+message "Model environment used: ${tsmp2_env}"
 message "Model binaries can be found in: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
