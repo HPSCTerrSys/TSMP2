@@ -10,7 +10,7 @@ else()
     list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=False)
 endif()
 
-if(DEFINED PDAF_SRC)
+if(${PDAF})
   list(APPEND PDAF_FLAGS  -DUSE_PDAF=True)
 endif()
 
@@ -40,7 +40,7 @@ ExternalProject_Add_Step(eCLM install-scripts
     USES_TERMINAL TRUE
 )
 
-if(DEFINED PDAF_SRC)
+if(${PDAF})
     ExternalProject_Add_Step(eCLM pdaf-workaround
         COMMAND       mv ${CMAKE_INSTALL_PREFIX}/lib/libmct.a ${CMAKE_INSTALL_PREFIX}/lib/libmct2.a
         COMMENT       "Workaround for PDAF: Renaming libmct.a to libmct2.a ..."
