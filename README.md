@@ -1,7 +1,7 @@
 ## Quickstart
 
 > [!TIP]
-> The top-level TSMP2 script `build_tsmp2.sh` is a shell-based. However, the build-system itself is cmake-based. During execution, the CMAKE-command is printed. If needed, one could always build the component model by using CMake directly instead of the top-level shell script.
+> `build_tsmp2.sh` is a lightweighted shell-script calling the cmake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputed CMake command or directly head over to [Building TSMP2 with CMake](#Building-TSMP2-with-CMake).
 
 1. Clone this repository.
 
@@ -51,7 +51,7 @@ To build a model component one need to activate the component model `--<COMP>`. 
 ```
 
 
-## Backend TSMP2
+## Building TSMP2 with CMake
 
 > [!NOTE]
 > For experienced users.
@@ -162,19 +162,18 @@ cmake -S . -B ${BUILD_DIR}                    \
 # CLM3.5-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DCLM35_SRC=ON                          \
-      -DPARFLOW_SRC=ON
+      -DCLM35=ON                          \
+      -DPARFLOW=ON
 
 # CLM3.5-COSMO5.01
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=ON                          \
-      -DCLM35_SRC=ON                          \
-      -DCOSMO_SRC=ON
+      -DCLM35=ON                          \
+      -DCOSMO=ON
 
 #
-# For standalone models, remove -DOASIS_SRC=${OASIS_SRC}
-# and pass the path to the component model (i.e. -D<model-name>_SRC=${<model-name>_SRC}).
+# For standalone models
+# pass the component model name (i.e. -D<model-name>=ON).
 #
 
 # CLM3.5 standalone

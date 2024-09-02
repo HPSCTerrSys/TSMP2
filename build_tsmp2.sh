@@ -1,15 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ### TSMP2 frontend
 ### Shell-based script to compile model components within the TSMP2 framework.
 ###
 ### For more information:
 ### ./build_tsmp2.sh --help
 
+# Force script to exit when error occurs
+set -eo pipefail
+
 ## functions
 
 function help_tsmp2() {
   echo "Usage: $0 [-v ] [--component_name] [--optionals]"
-  echo "  -q, --quite      Write less output during shell execution"
+  echo "  -q, --quiet      Write less output during shell execution"
+  echo "  --version        Print $0 scipt version"
   echo "  --ICON           Compile with ICON"
   echo "  --eCLM           Compile with eCLM"
   echo "  --ParFlow        Compile with ParFlow"
@@ -58,9 +62,9 @@ fi # compsrc
 }
 
 function message(){
-if [ -z "${quite}" ];then
+if [ -z "${quiet}" ];then
   echo "$1"
-fi # quite
+fi # quiet
 }
 
 ###
@@ -71,7 +75,8 @@ fi # quite
 while [[ "$#" -gt 0 ]]; do
     case "${1,,}" in
 	-h|--help) help_tsmp2;;
-	-q|--quite) quite=y;;
+	-q|--quiet) quiet=y;;
+	--version) echo "$0 version 0.1.0"; exit 1;;
         --icon) icon=y;;
         --eclm) eclm=y;;
 	--parflow) parflow=y;;
@@ -97,7 +102,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-## Create MODEL-ID + COMPONENT STRING
+## Create MODEL_ID + COMPONENT STRING
 model_id=""
 model_count=0
 cmake_comp_str=""
@@ -182,7 +187,7 @@ mkdir -pv ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
-message "MODEL-ID: $model_id"
+message "MODEL_ID: $model_id"
 message "TSMP2DIR: $cmake_tsmp2_dir"
 message "BUILDDIR: $cmake_build_dir"
 message "INSTALLDIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
