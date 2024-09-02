@@ -58,10 +58,9 @@ fi # compsrc
 }
 
 function message(){
-#local -n messstr="$1"
 if [ -z "${quite}" ];then
-  echo "$1" #$messstr
-fi # message
+  echo "$1"
+fi # quite
 }
 
 ###
@@ -82,6 +81,8 @@ while [[ "$#" -gt 0 ]]; do
 	--icon_src) icon_src="$2"; shift ;;
 	--eclm_src) eclm_src="$2"; shift ;;
 	--parflow_src) parflow_src="$2"; shift ;;
+	--cosmo_src) cosmo_src="$2"; shift ;;
+	--clm35_src) clm35_src="$2"; shift ;;
 	--pdaf_src) pdaf_src="$2"; shift ;;
 	--oasis_src) oasis_src="$2"; shift ;;
 	--build_config) build_config="$2"; shift ;;
@@ -169,7 +170,7 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 ## source environment
 message "source environment"
 if [ -n ${tsmp2_env} ]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2022_Intel.sh"
+  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
 else
   tsmp2_env="${tsmp2_env}"
 fi # tsmp2_env
@@ -187,6 +188,7 @@ message "BUILDDIR: $cmake_build_dir"
 message "INSTALLDIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
 message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_config} ${cmake_comp_str}  ${cmake_compsrc_str}  ${cmake_build_config} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
+message "== CMAKE CONNFIGURE start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_build_config} \
@@ -195,15 +197,21 @@ cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_build_config} ${cmake_compiler} ${cmake_install_dir} \
       |& tee ${build_log}
 
+message "== CMAKE CONFIGURE finished"
+
 ## Build and install
 
 message "CMAKE build:"
 message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
+message "== CMAKE BUILD start"
 cmake --build ${cmake_build_dir} |& tee -a $build_log
+message "== CMAKE BUILD finished"
 
 message "CMAKE install:"
 message "cmake --install ${cmake_build_dir} |& tee -a $build_log"
+message "== CMAKE BUILD start"
 cmake --install ${cmake_build_dir} |& tee -a $build_log
+message "== CMAKE BUILD finished"
 
 ## Copy log and environment
 message "Copy log and environment to install_dir"
