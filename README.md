@@ -1,7 +1,7 @@
 ## Quickstart
 
 > [!TIP]
-> The top-level TSMP2 script `build_tsmp2.sh` is a shell-based. However, the build-system itself is cmake-based. During execution, the CMAKE-command is printed. Thus, one can always reproduce the build command of the framework.
+> The top-level TSMP2 script `build_tsmp2.sh` is a shell-based. However, the build-system itself is cmake-based. During execution, the CMAKE-command is printed. If needed, one could always build the component model by using CMake directly instead of the top-level shell script.
 
 1. Clone this repository.
 

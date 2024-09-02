@@ -188,7 +188,7 @@ message "BUILDDIR: $cmake_build_dir"
 message "INSTALLDIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
 message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_config} ${cmake_comp_str}  ${cmake_compsrc_str}  ${cmake_build_config} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
-message "== CMAKE CONNFIGURE start"
+message "== CMAKE CONFIGURE start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_build_config} \
