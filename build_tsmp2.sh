@@ -183,12 +183,13 @@ message "===================="
 message "== TSMP2 settings =="
 message "===================="
 message "MODEL_ID: $model_id"
-message "TSMP2DIR: $cmake_tsmp2_dir"
-message "BUILDDIR: $cmake_build_dir"
-message "INSTALLDIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
+message "TSMP2_DIR: $cmake_tsmp2_dir"
+message "TSMP2_ENV: $tsmp2_env"
+message "BUILD_DIR: $cmake_build_dir"
+message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
 message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_config} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
-message "== CMAKE CONFIGURE start"
+message "== CMAKE GENERATE PROJECT start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_build_config} \
@@ -197,7 +198,7 @@ cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_compiler} ${cmake_install_dir} \
       |& tee ${build_log}
 
-message "== CMAKE CONFIGURE finished"
+message "== CMAKE GENERATE PROJECT finished"
 
 ## Build and install
 
@@ -209,9 +210,9 @@ message "== CMAKE BUILD finished"
 
 message "CMAKE install:"
 message "cmake --install ${cmake_build_dir} |& tee -a $build_log"
-message "== CMAKE BUILD start"
+message "== CMAKE INSTALL start"
 cmake --install ${cmake_build_dir} |& tee -a $build_log
-message "== CMAKE BUILD finished"
+message "== CMAKE INSTALL finished"
 
 ## Copy log and environment
 message "Copy log and environment to install_dir"

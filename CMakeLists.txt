@@ -24,7 +24,6 @@ endif()
 
 # init CMAKE internal variables
 string(TOUPPER $ENV{SYSTEMNAME} SYSTEMNAME)
-set(MODELCOUNT 0)
 set(MODEL_ID "")
 
 # TODO (for all Build*.cmake scripts):
@@ -34,6 +33,17 @@ set(MODEL_ID "")
 
 # model settings
 set(MODEL_ID "")
+
+find_package(MPIFortran REQUIRED)
+check_build_oasis(BUILD_OASIS) # check if >=2 components (ICON, COSMO, eCLM, CLM3.5, ParFlow) are build
+if (BUILD_OASIS)
+  if(NOT DEFINED OASIS_SRC)
+    set(OASIS_SRC "${CMAKE_SOURCE_DIR}/models/oasis3-mct")
+  endif()
+  include(BuildOASIS3MCT)
+  list(APPEND MODEL_DEPENDENCIES OASIS3_MCT)
+endif()
+
 if (${ICON})
   if(NOT DEFINED ICON_SRC)
     set(ICON_SRC "${CMAKE_SOURCE_DIR}/models/icon")
@@ -45,7 +55,6 @@ if (${ICON})
    else()
       set(MODEL_ID "${MODEL_ID}-ICON")
    endif()
-  MATH(EXPR MODELCOUNT "${MODELCOUNT}+1")
 endif()
 
 if (${COSMO})
@@ -55,7 +64,6 @@ if (${COSMO})
   include(BuildCOSMO)
   list(APPEND COMPONENT_MODELS "COSMO5.1")
   set(MODEL_ID "${MODEL_ID}COSMO")
-  MATH(EXPR MODELCOUNT "${MODELCOUNT}+1")
 endif()
 
 if (${eCLM})
@@ -69,7 +77,6 @@ if (${eCLM})
    else()
       set(MODEL_ID "${MODEL_ID}-eCLM")
    endif()
-  MATH(EXPR MODELCOUNT "${MODELCOUNT}+1")
 endif()
 
 if (${CLM3.5})
@@ -79,7 +86,6 @@ if (${CLM3.5})
   include(BuildCLM3.5)
   list(APPEND COMPONENT_MODELS "CLM3.5")
   set(MODEL_ID "${MODEL_ID}CLM3.5")
-  MATH(EXPR MODELCOUNT "${MODELCOUNT}+1")
 endif()
 
 if (${ParFlow})
@@ -95,7 +101,6 @@ if (${ParFlow})
    else()
       set(MODEL_ID "${MODEL_ID}-ParFlow")
    endif()
-  MATH(EXPR MODELCOUNT "${MODELCOUNT}+1")
 endif()
 
 if (${PDAF})
@@ -111,15 +116,6 @@ if (${PDAF})
    else()
       set(MODEL_ID "${MODEL_ID}-PDAF")
    endif()
-endif()
-
-find_package(MPIFortran REQUIRED)
-if (${MODELCOUNT} GREATER 1)
-  if(NOT DEFINED OASIS_SRC)
-    set(OASIS_SRC "${CMAKE_SOURCE_DIR}/models/oasis3-mct")
-  endif()
-  include(BuildOASIS3MCT)
-  list(APPEND MODEL_DEPENDENCIES OASIS3_MCT)
 endif()
 
 # set paths

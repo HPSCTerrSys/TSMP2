@@ -1,6 +1,6 @@
-if(${ICON} OR ${PARFLOW})
+if(${ICON} OR ${ParFlow})
     list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=True)
-    if(${PARFLOW})
+    if(${ParFlow})
         list(APPEND COUP_OAS_FLAGS  -DCOUP_OAS_PFL=True)
     endif()
     if(${ICON})
