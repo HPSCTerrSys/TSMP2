@@ -27,10 +27,9 @@ function help_tsmp2() {
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
   echo "  --build_config   Set build configuration: 'Debug' 'Release'"
   echo "  --compiler       Set compiler for building"
-  echo "  --source_dir     Set source dir of cmake, if not set <tsmp2_dir> is used"
+  echo "  --source_dir     Set source dir of cmake"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
-  echo "  --tsmp2_dir      Set tsmp2_dir, if not set pwd is used"
   echo "  --tsmp2_env      Set model environment."
   echo ""
   echo "Example: $0 --ICON --eCLM --ParFlow"
@@ -95,7 +94,6 @@ while [[ "$#" -gt 0 ]]; do
 	--build_dir) build_dir="$2"; shift ;;
         --source_dir) source_dir="$2"; shift ;;
 	--install_dir) install_dir="$2"; shift ;;
-	--tsmp2_dir) tsmp2_dir="$2"; shift ;;
 	--tsmp2_env) tsmp2_env="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
@@ -149,13 +147,10 @@ else
    cmake_comiler=" -DCMAKE_CXX_COMPILER_ID=${compiler}"
 fi
 
-# set INSTALL and BUILD DIR (neccesary for building)
-if [ -n ${tsmp2_dir} ]; then
-  cmake_tsmp2_dir="${PWD}"
-else
-  cmake_tsmp2_dir="${tsmp2_dir}"
-fi # tsmp2_dir
+# Get tsmp2_dir (full path) from location of $0
+cmake_tsmp2_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# set INSTALL and BUILD DIR (neccesary for building)
 if [ -z ${SYSTEMNAME} ]; then SYSTEMNAME="UNKN"; fi
 
 if [ -n ${build_dir} ]; then
@@ -192,14 +187,14 @@ message "TSMP2DIR: $cmake_tsmp2_dir"
 message "BUILDDIR: $cmake_build_dir"
 message "INSTALLDIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
-message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_config} ${cmake_comp_str}  ${cmake_compsrc_str}  ${cmake_build_config} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
+message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_config} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
 message "== CMAKE CONFIGURE start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_build_config} \
       ${cmake_comp_str} \
       ${cmake_compsrc_str} \
-      ${cmake_build_config} ${cmake_compiler} ${cmake_install_dir} \
+      ${cmake_compiler} ${cmake_install_dir} \
       |& tee ${build_log}
 
 message "== CMAKE CONFIGURE finished"
