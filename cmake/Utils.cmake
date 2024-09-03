@@ -1,6 +1,6 @@
 find_package(Git)
 if(NOT Git_FOUND)
-  message(WARNING "eTSMP: git executable not found. Model versions would not be detected.")
+  message(WARNING "TSMP2: git executable not found. Model versions would not be detected.")
 endif()
 
 function(get_model_version MODEL_DIR MODEL_VERSION)

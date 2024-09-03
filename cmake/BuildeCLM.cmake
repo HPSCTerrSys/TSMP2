@@ -51,4 +51,4 @@ if(${PDAF})
 endif()
 
 get_model_version(${eCLM_SRC} eCLM_VERSION)
-list(APPEND eTSMP_MODEL_VERSIONS "eCLM: ${eCLM_VERSION}")
+list(APPEND TSMP2_MODEL_VERSIONS "eCLM: ${eCLM_VERSION}")

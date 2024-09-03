@@ -127,6 +127,6 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set (CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/bin/${SYSTEMNAME}_${MODEL_ID}" CACHE PATH "default install path" FORCE)
 endif()
 
-print_model_versions("${COMPONENT_MODELS}" "${eTSMP_MODEL_VERSIONS}")
+print_model_versions("${COMPONENT_MODELS}" "${TSMP2_MODEL_VERSIONS}")
 
 #message(FATAL_ERROR "at the end of script")
