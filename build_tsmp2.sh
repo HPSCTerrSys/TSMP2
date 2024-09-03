@@ -134,14 +134,14 @@ set_compsrc clm35_src "CLM35_SRC"
 
 message "set CMAKE options"
 # build_config
-if [[ -z $build_config ]];then
+if [ -z "$build_config" ];then
    cmake_build_config=""
 else
    cmake_build_config=" -DCMAKE_BUILD_TYPE=${build_config}"
 fi
 
 # set compiler
-if [[ -z $compiler ]];then
+if [ -z "$compiler" ];then
    cmake_compiler=""
 else
    cmake_comiler=" -DCMAKE_CXX_COMPILER_ID=${compiler}"
@@ -151,15 +151,15 @@ fi
 cmake_tsmp2_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z ${SYSTEMNAME} ]; then SYSTEMNAME="UNKN"; fi
+if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME="UNKN"; fi
 
-if [ -n ${build_dir} ]; then
+if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${SYSTEMNAME^^}_${model_id}" 
 else
   cmake_build_dir="${build_dir}"
 fi # build_dir
 
-if [ -n ${install_dir} ]; then
+if [ -z "${install_dir}" ]; then
   cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${SYSTEMNAME^^}_${model_id}"
 else
   cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
@@ -169,7 +169,7 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 
 ## source environment
 message "source environment"
-if [ -n ${tsmp2_env} ]; then
+if [ -z "${tsmp2_env}" ]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
 else
   tsmp2_env="${tsmp2_env}"
