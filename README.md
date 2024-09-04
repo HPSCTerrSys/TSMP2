@@ -7,28 +7,16 @@
 
 ```bash
 git clone https://github.com/HPSCTerrSys/TSMP2.git
-export TSMP2_DIR=$(realpath TSMP2)
 cd $TSMP2_DIR
 ```
 
-2. Get model source code
-Get needed submodules of component models.
+2. Build model components with TSMP2 framework
+
+To build a model component one need to activate the component model `--<COMP>`. The options are not case-sensitive and do not need to be in an specific order.
 
 > [!NOTE]
-> Please just download the submodules, which you need. E.g. if you want to run ICON-eCLM-ParFlow, you need to download the submodules `models/icon`,`models/eclm`,`models/parflow` and the coupler `models/oasis3-mct`.
+> The component models (git submodules) are cloned during the execution of `build_tsmp2.sh`. If the component model (`models/<COMP>`) are already exists, the user is asked if the folder should be overwritten or not. If you do want to use the default model component source codes, one can use the option `--<COMP_SRC>`.
 
-```bash
-git submodule update --init -- models/icon
-git submodule update --init -- models/eCLM
-git submodule update --init -- models/parflow
-git submodule update --init -- models/oasis3-mct
-git submodule update --init -- models/pdaf
-git submodule update --init -- models/parflow_pdaf
-```
-
-3. Build model components with TSMP2 framework
-
-To build a model component one need to activate the component model `--<COMP>`. The options are not case-sensitive and do not need to be in an specific order. 
 
 ```bash
 # to see options

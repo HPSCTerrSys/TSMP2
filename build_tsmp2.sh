@@ -60,6 +60,32 @@ if [ -n "${compsrc_name}" ];then
 fi # compsrc
 }
 
+function dwn_compsrc(){
+comp_name=$1
+local -n comp_namey=$1
+local -n comp_srcname=$2
+sub_srcname=$3
+if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
+  if [ "${comp_name}" = "parflow" ] && [ -n "${pdaf}" ];then
+     submodule_name=$(echo "models/${sub_srcname}_pdaf")
+  else
+     submodule_name=$(echo "models/"${sub_srcname})
+  fi
+  if [ -d "${cmake_tsmp2_dir}/${submodule_name}" ];then
+     echo "submodule ${submodule_name} aleady exist. Do you want overwrite it? (y/n)"
+     read yn
+     if [ "${yn,}" = "y" ];then
+        message "Overwrite submodule ${submodule_name}"
+        git submodule update -- ${submodule_name}
+     else
+        message "Do not overwrite submodule ${submodule_name}"
+     fi
+  else
+     git submodule update --init -- ${submodule_name}
+  fi
+fi # compsrc
+}
+
 function message(){
 if [ -z "${quiet}" ];then
   echo "$1"
@@ -100,6 +126,9 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+# Get tsmp2_dir (full path) from location of $0
+cmake_tsmp2_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 ## Create MODEL_ID + COMPONENT STRING
 model_id=""
 model_count=0
@@ -117,6 +146,8 @@ set_component clm35 "CLM35"
 if [ $model_count = 0 ];then
   echo "No model component is chosen"
   exit 1
+elif [ $model_count -ge 2 ];then
+  oasis=y
 fi
 
 ## CONCADINATE SOURCE CODE STRING
@@ -129,6 +160,15 @@ set_compsrc oasis_src "OASIS_SRC"
 set_compsrc pdaf_src "PDAF_SRC"
 set_compsrc cosmo_src "COSMO_SRC"
 set_compsrc clm35_src "CLM35_SRC"
+
+## download model components
+dwn_compsrc icon icon_src "icon"
+dwn_compsrc eclm eclm_src "eCLM"
+dwn_compsrc parflow parflow_src "parflow"
+dwn_compsrc oasis oasis_src "oasis3-mct"
+dwn_compsrc pdaf pdaf_src "pdaf"
+dwn_compsrc cosmo cosmo_src "cosmo"
+dwn_compsrc clm35 clm35_src "clm35"
 
 ## CMAKE options
 
@@ -146,9 +186,6 @@ if [ -z "$compiler" ];then
 else
    cmake_comiler=" -DCMAKE_CXX_COMPILER_ID=${compiler}"
 fi
-
-# Get tsmp2_dir (full path) from location of $0
-cmake_tsmp2_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # set INSTALL and BUILD DIR (neccesary for building)
 if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME="UNKN"; fi
