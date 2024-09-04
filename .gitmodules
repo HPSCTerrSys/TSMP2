@@ -1,15 +1,24 @@
 [submodule "models/icon"]
 	path = models/icon
 	url = https://gitlab.jsc.fz-juelich.de/sdlts/tsmp_components_mirrors/icon2.6.4_oascoup
+	branch = master
 [submodule "models/parflow"]
 	path = models/parflow
 	url = https://github.com/parflow/parflow.git
+	branch = master
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
+	branch = tsmp-pdaf
 [submodule "models/pdaf"]
 	path = models/pdaf
 	url = https://github.com/HPSCTerrSys/pdaf.git
+	branch = tsmp-pdaf-patched
 [submodule "models/eCLM"]
 	path = models/eCLM
 	url = https://github.com/HPSCTerrSys/eCLM.git
+	branch = master
+[submodule "models/oasis3-mct"]
+        path = models/oasis3-mct
+        url = https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
+	branch = v5.0_patched
