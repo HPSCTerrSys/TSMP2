@@ -81,8 +81,8 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone https://github.com/HPSCTerrSys/eCLM.git models/eclm
-eCLM_SRC=`realpath models/eclm`
+git clone https://github.com/HPSCTerrSys/eCLM.git models/eCLM
+eCLM_SRC=`realpath models/eCLM`
 
 # ICON
 git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git models/icon
@@ -97,12 +97,12 @@ git clone -b v3.12.0-tsmp https://github.com/HPSCTerrSys/parflow models/parflow_
 PARFLOW_SRC=`realpath models/parflow_pdaf`
 
 # CLM3.5
-git clone -b tsmp-patches-v0.1 https://github.com/HPSCTerrSys/CLM3.5.git models/clm35
-CLM35_SRC=`realpath models/clm35`
+git clone -b tsmp-patches-v0.1 https://github.com/HPSCTerrSys/CLM3.5.git models/CLM3.5
+CLM35_SRC=`realpath models/CLM3.5`
 
 # COSMO5.01
-git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git models/cosmo
-COSMO_SRC=`realpath models/cosmo`
+git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git models/cosmo5.01_fresh
+COSMO_SRC=`realpath models/cosmo5.01_fresh`
 
 # OASIS3-MCT (required for coupled models)
 git clone -b tsmp-patches-v0.1 https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct models/oasis3-mct
