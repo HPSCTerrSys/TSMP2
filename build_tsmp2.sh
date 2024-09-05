@@ -46,7 +46,7 @@ if [ "${component}" = "y" ];then
       model_id+="-${cmake_name}"
   fi # model_id
   cmake_comp_str+=" -D${cmake_name}=ON"
-  if [[ $cmake_name = @(ICON|eCLM|PARFLOW|COSMO|CLM35) ]]; then
+  if [[ $cmake_name = @(ICON|eCLM|ParFlow|COSMO|CLM3.5) ]]; then
      model_count=$(( $model_count + 1 ))
   fi # cmake_name
 fi # component
@@ -76,7 +76,7 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
      read yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
-        git submodule update -- ${submodule_name}
+        git submodule update --init -- ${submodule_name}
      else
         message "Do not overwrite submodule ${submodule_name}"
      fi
@@ -138,10 +138,10 @@ message "set model-id and component string"
 # fun set_component shell_name cmake_name
 set_component icon "ICON"
 set_component eclm "eCLM"
-set_component parflow "PARFLOW"
+set_component parflow "ParFlow"
 set_component pdaf "PDAF"
 set_component cosmo "COSMO"
-set_component clm35 "CLM35"
+set_component clm35 "CLM3.5"
 
 if [ $model_count = 0 ];then
   echo "No model component is chosen"
