@@ -27,7 +27,6 @@ function help_tsmp2() {
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
   echo "  --build_config   Set build configuration: 'Debug' 'Release'"
   echo "  --compiler       Set compiler for building"
-  echo "  --source_dir     Set source dir of cmake"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --tsmp2_env      Set model environment."
@@ -118,7 +117,6 @@ while [[ "$#" -gt 0 ]]; do
 	--build_config) build_config="$2"; shift ;;
 	--compiler) compiler="$2"; shift ;; 
 	--build_dir) build_dir="$2"; shift ;;
-        --source_dir) source_dir="$2"; shift ;;
 	--install_dir) install_dir="$2"; shift ;;
 	--tsmp2_env) tsmp2_env="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
