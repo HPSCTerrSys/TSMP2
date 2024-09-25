@@ -75,7 +75,7 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
      read yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
-        git submodule update --init -- ${submodule_name}
+        git submodule update --init --force -- ${submodule_name}
      else
         message "Do not overwrite submodule ${submodule_name}"
      fi
