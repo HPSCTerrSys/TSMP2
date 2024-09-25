@@ -70,7 +70,7 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
   else
      submodule_name=$(echo "models/"${sub_srcname})
   fi
-  if [ -d "${cmake_tsmp2_dir}/${submodule_name}" ];then
+  if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
      echo "submodule ${submodule_name} aleady exist. Do you want overwrite it? (y/n)"
      read yn
      if [ "${yn,}" = "y" ];then
