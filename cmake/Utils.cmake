@@ -1,7 +1,26 @@
 find_package(Git)
 if(NOT Git_FOUND)
-  message(WARNING "eTSMP: git executable not found. Model versions would not be detected.")
+  message(WARNING "TSMP2: git executable not found. Model versions would not be detected.")
 endif()
+
+# Count how many component models shoul be build, and if >=2 compile with OASIS
+function(check_build_oasis BUILD_OASIS)
+   # Combine all options into a list
+   list(APPEND COMPONENT_MODELS ICON COSMO eCLM CLM3.5 ParFlow)
+   # Count enabled models
+   set(MODELCOUNT 0)
+   foreach(comp_model IN LISTS COMPONENT_MODELS)
+      if (${comp_model})
+         MATH(EXPR MODELCOUNT "${MODELCOUNT}+1")
+      endif()
+   endforeach()
+   #
+   if (${MODELCOUNT} GREATER_EQUAL 2)
+      set(${BUILD_OASIS} TRUE PARENT_SCOPE)
+   else()
+      set(${BUILD_OASIS} FALSE PARENT_SCOPE)
+   endif()
+endfunction()
 
 function(get_model_version MODEL_DIR MODEL_VERSION)
   if(Git_FOUND)
