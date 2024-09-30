@@ -89,7 +89,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
   endif()
 
   list(APPEND PDAF_OPTIM "-xHost")
-  list(APPEND PDAF_OPTIM "-r8")
+  list(APPEND PDAF_OPTIM "-r4")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
