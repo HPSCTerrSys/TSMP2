@@ -42,4 +42,4 @@ ExternalProject_Add(ParFlow
 )
 
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)
-list(APPEND eTSMP_MODEL_VERSIONS "ParFlow: ${PARFLOW_VERSION}")
+list(APPEND TSMP2_MODEL_VERSIONS "ParFlow: ${PARFLOW_VERSION}")

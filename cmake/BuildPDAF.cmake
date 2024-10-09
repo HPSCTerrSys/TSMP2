@@ -73,12 +73,48 @@ list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
 
 # Set PDAF_OPTIM for Makefile header
 # ----------------------------------
-list(APPEND PDAF_OPTIM "-O2")
-list(APPEND PDAF_OPTIM "-xHost")
-list(APPEND PDAF_OPTIM "-r8")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 
-# For Gnu-compiler
-# list(APPEND PDAF_OPTIM "-O2 -xHost -fbacktrace -fdefault-real-8 -falign-commons -fno-automatic -finit-local-zero -mcmodel=large")
+  # using Intel Compiler
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    # Release optimization flags
+    list(APPEND PDAF_OPTIM "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    # Debug optimization flags
+    list(APPEND PDAF_OPTIM "-O0")
+    list(APPEND PDAF_OPTIM "-g")
+    list(APPEND PDAF_OPTIM "-traceback")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_OPTIM "-xHost")
+  list(APPEND PDAF_OPTIM "-r8")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+  # using GCC (experimental)
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    # Release optimization flags
+    list(APPEND PDAF_OPTIM "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    # Debug optimization flags
+    list(APPEND PDAF_OPTIM "-O0")
+    list(APPEND PDAF_OPTIM "-g")
+    list(APPEND PDAF_OPTIM "-fbacktrace")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_OPTIM "-fdefault-real-8")
+  list(APPEND PDAF_OPTIM "-falign-commons")
+  list(APPEND PDAF_OPTIM "-fno-automatic")
+  list(APPEND PDAF_OPTIM "-finit-local-zero")
+  list(APPEND PDAF_OPTIM "-mcmodel=large")
+
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
 
 # Join list
 list(JOIN PDAF_OPTIM " " PDAF_OPTIM)
@@ -129,5 +165,5 @@ ExternalProject_Add(PDAF
 )
 
 get_model_version(${PDAF_SRC} PDAF_VERSION)
-list(APPEND eTSMP_MODEL_VERSIONS "PDAF: ${PDAF_VERSION}")
+list(APPEND TSMP2_MODEL_VERSIONS "PDAF: ${PDAF_VERSION}")
 

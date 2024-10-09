@@ -1,5 +1,49 @@
 ## Quickstart
 
+> [!TIP]
+> `build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputed CMake command or directly head over to [Building TSMP2 with CMake](#Building-TSMP2-with-CMake).
+
+1. Clone this repository.
+
+```bash
+git clone https://github.com/HPSCTerrSys/TSMP2.git
+cd $TSMP2_DIR
+```
+
+2. Build model components with TSMP2 framework
+
+To build a model component one need to activate the component model `--<COMP>`. The options are not case-sensitive and do not need to be in an specific order.
+
+> [!NOTE]
+> The component models (git submodules) are cloned during the execution of `build_tsmp2.sh`. If the component model (`models/<COMP>`) are already exists, the user is asked if the folder should be overwritten or not. If you do want to use the default model component source codes, one can use the option `--<COMP_SRC>`.
+
+
+```bash
+# to see options
+./build_tsmp2.sh --help
+
+# ICON-eCLM-ParFlow
+./build_tsmp2.sh --ICON --eCLM --PARFLOW
+
+# eCLM-ParFlow
+./build_tsmp2.sh --eCLM --PARFLOW
+
+# ICON-eCLM
+./build_tsmp2.sh --ICON --eCLM
+
+# eCLM-PDAF
+./build_tsmp2.sh --eCLM --PDAF
+
+# ICON (with source code)
+./build_tsmp2.sh --ICON --ICON_SRC ${ICON_SRC}
+```
+
+
+## Building TSMP2 with CMake
+
+> [!NOTE]
+> For experienced users.
+
 1. Clone this repository.
 
 ```bash
@@ -37,36 +81,36 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone https://github.com/HPSCTerrSys/eCLM.git
-eCLM_SRC=`realpath eCLM`
+git clone https://github.com/HPSCTerrSys/eCLM.git models/eCLM
+eCLM_SRC=`realpath models/eCLM`
 
 # ICON
-git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git
-ICON_SRC=`realpath icon2.6.4_oascoup`
+git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git models/icon
+ICON_SRC=`realpath models/icon`
 
 # ParFlow
-git clone -b v3.12.0 https://github.com/parflow/parflow.git
-PARFLOW_SRC=`realpath parflow`
+git clone -b v3.12.0 https://github.com/parflow/parflow.git models/parflow
+PARFLOW_SRC=`realpath models/parflow`
 
 # ParFlow (PDAF-patched)
-git clone -b v3.12.0-tsmp https://github.com/HPSCTerrSys/parflow
-PARFLOW_SRC=`realpath parflow`
+git clone -b v3.12.0-tsmp https://github.com/HPSCTerrSys/parflow models/parflow_pdaf
+PARFLOW_SRC=`realpath models/parflow_pdaf`
 
 # CLM3.5
-git clone -b tsmp-patches-v0.1 https://github.com/HPSCTerrSys/CLM3.5.git
-CLM35_SRC=`realpath CLM3.5`
+git clone -b tsmp-patches-v0.1 https://github.com/HPSCTerrSys/CLM3.5.git models/CLM3.5
+CLM35_SRC=`realpath models/CLM3.5`
 
 # COSMO5.01
-git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git
-COSMO_SRC=`realpath cosmo5.01_fresh`
+git clone -b tsmp-oasis https://icg4geo.icg.kfa-juelich.de/ModelSystems/tsmp_src/cosmo5.01_fresh.git models/cosmo5.01_fresh
+COSMO_SRC=`realpath models/cosmo5.01_fresh`
 
 # OASIS3-MCT (required for coupled models)
-git clone -b tsmp-patches-v0.1 https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
-OASIS_SRC=`realpath oasis3-mct`
+git clone -b tsmp-patches-v0.1 https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct models/oasis3-mct
+OASIS_SRC=`realpath models/oasis3-mct`
 
 # PDAF
-git clone -b PDAF_V2.2.1-tsmp https://github.com/HPSCTerrSys/pdaf.git
-PDAF_SRC=`realpath pdaf`
+git clone -b PDAF_V2.2.1-tsmp https://github.com/HPSCTerrSys/pdaf.git models/pdaf
+PDAF_SRC=`realpath models/pdaf`
 ```
 
 5. Run CMake configure step for the model combination that you wish to build. The
@@ -74,104 +118,96 @@ PDAF_SRC=`realpath pdaf`
 
 ```bash
 #
-# Coupled models requires the option -DOASIS_SRC=${OASIS_SRC}.
+#  The component source is searched in models/component by default but there is also the possibility to choose the path to the source code of components with -D<COMP>_SRC=${<COMP>_SRC}. OASIS is taken by default when coupled models are chosen.
 #
 
 # ICON-eCLM
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DeCLM_SRC=${eCLM_SRC}                  \
-      -DICON_SRC=${ICON_SRC}
+      -DeCLM=ON                               \
+      -DICON=ON
 
 # eCLM-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DeCLM_SRC=${eCLM_SRC}                  \
-      -DPARFLOW_SRC=${PARFLOW_SRC}
+      -DeCLM=ON                               \
+      -DPARFLOW_SRC=ON
 
 # ICON-eCLM-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DeCLM_SRC=${eCLM_SRC}                  \
-      -DICON_SRC=${ICON_SRC}		          \
-      -DPARFLOW_SRC=${PARFLOW_SRC}
+      -DeCLM=ON                               \
+      -DICON=ON                               \
+      -DPARFLOW=ON
 
 # CLM3.5-COSMO5.01-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DCLM35_SRC=${CLM35_SRC}                \
-      -DCOSMO_SRC=${COSMO_SRC}                \
-      -DPARFLOW_SRC=${PARFLOW_SRC}
+      -DCLM35=ON                              \
+      -DCOSMO=ON                              \
+      -DPARFLOW=ON
 
 # CLM3.5-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DCLM35_SRC=${CLM35_SRC}                \
-      -DPARFLOW_SRC=${PARFLOW_SRC}
+      -DCLM35=ON                          \
+      -DPARFLOW=ON
 
 # CLM3.5-COSMO5.01
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DCLM35_SRC=${CLM35_SRC}                \
-      -DCOSMO_SRC=${COSMO_SRC}
+      -DCLM35=ON                          \
+      -DCOSMO=ON
 
 #
-# For standalone models, remove -DOASIS_SRC=${OASIS_SRC}
-# and pass the path to the component model (i.e. -D<model-name>_SRC=${<model-name>_SRC}).
+# For standalone models
+# pass the component model name (i.e. -D<model-name>=ON).
 #
 
 # CLM3.5 standalone
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DCLM35_SRC=${CLM35_SRC}
+      -DCLM35=ON
 
 # eCLM standalone
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DeCLM_SRC=${eCLM_SRC}
+      -DeCLM=ON
 
 # ParFlow standalone
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DPARFLOW_SRC=${PARFLOW_SRC}
+      -DPARFLOW=ON
 
 #
-# For TSMP-PDAF builds, add -PDAF_SRC=${PDAF_SRC}
+# For TSMP-PDAF builds, add -PDAF=ON
 #
 
 # CLM3.5-PDAF
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DCLM35_SRC=${CLM35_SRC}                \
-      -DPDAF_SRC=${PDAF_SRC}
+      -DCLM35=ON                              \
+      -DPDAF=ON
 
 # CLM3.5-ParFlow-PDAF
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DCLM35_SRC=${CLM35_SRC}                \
-      -DPARFLOW_SRC=${PARFLOW_SRC}            \
-      -DPDAF_SRC=${PDAF_SRC}
+      -DCLM35=ON                              \
+      -DPARFLOW=ON                            \
+      -DPDAF=ON
 
 # eCLM-PDAF
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DeCLM_SRC=${eCLM_SRC}                \
-      -DPDAF_SRC=${PDAF_SRC}
+      -DeCLM=ON                               \
+      -DPDAF=ON
 
 # eCLM-ParFlow-PDAF
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DOASIS_SRC=${OASIS_SRC}                \
-      -DeCLM_SRC=${eCLM_SRC}                \
-      -DPARFLOW_SRC=${PARFLOW_SRC}            \
-      -DPDAF_SRC=${PDAF_SRC}
+      -DeCLM=ON                               \
+      -DPARFLOW=ON                            \
+      -DPDAF=ON
 
 ```
 

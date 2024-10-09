@@ -39,7 +39,7 @@ list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 list(JOIN ICON_LIBS " " ICON_LIBS)
 
 list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-ecrad --enable-parallel-netcdf)
-if(DEFINED eCLM_SRC OR DEFINED CLM35_SRC)
+if( ${eCLM} OR ${CLM3.5} )
   list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
 endif()
 
@@ -65,4 +65,4 @@ ExternalProject_Add(ICON
 )
 
 get_model_version(${ICON_SRC} ICON_VERSION)
-list(APPEND eTSMP_MODEL_VERSIONS "ICON: ${ICON_VERSION}")
+list(APPEND TSMP2_MODEL_VERSIONS "ICON: ${ICON_VERSION}")

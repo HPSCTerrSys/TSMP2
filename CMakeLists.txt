@@ -1,56 +1,128 @@
 cmake_minimum_required (VERSION 3.21.1)
-project(eTSMP LANGUAGES C CXX Fortran)
+project(TSMP2 LANGUAGES C CXX Fortran)
 include(ExternalProject)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Utils)
+
+# Prevent in-source builds
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
+# set default of components to off
+option(ICON "Compile ICON within TSMP2 framework" OFF)
+option(COSMO "Compile COSMO within TSMP2 framework" OFF)
+option(eCLM "Compile eCLM within TSMP2 framework" OFF)
+option(CLM3.5 "Compile CLM3.5 within TSMP2 framework" OFF)
+option(ParFlow "Compile ParFlow within TSMP2 framework" OFF)
+option(PDAF "Compile PDAF within TSMP2 framework" OFF)
+
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Choose the type of build." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")
 endif()
 
-find_package(MPIFortran REQUIRED)
-if(DEFINED OASIS_SRC)
-  include(BuildOASIS3MCT)
-  list(APPEND MODEL_DEPENDENCIES OASIS3_MCT)
-endif()
+# init CMAKE internal variables
+string(TOUPPER $ENV{SYSTEMNAME} SYSTEMNAME)
+set(MODEL_ID "")
 
 # TODO (for all Build*.cmake scripts):
 # - Check validity of compile flags
 # - Implement set of compile flags depending on compiler (e.g. GNU, Intel) and 
 #   build configuration (e.g. Debug, Release, Profiling)
 
-if(DEFINED eCLM_SRC)
-  include(BuildeCLM)
-  list(APPEND COMPONENT_MODELS "eCLM")
+# model settings
+set(MODEL_ID "")
+
+find_package(MPIFortran REQUIRED)
+check_build_oasis(BUILD_OASIS) # check if >=2 components (ICON, COSMO, eCLM, CLM3.5, ParFlow) are build
+if (BUILD_OASIS)
+  if(NOT DEFINED OASIS_SRC)
+    set(OASIS_SRC "${CMAKE_SOURCE_DIR}/models/oasis3-mct")
+  endif()
+  include(BuildOASIS3MCT)
+  list(APPEND MODEL_DEPENDENCIES OASIS3_MCT)
 endif()
 
-if(DEFINED CLM35_SRC)
-  include(BuildCLM3.5)
-  list(APPEND COMPONENT_MODELS "CLM3.5")
-endif()
-
-if(DEFINED ICON_SRC)
+if (${ICON})
+  if(NOT DEFINED ICON_SRC)
+    set(ICON_SRC "${CMAKE_SOURCE_DIR}/models/icon")
+  endif()
   include(BuildICON)
   list(APPEND COMPONENT_MODELS "ICON")
+  if ("${MODEL_ID}" STREQUAL "")
+      set(MODEL_ID "ICON")
+   else()
+      set(MODEL_ID "${MODEL_ID}-ICON")
+   endif()
 endif()
 
-if(DEFINED COSMO_SRC)
+if (${COSMO})
+  if(DEFINED COSMO_SRC)
+    set(COSMO_SRC "${CMAKE_SOURCE_DIR}/models/cosmo5.01_fresh")
+  endif()
   include(BuildCOSMO)
   list(APPEND COMPONENT_MODELS "COSMO5.1")
+  set(MODEL_ID "${MODEL_ID}COSMO")
 endif()
 
-if(DEFINED PARFLOW_SRC)
+if (${eCLM})
+  if(NOT DEFINED eCLM_SRC)
+    set(eCLM_SRC "${CMAKE_SOURCE_DIR}/models/eCLM")
+  endif()
+  include(BuildeCLM)
+  list(APPEND COMPONENT_MODELS "eCLM")
+  if ("${MODEL_ID}" STREQUAL "")
+      set(MODEL_ID "eCLM")
+   else()
+      set(MODEL_ID "${MODEL_ID}-eCLM")
+   endif()
+endif()
+
+if (${CLM3.5})
+  if(DEFINED CLM35_SRC)
+   set(CLM35_SRC "${CMAKE_SOURCE_DIR}/models/CLM3.5")
+  endif()
+  include(BuildCLM3.5)
+  list(APPEND COMPONENT_MODELS "CLM3.5")
+  set(MODEL_ID "${MODEL_ID}CLM3.5")
+endif()
+
+if (${ParFlow})
+  if(NOT DEFINED PARFLOW_SRC AND NOT ${PDAF})
+    set(PARFLOW_SRC "${CMAKE_SOURCE_DIR}/models/parflow")
+  elseif (NOT DEFINED PARFLOW_SRC AND ${PDAF})
+    set(PARFLOW_SRC "${CMAKE_SOURCE_DIR}/models/parflow_pdaf")
+  endif()
   include(BuildParFlow)
   list(APPEND COMPONENT_MODELS "ParFlow")
+  if ("${MODEL_ID}" STREQUAL "")
+      set(MODEL_ID "ParFlow")
+   else()
+      set(MODEL_ID "${MODEL_ID}-ParFlow")
+   endif()
 endif()
 
-if(DEFINED PDAF_SRC)
+if (${PDAF})
+  if(NOT DEFINED PDAF_SRC)
+    set(PDAF_SRC "${CMAKE_SOURCE_DIR}/models/pdaf")
+  endif()
   include(BuildPDAF)
   include(BuildPDAFMODEL)
   include(BuildPDAFFRAMEWORK)
   list(APPEND COMPONENT_MODELS "PDAF")
+  if ("${MODEL_ID}" STREQUAL "")
+      set(MODEL_ID "PDAF")
+   else()
+      set(MODEL_ID "${MODEL_ID}-PDAF")
+   endif()
 endif()
 
-print_model_versions("${COMPONENT_MODELS}" "${eTSMP_MODEL_VERSIONS}")
+# set paths
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set (CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/bin/${SYSTEMNAME}_${MODEL_ID}" CACHE PATH "default install path" FORCE)
+endif()
+
+print_model_versions("${COMPONENT_MODELS}" "${TSMP2_MODEL_VERSIONS}")
+
+#message(FATAL_ERROR "at the end of script")
