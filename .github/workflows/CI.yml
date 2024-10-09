@@ -23,11 +23,13 @@ jobs:
       OASIS_SRC: oasis3-mct
       OASIS_TAG: tsmp-patches-v0.1
       eCLM_SRC: eCLM
+      eCLM_TAG: beta-0.1
       PARFLOW_SRC: parflow
       PARFLOW_TAG: v3.12.0
       HYPRE_TAG: 2.26.0
       CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_PREFIX_PATH: $HOME/.local
+      SYSTEMNAME: ${{ runner.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +58,7 @@ jobs:
           cd $OASIS_SRC
           echo "OASIS3-MCT version: $(git describe --tags --always)"
 
-      - name: Cache eCLM
+      - name: Cache eCLM ${{ env.eCLM_TAG }}
         uses: actions/cache@v4
         id: cache-eclm
         env:
@@ -66,9 +68,9 @@ jobs:
           key: cache-${{ matrix.config.name }}
 
       - if: steps.cache-eclm.outputs.cache-hit != 'true'
-        name: Download eCLM
+        name: Download eCLM ${{ env.eCLM_TAG }}
         run: |
-          git clone https://github.com/HPSCTerrSys/eCLM.git
+          git clone -b $eCLM_TAG https://github.com/HPSCTerrSys/eCLM.git
           cd eCLM
           echo "eCLM version: $(git describe --tags --always)"
 
