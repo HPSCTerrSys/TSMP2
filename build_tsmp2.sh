@@ -186,7 +186,7 @@ else
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME="UNKN"; fi
+if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME=$(hostname); fi
 
 if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${SYSTEMNAME^^}_${model_id}" 
@@ -203,13 +203,15 @@ fi # install_dir
 build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log"
 
 ## source environment
-message "source environment"
-if [ -z "${tsmp2_env}" ]; then
+if [[ $SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ]]; then
+  message "source environment"
+  if [ -z "${tsmp2_env}" ]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
-else
-  tsmp2_env="${tsmp2_env}"
-fi # tsmp2_env
-source $tsmp2_env
+  else
+    tsmp2_env="${tsmp2_env}"
+  fi # tsmp2_env
+  source $tsmp2_env
+fi
 
 ## CMAKE config
 # rm -rf ${cmake_build_dir}
