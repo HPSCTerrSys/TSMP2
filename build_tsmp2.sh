@@ -205,7 +205,7 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 ## source environment
 message "source environment"
 if [ -z "${tsmp2_env}" ]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
+  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
 else
   tsmp2_env="${tsmp2_env}"
 fi # tsmp2_env
