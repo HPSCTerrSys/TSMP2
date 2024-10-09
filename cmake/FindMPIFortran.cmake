@@ -10,14 +10,17 @@ find_package(MPI REQUIRED)
 find_package(PkgConfig QUIET)
 include(FindPackageHandleStandardArgs)
 
-if (MPI_Fortran_MODULE_DIR)
-  message(STATUS "MPI_Fortran_MODULE_DIR=${MPI_Fortran_MODULE_DIR}")
+if (NOT MPI_Fortran_INCLUDE_DIRS)
+  # TODO: MPICH is specific to ParaStationMPI; another approach is necessary for IntelMPI
+  pkg_check_modules(MPICH_Fortran REQUIRED mpich)
+  if (MPICH_Fortran_FOUND)
+    pkg_get_variable(MPI_Fortran_INCLUDE_DIRS mpich includedir)
+    pkg_get_variable(MPI_Fortran_LIB_DIR mpich libdir)
+  endif()
 endif()
 
-if (MPI_mpi_LIBRARY)
-  message(STATUS "MPI_mpi_LIBRARY=${MPI_mpi_LIBRARY}")
-  get_filename_component(MPI_Fortran_LIB_DIR ${MPI_mpi_LIBRARY} DIRECTORY)
-  message(STATUS "MPI_Fortran_LIB_DIR=${MPI_Fortran_LIB_DIR}")
+if (NOT MPI_Fortran_MODULE_DIR)
+  find_path(MPI_Fortran_MODULE_DIR NAMES "mpi.mod" "mpi_f08.mod" HINTS MPI_Fortran_INCLUDE_DIRS)
 endif()
 
 find_package_handle_standard_args(MPIFortran
