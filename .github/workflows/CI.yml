@@ -109,12 +109,10 @@ jobs:
           make -j4 install
 
       - name: Configure TSMP2
-        run: |
+        run: >-
           cmake -S . -B $BUILD_DIR
                 -DCMAKE_BUILD_TYPE="RELEASE"
                 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-                -DCMAKE_C_COMPILER=$CC
-                -DCMAKE_Fortran_COMPILER=$FC
                 -DOASIS_SRC=${OASIS_SRC}
                 -DeCLM="ON"
                 -DeCLM_SRC=${eCLM_SRC}
