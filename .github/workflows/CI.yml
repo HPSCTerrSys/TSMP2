@@ -110,19 +110,19 @@ jobs:
 
       - name: Configure TSMP2
         run: >-
-          cmake -S . -B $BUILD_DIR
-                -DCMAKE_BUILD_TYPE="RELEASE"
-                -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-                -DOASIS_SRC=${OASIS_SRC}
-                -DeCLM="ON"
-                -DeCLM_SRC=${eCLM_SRC}
-                -DParFlow="ON"
-                -DPARFLOW_SRC=${PARFLOW_SRC}
+          cmake -S . -B ${BUILD_DIR}
+          -DCMAKE_BUILD_TYPE="RELEASE"
+          -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+          -DOASIS_SRC=${OASIS_SRC}
+          -DeCLM="ON"
+          -DeCLM_SRC=${eCLM_SRC}
+          -DParFlow="ON"
+          -DPARFLOW_SRC=${PARFLOW_SRC}
 
       - name: Build TSMP2
         run: |
-          cmake --build $BUILD_DIR
+          cmake --build ${BUILD_DIR}
 
       - name: Install TSMP2
         run: |
-          cmake --install $BUILD_DIR
+          cmake --install ${BUILD_DIR}
