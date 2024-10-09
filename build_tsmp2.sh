@@ -186,7 +186,7 @@ else
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME=$(hostname); fi
+if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname); fi
 
 if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${SYSTEMNAME^^}_${model_id}" 
