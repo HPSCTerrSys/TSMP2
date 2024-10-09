@@ -1,13 +1,13 @@
-Paul RIGOR
 Stefan KOLLET
-Niklas WAGNER
-Lukas STREBEL
-Haojin ZHAO
-Klaus GOERGEN
+Paul RIGOR
 Stefan POLL
 Johannes KELLER
 Daniel CAVIEDES-VOULLIEME
-Ilya ZHUKOV
 Joerg BENKE
+Klaus GOERGEN
 Carl HARTICK
+Lukas STREBEL
 Marco VAN HULTEN
+Niklas WAGNER
+Haojin ZHAO
+Ilya ZHUKOV
