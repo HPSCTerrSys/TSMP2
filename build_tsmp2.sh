@@ -25,7 +25,7 @@ function help_tsmp2() {
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
   echo "  --OASIS_SRC      Set OASIS3-MCT directory"
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
-  echo "  --build_config   Set build configuration: 'DEBUG' 'RELEASE'"
+  echo "  --build_type   Set build configuration: 'DEBUG' 'RELEASE'"
   echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
@@ -114,7 +114,7 @@ while [[ "$#" -gt 0 ]]; do
 	--clm35_src) clm35_src="$2"; shift ;;
 	--pdaf_src) pdaf_src="$2"; shift ;;
 	--oasis_src) oasis_src="$2"; shift ;;
-	--build_config) build_config="$2"; shift ;;
+	--build_type) build_type="$2"; shift ;;
 	--compiler) compiler="$2"; shift ;; 
 	--build_dir) build_dir="$2"; shift ;;
 	--install_dir) install_dir="$2"; shift ;;
@@ -171,11 +171,11 @@ dwn_compsrc clm35 clm35_src "clm35"
 ## CMAKE options
 
 message "set CMAKE options"
-# build_config
-if [ -z "$build_config" ];then
-   cmake_build_config=""
+# build_type
+if [ -z "$build_type" ];then
+   cmake_build_type=""
 else
-   cmake_build_config=" -DCMAKE_BUILD_TYPE=${build_config^^}"
+   cmake_build_type=" -DCMAKE_BUILD_TYPE=${build_type^^}"
 fi
 
 # set compiler
@@ -223,11 +223,11 @@ message "TSMP2_ENV: $tsmp2_env"
 message "BUILD_DIR: $cmake_build_dir"
 message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
-message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_config} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
+message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
 message "== CMAKE GENERATE PROJECT start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
-      ${cmake_build_config} \
+      ${cmake_build_type} \
       ${cmake_comp_str} \
       ${cmake_compsrc_str} \
       ${cmake_compiler} ${cmake_install_dir} \
