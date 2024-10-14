@@ -25,7 +25,7 @@ function help_tsmp2() {
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
   echo "  --OASIS_SRC      Set OASIS3-MCT directory"
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
-  echo "  --build_config   Set build configuration: 'Debug' 'Release'"
+  echo "  --build_config   Set build configuration: 'DEBUG' 'RELEASE'"
   echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
@@ -175,7 +175,7 @@ message "set CMAKE options"
 if [ -z "$build_config" ];then
    cmake_build_config=""
 else
-   cmake_build_config=" -DCMAKE_BUILD_TYPE=${build_config}"
+   cmake_build_config=" -DCMAKE_BUILD_TYPE=${build_config^^}"
 fi
 
 # set compiler
