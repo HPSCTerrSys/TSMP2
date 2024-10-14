@@ -175,7 +175,7 @@ message "set CMAKE options"
 if [ -z "$build_config" ];then
    cmake_build_config=""
 else
-   cmake_build_config=" -DCMAKE_BUILD_TYPE=${build_config}"
+   cmake_build_config=" -DCMAKE_BUILD_TYPE=${build_config^^}"
 fi
 
 # set compiler
