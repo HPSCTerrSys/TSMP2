@@ -1,0 +1,128 @@
+name: TSMP2 Build
+
+# Controls when the action will run.
+on: [push, pull_request]
+
+jobs:
+  eclm_build_job:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-22.04 ]
+        config:
+        - {
+            name: "eCLM-ParFlow",
+          }
+
+    env:
+      CC: mpicc
+      FC: mpifort
+      BUILD_DIR: bld
+      INSTALL_DIR: install
+      OASIS_SRC: oasis3-mct
+      OASIS_TAG: tsmp-patches-v0.1
+      eCLM_SRC: eCLM
+      eCLM_TAG: beta-0.1
+      PARFLOW_SRC: parflow
+      PARFLOW_TAG: v3.12.0
+      HYPRE_TAG: 2.26.0
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      CMAKE_PREFIX_PATH: $HOME/.local
+      SYSTEMNAME: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libxml2-utils pylint wget cmake netcdf-bin libnetcdf-dev libnetcdff-dev libpnetcdf-dev
+          version: 1.0
+          execute_install_scripts: true
+
+      - name: Download MPI Fortran compiler
+        run: sudo apt-get install gfortran openmpi-bin libopenmpi-dev
+
+      - name: Cache OASIS3-MCT ${{ env.OASIS_TAG }}
+        uses: actions/cache@v4
+        id: cache-oasis
+        env:
+          cache-name: cache-oasis
+        with:
+          path: "~/$OASIS_SRC"
+          key: cache-${{ matrix.config.name }}-${{ env.OASIS_TAG }}
+
+      - if: steps.cache-oasis.outputs.cache-hit != 'true'
+        name: Download OASIS3-MCT ${{ env.OASIS_TAG }}
+        run: |
+          git clone -b $OASIS_TAG https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
+          cd $OASIS_SRC
+          echo "OASIS3-MCT version: $(git describe --tags --always)"
+
+      - name: Cache eCLM ${{ env.eCLM_TAG }}
+        uses: actions/cache@v4
+        id: cache-eclm
+        env:
+          cache-name: cache-eclm
+        with:
+          path: "~/$eCLM_SRC"
+          key: cache-${{ matrix.config.name }}
+
+      - if: steps.cache-eclm.outputs.cache-hit != 'true'
+        name: Download eCLM ${{ env.eCLM_TAG }}
+        run: |
+          git clone -b $eCLM_TAG https://github.com/HPSCTerrSys/eCLM.git
+          cd eCLM
+          echo "eCLM version: $(git describe --tags --always)"
+
+      - name: Cache ParFlow ${{ env.PARFLOW_TAG }}
+        uses: actions/cache@v4
+        id: cache-parflow
+        env:
+          cache-name: cache-parflow
+        with:
+          path: "~/$PARFLOW_SRC"
+          key: cache-${{ matrix.config.name }}-${{ env.PARFLOW_TAG }}
+
+      - if: steps.cache-parflow.outputs.cache-hit != 'true'
+        name: Download ParFlow ${{ env.PARFLOW_TAG }}
+        run: |
+          git clone -b $PARFLOW_TAG https://github.com/parflow/parflow.git
+          cd parflow
+          echo "ParFlow version: $(git describe --tags --always)"
+
+      - name: Cache Hypre ${{ env.HYPRE_TAG }}
+        uses: actions/cache@v4
+        id: cache-hypre
+        env:
+          cache-name: cache-hypre
+        with:
+          path: "~/$CMAKE_PREFIX_PATH"
+          key: cache-${{ matrix.config.name }}-${{ env.HYPRE_TAG }}
+
+      - if: steps.cache-hypre.outputs.cache-hit != 'true'
+        name: Install Hypre ${{ env.HYPRE_TAG }}
+        run: |
+          wget https://github.com/hypre-space/hypre/archive/v${HYPRE_TAG}.tar.gz
+          tar xf v${HYPRE_TAG}.tar.gz
+          cd hypre-${HYPRE_TAG}/src
+          ./configure --prefix=$CMAKE_PREFIX_PATH
+          make -j4 install
+
+      - name: Configure TSMP2
+        run: >-
+          cmake -S . -B ${BUILD_DIR}
+          -DCMAKE_BUILD_TYPE="RELEASE"
+          -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+          -DOASIS_SRC=${OASIS_SRC}
+          -DeCLM="ON"
+          -DeCLM_SRC=${eCLM_SRC}
+          -DParFlow="ON"
+          -DPARFLOW_SRC=${PARFLOW_SRC}
+
+      - name: Build TSMP2
+        run: |
+          cmake --build ${BUILD_DIR}
+
+      - name: Install TSMP2
+        run: |
+          cmake --install ${BUILD_DIR}
