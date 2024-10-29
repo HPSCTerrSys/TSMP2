@@ -107,7 +107,7 @@ jobs:
           wget https://github.com/hypre-space/hypre/archive/v${HYPRE_TAG}.tar.gz
           tar xf v${HYPRE_TAG}.tar.gz
           cd hypre-${HYPRE_TAG}/src
-          ./configure --prefix=${CMAKE_PREFIX_PATH}
+          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
           make -j${CMAKE_BUILD_PARALLEL_LEVEL} install
 
       - name: Configure TSMP2
