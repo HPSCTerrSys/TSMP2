@@ -1,9 +1,9 @@
-# TODO: Properly implement these flags!
-set(PF_CFLAGS "-qopenmp -Wall -Werror")
-set(PF_LDFLAGS "-lcudart -lcusparse -lcurand")
-
 find_package(NetCDF REQUIRED)
 find_package(Hypre REQUIRED)
+find_package(OpenMP REQUIRED)
+
+set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror")
+set(PF_LDFLAGS "-lcudart -lcusparse -lcurand")
 
 if(DEFINED eCLM_SRC)
     list(APPEND PF_CLM_FLAGS -DPARFLOW_AMPS_LAYER=oas3
