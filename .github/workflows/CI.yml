@@ -20,83 +20,85 @@ jobs:
       FC: mpifort
       BUILD_DIR: bld
       INSTALL_DIR: install
-      OASIS_SRC: oasis3-mct
+      MODEL_DIR: component-models
       OASIS_TAG: tsmp-patches-v0.1
-      eCLM_SRC: eCLM
       eCLM_TAG: beta-0.1
-      PARFLOW_SRC: parflow
-      PARFLOW_TAG: v3.12.0
+      PARFLOW_TAG: v3.13.0
       HYPRE_TAG: 2.26.0
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      CMAKE_PREFIX_PATH: $HOME/.local
+      CMAKE_PREFIX_PATH: dependencies
       SYSTEMNAME: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libxml2-utils pylint wget cmake netcdf-bin libnetcdf-dev libnetcdff-dev libpnetcdf-dev
+          packages: libxml2-utils pylint wget cmake netcdf-bin libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
           version: 1.0
           execute_install_scripts: true
 
       - name: Download MPI Fortran compiler
         run: sudo apt-get install gfortran openmpi-bin libopenmpi-dev
 
-      - name: Cache OASIS3-MCT ${{ env.OASIS_TAG }}
+      - name: Create directories for component model and dependencies
+        run: |
+          mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
+
+      - name: Restore cached OASIS3-MCT ${{ env.OASIS_TAG }}
         uses: actions/cache@v4
         id: cache-oasis
         env:
           cache-name: cache-oasis
         with:
-          path: "~/$OASIS_SRC"
+          path: ${{ env.MODEL_DIR }}/oasis3-mct
           key: cache-${{ matrix.config.name }}-${{ env.OASIS_TAG }}
 
       - if: steps.cache-oasis.outputs.cache-hit != 'true'
         name: Download OASIS3-MCT ${{ env.OASIS_TAG }}
+        working-directory: ${{ env.MODEL_DIR }}
         run: |
           git clone -b $OASIS_TAG https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
-          cd $OASIS_SRC
-          echo "OASIS3-MCT version: $(git describe --tags --always)"
+          echo "OASIS3-MCT version: $(cd oasis3-mct && git describe --tags --always)"
 
-      - name: Cache eCLM ${{ env.eCLM_TAG }}
+      - name: Restore cached eCLM ${{ env.eCLM_TAG }}
         uses: actions/cache@v4
         id: cache-eclm
         env:
           cache-name: cache-eclm
         with:
-          path: "~/$eCLM_SRC"
+          path: ${{ env.MODEL_DIR }}/eCLM
           key: cache-${{ matrix.config.name }}
 
       - if: steps.cache-eclm.outputs.cache-hit != 'true'
         name: Download eCLM ${{ env.eCLM_TAG }}
+        working-directory: ${{ env.MODEL_DIR }}
         run: |
           git clone -b $eCLM_TAG https://github.com/HPSCTerrSys/eCLM.git
-          cd eCLM
-          echo "eCLM version: $(git describe --tags --always)"
+          echo "eCLM version: $(cd eCLM && git describe --tags --always)"
 
-      - name: Cache ParFlow ${{ env.PARFLOW_TAG }}
+      - name: Restore cached ParFlow ${{ env.PARFLOW_TAG }}
         uses: actions/cache@v4
         id: cache-parflow
         env:
           cache-name: cache-parflow
         with:
-          path: "~/$PARFLOW_SRC"
+          path: ${{ env.MODEL_DIR }}/parflow
           key: cache-${{ matrix.config.name }}-${{ env.PARFLOW_TAG }}
 
       - if: steps.cache-parflow.outputs.cache-hit != 'true'
         name: Download ParFlow ${{ env.PARFLOW_TAG }}
+        working-directory: ${{ env.MODEL_DIR }}
         run: |
           git clone -b $PARFLOW_TAG https://github.com/parflow/parflow.git
-          cd parflow
-          echo "ParFlow version: $(git describe --tags --always)"
+          echo "ParFlow version: $(cd parflow && git describe --tags --always)"
 
-      - name: Cache Hypre ${{ env.HYPRE_TAG }}
+      - name: Restore cached Hypre ${{ env.HYPRE_TAG }}
         uses: actions/cache@v4
         id: cache-hypre
         env:
           cache-name: cache-hypre
         with:
-          path: "~/$CMAKE_PREFIX_PATH"
+          path: ${{ env.CMAKE_PREFIX_PATH }}
           key: cache-${{ matrix.config.name }}-${{ env.HYPRE_TAG }}
 
       - if: steps.cache-hypre.outputs.cache-hit != 'true'
@@ -105,19 +107,19 @@ jobs:
           wget https://github.com/hypre-space/hypre/archive/v${HYPRE_TAG}.tar.gz
           tar xf v${HYPRE_TAG}.tar.gz
           cd hypre-${HYPRE_TAG}/src
-          ./configure --prefix=$CMAKE_PREFIX_PATH
-          make -j4 install
+          ./configure --prefix=${CMAKE_PREFIX_PATH}
+          make -j${CMAKE_BUILD_PARALLEL_LEVEL} install
 
       - name: Configure TSMP2
         run: >-
           cmake -S . -B ${BUILD_DIR}
           -DCMAKE_BUILD_TYPE="RELEASE"
           -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-          -DOASIS_SRC=${OASIS_SRC}
+          -DOASIS_SRC=${MODEL_DIR}/oasis3-mct
           -DeCLM="ON"
-          -DeCLM_SRC=${eCLM_SRC}
+          -DeCLM_SRC=${MODEL_DIR}/eCLM
           -DParFlow="ON"
-          -DPARFLOW_SRC=${PARFLOW_SRC}
+          -DPARFLOW_SRC=${MODEL_DIR}/parflow
 
       - name: Build TSMP2
         run: |
