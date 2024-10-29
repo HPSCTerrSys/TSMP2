@@ -2,9 +2,18 @@ find_package(NetCDF REQUIRED)
 find_package(Hypre REQUIRED)
 find_package(OpenMP REQUIRED)
 
-set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror")
-set(PF_LDFLAGS "-lcudart -lcusparse -lcurand")
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    # Flags were based from https://github.com/parflow/parflow/blob/77316043227b95215744e58fe9005d35145432ab/.github/workflows/linux.yml#L305
+    set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-result -Wno-unused-function")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
+    set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror")
+    set(PF_LDFLAGS "-lcudart -lcusparse -lcurand") #TODO: These linker flags are specific to JSC system!
+else()
+  message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
+endif()
 
+
+set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} ${OpenMP_Fortran_FLAGS}")
 if(DEFINED eCLM_SRC)
     list(APPEND PF_CLM_FLAGS -DPARFLOW_AMPS_LAYER=oas3
                              -DOAS3_ROOT=${OASIS_ROOT}
