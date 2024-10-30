@@ -1,7 +1,11 @@
 name: TSMP2 Build
 
 # Controls when the action will run.
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   eclm_build_job:
@@ -46,6 +50,11 @@ jobs:
       - name: Create directories for component model and dependencies
         run: |
           mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
+
+      - name: Introspect netcdf-mpi
+        run: |
+          NETCDF_PREFIX=$(pkg-config --variable=prefix netcdf-mpi)
+          ls ${NETCDF_PREFIX}/include
 
       #
       # OASIS3-MCT
