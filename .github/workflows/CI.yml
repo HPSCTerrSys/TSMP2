@@ -1,7 +1,11 @@
 name: TSMP2 Build
 
 # Controls when the action will run.
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   eclm_build_job:
@@ -32,9 +36,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+
+      - name: Install TSMP2 dependencies on Ubuntu
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libxml2-utils pylint wget cmake netcdf-bin libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
+          packages: libxml2-utils pylint wget cmake libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
           version: 1.0
           execute_install_scripts: true
 
@@ -44,6 +50,13 @@ jobs:
       - name: Create directories for component model and dependencies
         run: |
           mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
+
+      - name: Introspect netcdf-mpi
+        run: |
+          NETCDF_P_PREFIX=$(pkg-config --variable=prefix netcdf-mpi)
+          echo "NETCDF_P_PREFIX=${NETCDF_P_PREFIX}" && ls ${NETCDF_P_PREFIX}/include
+          NETCDF_PREFIX=$(pkg-config --variable=prefix netcdf)
+          echo "NETCDF_PREFIX=${NETCDF_PREFIX}" && ls ${NETCDF_PREFIX}/include
 
       #
       # OASIS3-MCT
