@@ -52,7 +52,7 @@ ExternalProject_Add(ParFlow
                 -DTCL_TCLSH=${TCL_TCLSH}
                 -DHYPRE_ROOT=${HYPRE_ROOT}
                 -DNETCDF_INCLUDE_DIR=${NetCDF_C_ROOT}/include
-                -DNETCDF_LIBRARY=${NetCDF_C_ROOT}/lib
+                -DNETCDF_LIBRARY=${NetCDF_C_LIB_DIR}/libnetcdf.so  # TODO: Fix this hardcoded library file!
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=on
                 -DPARFLOW_ENABLE_TIMING=TRUE
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
