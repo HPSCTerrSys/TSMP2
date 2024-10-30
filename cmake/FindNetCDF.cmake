@@ -3,6 +3,7 @@ include(FindPackageHandleStandardArgs)
 
 find_package(NetCDF_C QUIET NAMES netCDF)
 if(NetCDF_C_FOUND)
+   message(STATUS "netCDF_HAS_PARALLEL=${netCDF_HAS_PARALLEL}")
    if (${netCDF_HAS_PARALLEL})
       set(NetCDF_C_ROOT "${netCDF_INSTALL_PREFIX}")
       set(NetCDF_C_LIB_DIR "${netCDF_LIB_DIR}")
