@@ -3,20 +3,40 @@ include(FindPackageHandleStandardArgs)
 
 find_package(NetCDF_C QUIET NAMES netCDF)
 if(NetCDF_C_FOUND)
+   # Set default NetCDF C paths to the first found NetCDF C library.
    set(NetCDF_C_LIB_DIR "${netCDF_LIB_DIR}")
+   set(NetCDF_C_ROOT "${netCDF_INSTALL_PREFIX}")
+
+   # However, if the default NetCDF C library doesn't have parallel support, try searching for another one.
+   if(NOT ${netCDF_HAS_PARALLEL})
+      # Option 1 (Ubuntu-specific): `sudo apt-get install libnetcdf-mpi-dev` provides NetCDF with parallel support.
+      pkg_check_modules(NetCDF_C_MPI QUIET netcdf-mpi)
+      if (NetCDF_C_MPI_FOUND)
+         pkg_get_variable(NetCDF_C_ROOT netcdf-mpi prefix)
+         set(NetCDF_C_LIB_DIR "${NetCDF_C_ROOT}/lib")
+         set(netCDF_HAS_PARALLEL "ON")
+      endif()
+   endif()
 endif()
 
 pkg_check_modules(NetCDF_F90 REQUIRED netcdf-fortran)
 if (NetCDF_F90_FOUND)
-   pkg_get_variable(NetCDF_F90_LIB_DIR netcdf-fortran libdir)
    pkg_get_variable(NetCDF_F90_ROOT netcdf-fortran prefix)
+   pkg_get_variable(NetCDF_F90_LIB_DIR netcdf-fortran libdir)
+   pkg_get_variable(NetCDF_F90_INCLUDEDIR netcdf-fortran fmoddir)
 endif()
 
 find_package_handle_standard_args(NetCDF
-   REQUIRED_VARS NetCDF_C_LIB_DIR NetCDF_F90_LIB_DIR
+   REQUIRED_VARS NetCDF_C_ROOT NetCDF_F90_ROOT NetCDF_C_LIB_DIR NetCDF_F90_LIB_DIR NetCDF_F90_INCLUDEDIR
    VERSION_VAR NetCDF_F90_VERSION)
 
 if(NetCDF_FOUND)
    set(NetCDF_LIBRARIES "-L${NetCDF_C_LIB_DIR} -L${NetCDF_F90_LIB_DIR} -lnetcdff -lnetcdf" CACHE STRING "NetCDF linker options")
-   set(NetCDF_ROOT ${NetCDF_F90_ROOT} CACHE PATH "Full path to the root directory containing NetCDF include files and libraries.")
+   set(NetCDF_F90_ROOT ${NetCDF_F90_ROOT} CACHE PATH "Path to NetCDF-Fortran directory which contains its include header files and libraries.")
+   set(NetCDF_C_ROOT   ${NetCDF_C_ROOT} CACHE PATH "Path to NetCDF-C directory which contains its include header files and libraries.")
+   if (netCDF_HAS_PARALLEL)
+      message(STATUS "TSMP2 found NetCDF C built with parallel I/O support.")
+   else()
+      message(WARNING "TSMP2 is using NetCDF C without parallel I/O support.")
+   endif()
 endif()

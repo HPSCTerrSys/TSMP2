@@ -17,7 +17,7 @@ set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
 # Include directories
 # -------------------
 # General include dirs
-list(APPEND PDAF_INCLUDES "-I${NetCDF_ROOT}/include")
+list(APPEND PDAF_INCLUDES "-I${NetCDF_F90_ROOT}/include")
 
 # DA include dirs
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model")

@@ -44,7 +44,7 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                -DNETCDF_DIR=${NetCDF_ROOT}
+                -DNETCDF_DIR=${NetCDF_C_ROOT}
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=on
                 -DHYPRE_ROOT=${HYPRE_ROOT}
                 -DPARFLOW_ENABLE_TIMING=TRUE

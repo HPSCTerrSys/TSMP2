@@ -20,13 +20,13 @@ jobs:
       FC: mpifort
       BUILD_DIR: bld
       INSTALL_DIR: install
-      MODEL_DIR: component-models
+      MODEL_DIR: ${{ github.workspace }}/component-models
       OASIS_TAG: tsmp-patches-v0.1
       eCLM_TAG: beta-0.1
       PARFLOW_TAG: v3.13.0
       HYPRE_TAG: 2.26.0
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      CMAKE_PREFIX_PATH: dependencies
+      CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
       SYSTEMNAME: ${{ matrix.os }}
 
     steps:
@@ -44,16 +44,17 @@ jobs:
         run: |
           mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
 
+      #
+      # OASIS3-MCT
+      #
       - name: Restore cached OASIS3-MCT ${{ env.OASIS_TAG }}
-        uses: actions/cache@v4
-        id: cache-oasis
-        env:
-          cache-name: cache-oasis
+        uses: actions/cache/restore@v4
+        id: cache-oasis-restore
         with:
           path: ${{ env.MODEL_DIR }}/oasis3-mct
           key: cache-${{ matrix.config.name }}-${{ env.OASIS_TAG }}
 
-      - if: steps.cache-oasis.outputs.cache-hit != 'true'
+      - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Download OASIS3-MCT ${{ env.OASIS_TAG }}
         working-directory: ${{ env.MODEL_DIR }}
         run: |
@@ -61,16 +62,24 @@ jobs:
           echo "OASIS3-MCT version: $(cd oasis3-mct && git describe --tags --always)"
           realpath oasis3-mct
 
+      - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
+        name: Cache OASIS3-MCT ${{ env.OASIS_TAG }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.MODEL_DIR }}/oasis3-mct
+          key: cache-${{ matrix.config.name }}-${{ env.OASIS_TAG }}
+
+      #
+      # eCLM
+      #
       - name: Restore cached eCLM ${{ env.eCLM_TAG }}
-        uses: actions/cache@v4
-        id: cache-eclm
-        env:
-          cache-name: cache-eclm
+        uses: actions/cache/restore@v4
+        id: cache-eclm-restore
         with:
           path: ${{ env.MODEL_DIR }}/eCLM
-          key: cache-${{ matrix.config.name }}
+          key: cache-${{ matrix.config.name }}-${{ env.eCLM_TAG }}
 
-      - if: steps.cache-eclm.outputs.cache-hit != 'true'
+      - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Download eCLM ${{ env.eCLM_TAG }}
         working-directory: ${{ env.MODEL_DIR }}
         run: |
@@ -78,16 +87,24 @@ jobs:
           echo "eCLM version: $(cd eCLM && git describe --tags --always)"
           realpath eCLM
 
+      - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
+        name: Cache eCLM ${{ env.eCLM_TAG }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.MODEL_DIR }}/eCLM
+          key: cache-${{ matrix.config.name }}-${{ env.eCLM_TAG }}
+
+      #
+      # ParFlow
+      #
       - name: Restore cached ParFlow ${{ env.PARFLOW_TAG }}
-        uses: actions/cache@v4
-        id: cache-parflow
-        env:
-          cache-name: cache-parflow
+        uses: actions/cache/restore@v4
+        id: cache-parflow-restore
         with:
           path: ${{ env.MODEL_DIR }}/parflow
           key: cache-${{ matrix.config.name }}-${{ env.PARFLOW_TAG }}
 
-      - if: steps.cache-parflow.outputs.cache-hit != 'true'
+      - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Download ParFlow ${{ env.PARFLOW_TAG }}
         working-directory: ${{ env.MODEL_DIR }}
         run: |
@@ -95,16 +112,24 @@ jobs:
           echo "ParFlow version: $(cd parflow && git describe --tags --always)"
           realpath parflow
 
+      - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
+        name: Cache ParFlow ${{ env.PARFLOW_TAG }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.MODEL_DIR }}/parflow
+          key: cache-${{ matrix.config.name }}-${{ env.PARFLOW_TAG }}
+
+      #
+      # Hypre
+      #
       - name: Restore cached Hypre ${{ env.HYPRE_TAG }}
-        uses: actions/cache@v4
-        id: cache-hypre
-        env:
-          cache-name: cache-hypre
+        uses: actions/cache/restore@v4
+        id: cache-hypre-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
           key: cache-${{ matrix.config.name }}-${{ env.HYPRE_TAG }}
 
-      - if: steps.cache-hypre.outputs.cache-hit != 'true'
+      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Install Hypre ${{ env.HYPRE_TAG }}
         run: |
           wget https://github.com/hypre-space/hypre/archive/v${HYPRE_TAG}.tar.gz
@@ -113,11 +138,16 @@ jobs:
           ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
           make -j${CMAKE_BUILD_PARALLEL_LEVEL} install
 
-      - name: Check  for component model and dependency directories
-        run: |
-          tree ${CMAKE_PREFIX_PATH}
-          tree ${MODEL_DIR}
+      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
+        name: Cache Hypre ${{ env.HYPRE_TAG }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.HYPRE_TAG }}
 
+      #
+      # TSMP2
+      #
       - name: Configure TSMP2
         run: >-
           cmake -S . -B ${BUILD_DIR}
