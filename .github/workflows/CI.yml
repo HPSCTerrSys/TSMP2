@@ -32,14 +32,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: libxml2-utils pylint wget cmake netcdf-bin libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
-          version: 1.0
-          execute_install_scripts: true
 
-      - name: Download MPI Fortran compiler
-        run: sudo apt-get install gfortran openmpi-bin libopenmpi-dev
+      - name: Install TSMP2 dependencies on Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt-get install libxml2-utils wget gfortran cmake openmpi-bin libopenmpi-dev libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
 
       - name: Create directories for component model and dependencies
         run: |
