@@ -74,7 +74,7 @@ list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
 # Set PDAF_OPTIM for Makefile header
 # ----------------------------------
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
-    or CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
 
   # using Intel Compiler
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
