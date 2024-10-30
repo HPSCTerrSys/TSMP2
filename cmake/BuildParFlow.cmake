@@ -26,11 +26,9 @@ endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/77316043227b95215744e58fe9005d35145432ab/.github/workflows/linux.yml#L305
     set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-result -Wno-unused-function")
-    #set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none -ffree-form")
+    set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
     set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror")
-    #set(PF_FFLAGS "-free")
-
     #TODO: These flags are specific to JSC system. This should be set in an env or build script!
     list(APPEND JSC_FLAGS -DPARFLOW_ENABLE_SLURM=ON)
     list(APPEND JSC_FLAGS -DCMAKE_EXE_LINKER_FLAGS="-lcudart -lcusparse -lcurand")
