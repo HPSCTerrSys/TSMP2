@@ -54,7 +54,7 @@ jobs:
       - name: Introspect netcdf-mpi
         run: |
           NETCDF_P_PREFIX=$(pkg-config --variable=prefix netcdf-mpi)
-          echo "NETCDF_P_PREFIX=${NETCDF_PREFIX}" && ls ${NETCDF_P_PREFIX}/include
+          echo "NETCDF_P_PREFIX=${NETCDF_P_PREFIX}" && ls ${NETCDF_P_PREFIX}/include
           NETCDF_PREFIX=$(pkg-config --variable=prefix netcdf)
           echo "NETCDF_PREFIX=${NETCDF_PREFIX}" && ls ${NETCDF_PREFIX}/include
 
