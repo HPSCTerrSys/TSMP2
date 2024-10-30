@@ -59,6 +59,7 @@ jobs:
         run: |
           git clone -b $OASIS_TAG https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
           echo "OASIS3-MCT version: $(cd oasis3-mct && git describe --tags --always)"
+          realpath oasis3-mct
 
       - name: Restore cached eCLM ${{ env.eCLM_TAG }}
         uses: actions/cache@v4
@@ -75,6 +76,7 @@ jobs:
         run: |
           git clone -b $eCLM_TAG https://github.com/HPSCTerrSys/eCLM.git
           echo "eCLM version: $(cd eCLM && git describe --tags --always)"
+          realpath eCLM
 
       - name: Restore cached ParFlow ${{ env.PARFLOW_TAG }}
         uses: actions/cache@v4
@@ -91,6 +93,7 @@ jobs:
         run: |
           git clone -b $PARFLOW_TAG https://github.com/parflow/parflow.git
           echo "ParFlow version: $(cd parflow && git describe --tags --always)"
+          realpath parflow
 
       - name: Restore cached Hypre ${{ env.HYPRE_TAG }}
         uses: actions/cache@v4
@@ -109,6 +112,11 @@ jobs:
           cd hypre-${HYPRE_TAG}/src
           ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
           make -j${CMAKE_BUILD_PARALLEL_LEVEL} install
+
+      - name: Check  for component model and dependency directories
+        run: |
+          tree ${CMAKE_PREFIX_PATH}
+          tree ${MODEL_DIR}
 
       - name: Configure TSMP2
         run: >-
