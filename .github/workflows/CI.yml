@@ -17,7 +17,9 @@ jobs:
 
     env:
       CC: mpicc
+      CXX: mpicxx
       FC: mpifort
+      F77: mpif77
       BUILD_DIR: bld
       INSTALL_DIR: install
       MODEL_DIR: ${{ github.workspace }}/component-models
