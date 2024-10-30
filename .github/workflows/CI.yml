@@ -34,9 +34,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install TSMP2 dependencies on Ubuntu
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libxml2-utils pylint wget cmake gfortran openmpi-bin libopenmpi-dev libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
+          version: 1.0
+          execute_install_scripts: true
+
+      - name: Set default MPI compilers on Ubuntu
         run: |
           sudo apt-get update
-          sudo apt-get install libxml2-utils wget gfortran cmake openmpi-bin libopenmpi-dev libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
+          sudo apt-get install --reinstall openmpi-bin
 
       - name: Create directories for component model and dependencies
         run: |
