@@ -1,7 +1,6 @@
 find_package(NetCDF REQUIRED)
 find_package(Hypre REQUIRED)
 find_package(OpenMP REQUIRED)
-find_package(TCL REQUIRED)
 
 #
 # Choose which CLM to enable
@@ -49,7 +48,6 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                -DTCL_TCLSH=${TCL_TCLSH}
                 -DHYPRE_ROOT=${HYPRE_ROOT}
                 -DNETCDF_INCLUDE_DIR=${NetCDF_C_ROOT}/include
                 -DNETCDF_LIBRARY=${NetCDF_C_LIB_DIR}/libnetcdf.so  # TODO: Fix this hardcoded library file!

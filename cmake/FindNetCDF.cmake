@@ -3,18 +3,21 @@ include(FindPackageHandleStandardArgs)
 
 find_package(NetCDF_C QUIET NAMES netCDF)
 if(NetCDF_C_FOUND)
-   # Set default NetCDF C paths to the first found NetCDF C library.
-   set(NetCDF_C_LIB_DIR "${netCDF_LIB_DIR}")
-   set(NetCDF_C_ROOT "${netCDF_INSTALL_PREFIX}")
-
-   # However, if the default NetCDF C library doesn't have parallel support, try searching for another one.
-   if(NOT ${netCDF_HAS_PARALLEL})
+   if (netCDF_HAS_PARALLEL)
+      set(NetCDF_C_ROOT "${netCDF_INSTALL_PREFIX}")
+      set(NetCDF_C_LIB_DIR "${netCDF_LIB_DIR}")
+   else()
+      # If the default NetCDF C library doesn't have parallel support, try searching for another one.
       # Option 1 (Ubuntu-specific): `sudo apt-get install libnetcdf-mpi-dev` provides NetCDF with parallel support.
       pkg_check_modules(NetCDF_C_MPI QUIET netcdf-mpi)
       if (NetCDF_C_MPI_FOUND)
          pkg_get_variable(NetCDF_C_ROOT netcdf-mpi prefix)
          set(NetCDF_C_LIB_DIR "${NetCDF_C_ROOT}/lib")
          set(netCDF_HAS_PARALLEL "ON")
+      else()
+         # Set default NetCDF C paths to the first found NetCDF C library.
+         set(NetCDF_C_ROOT "${netCDF_INSTALL_PREFIX}")
+         set(NetCDF_C_LIB_DIR "${netCDF_LIB_DIR}")
       endif()
    endif()
 endif()
