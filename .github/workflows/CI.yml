@@ -25,7 +25,7 @@ jobs:
       MODEL_DIR: ${{ github.workspace }}/component-models
       OASIS_TAG: tsmp-patches-v0.1
       eCLM_TAG: beta-0.1
-      PARFLOW_TAG: v3.13.0
+      PARFLOW_TAG: oasis3-ubuntu22.04 #v3.13.0
       HYPRE_TAG: 2.26.0
       CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
       SYSTEMNAME: ${{ matrix.os }}
@@ -61,7 +61,6 @@ jobs:
         run: |
           git clone -b $OASIS_TAG https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
           echo "OASIS3-MCT version: $(cd oasis3-mct && git describe --tags --always)"
-          realpath oasis3-mct
 
       - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Cache OASIS3-MCT ${{ env.OASIS_TAG }}
@@ -86,7 +85,6 @@ jobs:
         run: |
           git clone -b $eCLM_TAG https://github.com/HPSCTerrSys/eCLM.git
           echo "eCLM version: $(cd eCLM && git describe --tags --always)"
-          realpath eCLM
 
       - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Cache eCLM ${{ env.eCLM_TAG }}
@@ -105,13 +103,13 @@ jobs:
           path: ${{ env.MODEL_DIR }}/parflow
           key: cache-${{ matrix.config.name }}-${{ env.PARFLOW_TAG }}
 
+      # TODO: Must use upstream repo https://github.com/parflow/parflow.git
       - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Download ParFlow ${{ env.PARFLOW_TAG }}
         working-directory: ${{ env.MODEL_DIR }}
         run: |
-          git clone -b $PARFLOW_TAG https://github.com/parflow/parflow.git
+          git clone -b $PARFLOW_TAG https://github.com/kvrigor/parflow.git
           echo "ParFlow version: $(cd parflow && git describe --tags --always)"
-          realpath parflow
 
       - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Cache ParFlow ${{ env.PARFLOW_TAG }}
