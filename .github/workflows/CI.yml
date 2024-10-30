@@ -27,7 +27,6 @@ jobs:
       eCLM_TAG: beta-0.1
       PARFLOW_TAG: v3.13.0
       HYPRE_TAG: 2.26.0
-      CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
       SYSTEMNAME: ${{ matrix.os }}
 
@@ -138,7 +137,7 @@ jobs:
           tar xf v${HYPRE_TAG}.tar.gz
           cd hypre-${HYPRE_TAG}/src
           ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
-          make -j${CMAKE_BUILD_PARALLEL_LEVEL} install
+          make -j4 install
 
       - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Cache Hypre ${{ env.HYPRE_TAG }}
