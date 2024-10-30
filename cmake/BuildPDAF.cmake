@@ -90,7 +90,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
   endif()
 
   list(APPEND PDAF_OPTIM "-xHost")
-  list(APPEND PDAF_OPTIM "-r8")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
@@ -107,7 +106,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
   endif()
 
-  list(APPEND PDAF_OPTIM "-fdefault-real-8")
   list(APPEND PDAF_OPTIM "-falign-commons")
   list(APPEND PDAF_OPTIM "-fno-automatic")
   list(APPEND PDAF_OPTIM "-finit-local-zero")
@@ -119,6 +117,23 @@ endif()
 
 # Join list
 list(JOIN PDAF_OPTIM " " PDAF_OPTIM)
+
+# Set PDAF_DOUBLEPRECISION for Makefile header
+# --------------------------------------------
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+
+  list(APPEND PDAF_DOUBLEPRECISION "-r8")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+  list(APPEND PDAF_DOUBLEPRECISION "-fdefault-real-8")
+
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+# Join list
+list(JOIN PDAF_DOUBLEPRECISION " " PDAF_DOUBLEPRECISION)
 
 # Set PDAF_MPI_INC for Makefile header
 # ----------------------------------
@@ -145,6 +160,7 @@ list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
 list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
 list(APPEND PDAF_ENV_VARS TSMPPDAFLINK_LIBS=${PDAF_LINK_LIBS})
 list(APPEND PDAF_ENV_VARS TSMPPDAFOPTIM=${PDAF_OPTIM})
+list(APPEND PDAF_ENV_VARS TSMPPDAFDOUBLEPRECISION=${PDAF_DOUBLEPRECISION})
 list(APPEND PDAF_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
 list(APPEND PDAF_ENV_VARS TSMPPDAFCPP_DEFS=${PDAF_CPP_DEFS})
 
