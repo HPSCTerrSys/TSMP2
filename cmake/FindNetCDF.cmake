@@ -1,7 +1,7 @@
 find_package(PkgConfig QUIET)
 include(FindPackageHandleStandardArgs)
 
-find_package(NetCDF_C QUIET NAMES netCDF)
+find_package(NetCDF_C NAMES netCDF)
 if(NetCDF_C_FOUND)
    message(STATUS "netCDF_HAS_PARALLEL=${netCDF_HAS_PARALLEL}")
    if (${netCDF_HAS_PARALLEL})
