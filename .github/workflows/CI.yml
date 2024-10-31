@@ -171,6 +171,13 @@ jobs:
           -DParFlow="ON"
           -DPARFLOW_SRC=${MODEL_DIR}/parflow
 
+      - name: Set debugging session
+        uses: lhotari/action-upterm@v1
+        with:
+          limit-access-to-actor: true
+          limit-access-to-users: kvrigor
+          wait-timeout-minutes: 5
+
       - name: Build TSMP2
         run: |
           cmake --build ${BUILD_DIR}
