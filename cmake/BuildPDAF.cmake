@@ -120,7 +120,8 @@ list(JOIN PDAF_OPTIM " " PDAF_OPTIM)
 
 # Set PDAF_DOUBLEPRECISION for Makefile header
 # --------------------------------------------
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
 
   list(APPEND PDAF_DOUBLEPRECISION "-r8")
 
