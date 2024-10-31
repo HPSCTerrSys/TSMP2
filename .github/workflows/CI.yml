@@ -51,12 +51,10 @@ jobs:
         run: |
           mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
 
-      - name: Introspect netcdf-mpi
+      # This workaround helps TSMP2 to locate parallel-aware NetCDF more easily
+      - name: Add parallel-aware NetCDF C to CMAKE_PREFIX_PATH
         run: |
-          NETCDF_P_PREFIX=$(pkg-config --variable=prefix netcdf-mpi)
-          echo "NETCDF_P_PREFIX=${NETCDF_P_PREFIX}" && ls ${NETCDF_P_PREFIX}/include
-          NETCDF_PREFIX=$(pkg-config --variable=prefix netcdf)
-          echo "NETCDF_PREFIX=${NETCDF_PREFIX}" && ls ${NETCDF_PREFIX}/include
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:$(pkg-config --variable=prefix netcdf-mpi)" >> $GITHUB_ENV
 
       #
       # OASIS3-MCT
@@ -162,7 +160,7 @@ jobs:
       #
       - name: Configure TSMP2
         run: >-
-          cmake -S . -B ${BUILD_DIR}
+          cmake -S . -B ${BUILD_DIR} --log-level=DEBUG
           -DCMAKE_BUILD_TYPE="RELEASE"
           -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
           -DOASIS_SRC=${MODEL_DIR}/oasis3-mct
