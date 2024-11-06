@@ -23,6 +23,8 @@ module load NCO/5.1.3
 module load CMake/3.23.1
 module load git/2.36.0-nodocs  
 
+module load pkgconf/.1.8.0
+
 module li
 
 # Set default compilers
