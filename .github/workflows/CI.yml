@@ -31,6 +31,8 @@ jobs:
       eCLM_TAG: beta-0.1
       PARFLOW_TAG: oasis3-ubuntu22.04 #v3.13.0
       HYPRE_TAG: 2.26.0
+      VER_NETCDF_C: 4.9.2
+      VER_NETCDF_F90: 4.6.1
       CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
       SYSTEMNAME: ${{ matrix.os }}
 
@@ -40,16 +42,72 @@ jobs:
       - name: Install TSMP2 dependencies on Ubuntu
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libxml2-utils pylint wget cmake libnetcdf-mpi-dev libnetcdff-dev libpnetcdf-dev tcl-dev tk-dev
+          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev
           version: 1.0
           execute_install_scripts: true
 
-      - name: Download MPI Fortran compiler
-        run: sudo apt-get install gfortran openmpi-bin libopenmpi-dev
+      - name: Download HDF5 headers and MPI Fortran compiler
+        run: sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-103 hdf5-helpers 
 
       - name: Create directories for component model and dependencies
         run: |
           mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
+
+      #
+      # NetCDF C
+      #
+      - name: Restore cached NetCDF C ${{ env.VER_NETCDF_C }}
+        uses: actions/cache/restore@v4
+        id: cache-netcdf-restore
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+
+      - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
+        name: Install NetCDF C ${{ env.VER_NETCDF_C }}
+        run: |
+          wget https://github.com/Unidata/netcdf-c/archive/v${VER_NETCDF_C}.tar.gz
+          tar xf v${VER_NETCDF_C}.tar.gz
+          cd netcdf-c-${VER_NETCDF_C}
+          export CPPFLAGS=-I/usr/include/hdf5/openmpi
+          export LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+          make -j4 install
+
+      - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
+        name: Cache NetCDF ${{ env.VER_NETCDF_C }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+
+      #
+      # NetCDF Fortran
+      #
+      - name: Restore cached NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+        uses: actions/cache/restore@v4
+        id: cache-netcdff90-restore
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
+
+      - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
+        name: Install NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+        run: |
+          wget https://github.com/Unidata/netcdf-fortran/archive/v${VER_NETCDF_F90}.tar.gz
+          tar xf v${VER_NETCDF_F90}.tar.gz
+          cd netcdf-fortran-${VER_NETCDF_F90}
+          export CPPFLAGS=-I${CMAKE_PREFIX_PATH}
+          export LDFLAGS=-L${CMAKE_PREFIX_PATH}
+          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+          make -j4 install
+
+      - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
+        name: Cache NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
 
       #
       # OASIS3-MCT
@@ -150,11 +208,8 @@ jobs:
           path: ${{ env.CMAKE_PREFIX_PATH }}
           key: cache-${{ matrix.config.name }}-${{ env.HYPRE_TAG }}
 
-      # This workaround helps TSMP2 to locate parallel-aware NetCDF more easily
-      - name: Add parallel-aware NetCDF C to CMAKE_PREFIX_PATH
-        run: |
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:$(pkg-config --variable=prefix netcdf-mpi)" >> $GITHUB_ENV
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      - name: Check CMAKE_PREFIX_PATH
+        run: tree -FUCh --du --filelimit 20 -L 2 ${CMAKE_PREFIX_PATH}
 
       #
       # TSMP2
@@ -170,12 +225,12 @@ jobs:
           -DParFlow="ON"
           -DPARFLOW_SRC=${MODEL_DIR}/parflow
 
-      - name: Set debugging session
-        uses: lhotari/action-upterm@v1
-        with:
-          limit-access-to-actor: true
-          limit-access-to-users: kvrigor
-          wait-timeout-minutes: 5
+      # - name: Set debugging session
+      #   uses: lhotari/action-upterm@v1
+      #   with:
+      #     limit-access-to-actor: true
+      #     limit-access-to-users: kvrigor
+      #     wait-timeout-minutes: 5
 
       - name: Build TSMP2
         run: |
