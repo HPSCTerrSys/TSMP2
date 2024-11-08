@@ -49,8 +49,7 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                 -DHYPRE_ROOT=${HYPRE_ROOT}
-                -DNETCDF_INCLUDE_DIR=${NetCDF_C_ROOT}/include
-                -DNETCDF_LIBRARY=${NetCDF_C_LIB_DIR}/libnetcdf.so  # TODO: Fix this hardcoded library file!
+                -DNETCDF_DIR=${NetCDF_C_ROOT}
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=on
                 -DPARFLOW_ENABLE_TIMING=TRUE
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
