@@ -29,7 +29,7 @@ jobs:
       MODEL_DIR: ${{ github.workspace }}/component-models
       VER_OASIS: tsmp-patches-v0.1
       VER_eCLM: beta-0.1
-      VER_PARFLOW: oasis3-ubuntu22.04 #v3.13.0
+      VER_PARFLOW: oasis3-ubuntu22.04
       VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
@@ -208,9 +208,6 @@ jobs:
           path: ${{ env.CMAKE_PREFIX_PATH }}
           key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
 
-      - name: Check CMAKE_PREFIX_PATH
-        run: tree -FUCh --du --filelimit 20 -L 2 ${CMAKE_PREFIX_PATH}
-
       #
       # TSMP2
       #
@@ -224,13 +221,6 @@ jobs:
           -DeCLM_SRC=${MODEL_DIR}/eCLM
           -DParFlow="ON"
           -DPARFLOW_SRC=${MODEL_DIR}/parflow
-
-      # - name: Set debugging session
-      #   uses: lhotari/action-upterm@v1
-      #   with:
-      #     limit-access-to-actor: true
-      #     limit-access-to-users: kvrigor
-      #     wait-timeout-minutes: 5
 
       - name: Build TSMP2
         run: |
