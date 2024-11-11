@@ -213,7 +213,7 @@ jobs:
       #
       - name: Configure TSMP2
         run: >-
-          cmake -S . -B ${BUILD_DIR} --log-level=DEBUG
+          cmake -S . -B ${BUILD_DIR}
           -DCMAKE_BUILD_TYPE="RELEASE"
           -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
           -DOASIS_SRC=${MODEL_DIR}/oasis3-mct
