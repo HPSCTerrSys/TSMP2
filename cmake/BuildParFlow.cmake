@@ -30,7 +30,8 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "Int
     set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror")
     #TODO: These flags are specific to JSC system. This should be set in an env or build script!
     list(APPEND JSC_FLAGS -DPARFLOW_ENABLE_SLURM=ON)
-    list(APPEND JSC_FLAGS -DCMAKE_EXE_LINKER_FLAGS="-lcudart -lcusparse -lcurand")
+    set(PF_LDFLAGS "-lcudart -lcusparse -lcurand")
+    list(APPEND JSC_FLAGS -DCMAKE_EXE_LINKER_FLAGS=${PF_LDFLAGS})
 else()
   message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
 endif()
