@@ -55,7 +55,7 @@ cd $TSMP2_DIR
 2. Load the environment variables required for the build.
 
 ```bash
-source env/jsc.2023_Intel.sh
+source env/jsc.2024_Intel.sh
 ```
 
 3. Specify build and install directories.
@@ -81,7 +81,7 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone https://github.com/HPSCTerrSys/eCLM.git models/eCLM
+git clone -b beta-0.1 https://github.com/HPSCTerrSys/eCLM.git models/eCLM
 eCLM_SRC=`realpath models/eCLM`
 
 # ICON
