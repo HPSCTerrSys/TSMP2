@@ -122,7 +122,8 @@ list(JOIN PDAF_FOPT " " PDAF_FOPT)
 
 # Set PDAF_COPT for Makefile header
 # ----------------------------------
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
 
   # using Intel Compiler
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
