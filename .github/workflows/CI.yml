@@ -173,8 +173,9 @@ jobs:
         working-directory: ${{ env.MODEL_DIR }}
         run: |
           git clone https://github.com/parflow/parflow.git
+          cd parflow
           git checkout $VER_PARFLOW
-          echo "ParFlow version: $(cd parflow && git describe --tags --always)"
+          echo "ParFlow version: $(git describe --tags --always)"
 
       - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Cache ParFlow ${{ env.VER_PARFLOW }}
