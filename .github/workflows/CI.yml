@@ -29,7 +29,7 @@ jobs:
       MODEL_DIR: ${{ github.workspace }}/component-models
       VER_OASIS: tsmp-patches-v0.1
       VER_eCLM: beta-0.1
-      VER_PARFLOW: oasis3-ubuntu22.04
+      VER_PARFLOW: 499ea4465e91aab96261679f3c26b3d73b159892 # points to commit "Upgrade OASIS3-MCT CI to Ubuntu22.04"
       VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
@@ -172,7 +172,7 @@ jobs:
         name: Download ParFlow ${{ env.VER_PARFLOW }}
         working-directory: ${{ env.MODEL_DIR }}
         run: |
-          git clone -b $VER_PARFLOW https://github.com/kvrigor/parflow.git
+          git clone -b $VER_PARFLOW https://github.com/parflow/parflow.git
           echo "ParFlow version: $(cd parflow && git describe --tags --always)"
 
       - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
