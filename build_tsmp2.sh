@@ -72,8 +72,7 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     echo "submodule ${submodule_name} aleady exist. Do you want overwrite it? (y/n)"
-     read yn
+     read -p "submodule ${submodule_name} aleady exists. Do you want overwrite it? (y/n) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
