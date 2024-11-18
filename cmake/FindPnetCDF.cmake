@@ -31,10 +31,9 @@ find_package_handle_standard_args(PnetCDF
    VERSION_VAR PnetCDF_VERSION)
 
 if (PnetCDF_FOUND)
-   add_library(PnetCDF::PnetCDF INTERFACE IMPORTED)
-   target_include_directories(PnetCDF::PnetCDF INTERFACE ${PnetCDF_INCLUDEDIR})
-   target_link_libraries(PnetCDF::PnetCDF INTERFACE ${PnetCDF_LIBRARIES})
    if(DEFINED PnetCDF_LIBDIR)
-      target_link_directories(PnetCDF::PnetCDF INTERFACE ${PnetCDF_LIBDIR})
+     set(PNetCDF_LIBRARIES "-L${PnetCDF_LIBDIR} -lpnetcdf" CACHE STRING "PNetCDF linker options")
+   else()
+     set(PNetCDF_LIBRARIES "-lpnetcdf" CACHE STRING "PNetCDF linker options")
    endif()
 endif()
