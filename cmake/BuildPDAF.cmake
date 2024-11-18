@@ -66,7 +66,8 @@ list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
 list(APPEND PDAF_LINK_LIBS "-lmpich")
 list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
-list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+# list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
 
 # Join list
 list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
