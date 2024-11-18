@@ -168,7 +168,7 @@ dwn_compsrc parflow parflow_src "parflow"
 dwn_compsrc oasis oasis_src "oasis3-mct"
 dwn_compsrc pdaf pdaf_src "pdaf"
 dwn_compsrc cosmo cosmo_src "cosmo"
-dwn_compsrc clm35 clm35_src "clm35"
+dwn_compsrc clm35 clm35_src "CLM3.5"
 
 ## CMAKE options
 
