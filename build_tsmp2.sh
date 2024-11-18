@@ -139,9 +139,9 @@ message "set model-id and component string"
 set_component icon "ICON"
 set_component eclm "eCLM"
 set_component parflow "ParFlow"
-set_component pdaf "PDAF"
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
+set_component pdaf "PDAF"
 
 if [ $model_count = 0 ];then
   echo "No model component is chosen"
