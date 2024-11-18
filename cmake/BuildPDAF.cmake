@@ -8,6 +8,14 @@
 # For eCLM-PDAF, NetCDF is not loaded by other component models
 find_package(NetCDF REQUIRED)
 
+# Check forPnetCDF if eCLM is defined
+if(DEFINED eCLM_SRC)
+  option(PDAF_WITH_PNETCDF "PDAF: Whether to build with PnetCDF" TRUE)
+  find_package(PnetCDF REQUIRED)
+endif()
+
+
+
 # MKL is required (error: https://gitlab.jsc.fz-juelich.de/HPSCTerrSys/tsmp-internal-development-tracking/-/issues/87)
 # `find_package`command for oneMKL from https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-windows/2024-0/cmake-config-for-onemkl.html
 # set(MKL_LINK static) # Switching to static MKL libraries
@@ -66,7 +74,14 @@ list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
 list(APPEND PDAF_LINK_LIBS "-lmpich")
 list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
-list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+# Use locally set NetCDF libraries variable
+list(APPEND PDAF_LINK_LIBS "${NetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+if(${PDAF_WITH_PNETCDF})
+  list(APPEND PDAF_LINK_LIBS "${PnetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+  if(DEFINED PnetCDF_LIBDIR)
+    list(APPEND PDAF_LINK_LIBS "${PnetCDF_LIBDIR}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+  endif()
+endif()
 # list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
 
 # Join list
