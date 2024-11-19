@@ -71,51 +71,97 @@ list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetc
 # Join list
 list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
 
-# Set PDAF_OPTIM for Makefile header
+# Set PDAF_FOPT for Makefile header
 # ----------------------------------
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 
   # using Intel Compiler
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     # Release optimization flags
-    list(APPEND PDAF_OPTIM "-O2")
+    list(APPEND PDAF_FOPT "-O2")
   elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     # Debug optimization flags
-    list(APPEND PDAF_OPTIM "-O0")
-    list(APPEND PDAF_OPTIM "-g")
-    list(APPEND PDAF_OPTIM "-traceback")
+    list(APPEND PDAF_FOPT "-O0")
+    list(APPEND PDAF_FOPT "-g")
+    list(APPEND PDAF_FOPT "-traceback")
   else()
     message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
   endif()
 
-  list(APPEND PDAF_OPTIM "-xHost")
+  list(APPEND PDAF_FOPT "-xHost")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   # using GCC (experimental)
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     # Release optimization flags
-    list(APPEND PDAF_OPTIM "-O2")
+    list(APPEND PDAF_FOPT "-O2")
   elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     # Debug optimization flags
-    list(APPEND PDAF_OPTIM "-O0")
-    list(APPEND PDAF_OPTIM "-g")
-    list(APPEND PDAF_OPTIM "-fbacktrace")
+    list(APPEND PDAF_FOPT "-O0")
+    list(APPEND PDAF_FOPT "-g")
+    list(APPEND PDAF_FOPT "-fbacktrace")
   else()
     message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
   endif()
 
-  list(APPEND PDAF_OPTIM "-falign-commons")
-  list(APPEND PDAF_OPTIM "-fno-automatic")
-  list(APPEND PDAF_OPTIM "-finit-local-zero")
-  list(APPEND PDAF_OPTIM "-mcmodel=large")
+  list(APPEND PDAF_FOPT "-falign-commons")
+  list(APPEND PDAF_FOPT "-fno-automatic")
+  list(APPEND PDAF_FOPT "-finit-local-zero")
+  list(APPEND PDAF_FOPT "-mcmodel=large")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 # Join list
-list(JOIN PDAF_OPTIM " " PDAF_OPTIM)
+list(JOIN PDAF_FOPT " " PDAF_FOPT)
+
+# Set PDAF_COPT for Makefile header
+# ----------------------------------
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+
+  # using Intel Compiler
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    # Release optimization flags
+    list(APPEND PDAF_COPT "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    # Debug optimization flags
+    list(APPEND PDAF_COPT "-O0")
+    list(APPEND PDAF_COPT "-g")
+    list(APPEND PDAF_COPT "-traceback")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_COPT "-xHost")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+  # using GCC (experimental)
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    # Release optimization flags
+    list(APPEND PDAF_COPT "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    # Debug optimization flags
+    list(APPEND PDAF_COPT "-O0")
+    list(APPEND PDAF_COPT "-g")
+    list(APPEND PDAF_COPT "-fbacktrace")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_COPT "-falign-commons")
+  list(APPEND PDAF_COPT "-fno-automatic")
+  list(APPEND PDAF_COPT "-finit-local-zero")
+  list(APPEND PDAF_COPT "-mcmodel=large")
+
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+# Join list
+list(JOIN PDAF_COPT " " PDAF_COPT)
 
 # Set PDAF_DOUBLEPRECISION for Makefile header
 # --------------------------------------------
@@ -158,7 +204,9 @@ list(JOIN PDAF_CPP_DEFS " " PDAF_CPP_DEFS)
 list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
 list(APPEND PDAF_ENV_VARS PDAF_DIR=${PDAF_DIR})
 list(APPEND PDAF_ENV_VARS TSMPPDAFLINK_LIBS=${PDAF_LINK_LIBS})
-list(APPEND PDAF_ENV_VARS TSMPPDAFOPTIM=${PDAF_OPTIM})
+list(APPEND PDAF_ENV_VARS TSMPPDAFOPTIM=${PDAF_FOPT}) #backward compatibility
+list(APPEND PDAF_ENV_VARS TSMPPDAFFOPT=${PDAF_FOPT})
+list(APPEND PDAF_ENV_VARS TSMPPDAFCOPT=${PDAF_COPT})
 list(APPEND PDAF_ENV_VARS TSMPPDAFDOUBLEPRECISION=${PDAF_DOUBLEPRECISION})
 list(APPEND PDAF_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
 list(APPEND PDAF_ENV_VARS TSMPPDAFCPP_DEFS=${PDAF_CPP_DEFS})

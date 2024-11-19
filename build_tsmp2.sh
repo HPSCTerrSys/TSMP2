@@ -13,6 +13,7 @@ set -eo pipefail
 function help_tsmp2() {
   echo "Usage: $0 [-v ] [--component_name] [--optionals]"
   echo "  -q, --quiet      Write less output during shell execution"
+  echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
   echo "  --version        Print $0 scipt version"
   echo "  --ICON           Compile with ICON"
   echo "  --eCLM           Compile with eCLM"
@@ -100,6 +101,7 @@ while [[ "$#" -gt 0 ]]; do
     case "${1,,}" in
 	-h|--help) help_tsmp2;;
 	-q|--quiet) quiet=y;;
+	-v|--verbose) verbose_makefile=y;;
 	--version) echo "$0 version 0.1.0"; exit 1;;
         --icon) icon=y;;
         --eclm) eclm=y;;
@@ -200,6 +202,12 @@ else
   cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
 fi # install_dir
 
+if [ -z "${verbose_makefile}" ]; then
+  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
+else
+  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
+fi # Makefile verbosity
+
 build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log"
 
 ## source environment
@@ -223,7 +231,7 @@ message "TSMP2_ENV: $tsmp2_env"
 message "BUILD_DIR: $cmake_build_dir"
 message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
-message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} |& tee ${build_log} "
+message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} ${cmake_verbose_makefile} |& tee ${build_log} "
 message "== CMAKE GENERATE PROJECT start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
@@ -231,6 +239,7 @@ cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_comp_str} \
       ${cmake_compsrc_str} \
       ${cmake_compiler} ${cmake_install_dir} \
+      ${cmake_verbose_makefile} \
       |& tee ${build_log}
 
 message "== CMAKE GENERATE PROJECT finished"
