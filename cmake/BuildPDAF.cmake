@@ -75,12 +75,9 @@ list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
 list(APPEND PDAF_LINK_LIBS "-lmpich")
 list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
 # Use locally set NetCDF libraries variable
-list(APPEND PDAF_LINK_LIBS "${NetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
+list(APPEND PDAF_LINK_LIBS "${NetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff"
 if(${PDAF_WITH_PNETCDF})
-  list(APPEND PDAF_LINK_LIBS "${PnetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
-  if(DEFINED PnetCDF_LIBDIR)
-    list(APPEND PDAF_LINK_LIBS "${PnetCDF_LIBDIR}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
-  endif()
+  list(APPEND PDAF_LINK_LIBS "${PnetCDF_PDAF_LIBRARIES}") # "-lpnetcdf"
 endif()
 # list(APPEND PDAF_LINK_LIBS "${NetCDF_F90_STATIC_LDFLAGS}") # "-lnetcdf", "-lnetcdff", "-lpnetcdf", "-lm"
 
