@@ -32,8 +32,8 @@ find_package_handle_standard_args(PnetCDF
 
 if (PnetCDF_FOUND)
    if(DEFINED PnetCDF_LIBDIR)
-     set(PNetCDF_PDAF_LIBRARIES "-L${PnetCDF_LIBDIR} -lpnetcdf" CACHE STRING "PNetCDF linker options")
+     set(PnetCDF_PDAF_LIBRARIES "-L${PnetCDF_LIBDIR} -lpnetcdf" CACHE STRING "PnetCDF linker options")
    else()
-     set(PNetCDF_PDAF_LIBRARIES "-lpnetcdf" CACHE STRING "PNetCDF linker options")
+     set(PnetCDF_PDAF_LIBRARIES "-lpnetcdf" CACHE STRING "PnetCDF linker options")
    endif()
 endif()
