@@ -66,10 +66,10 @@ local -n comp_namey=$1
 local -n comp_srcname=$2
 sub_srcname=$3
 if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
-  if [ "${comp_name}" = "parflow" ] && [ -n "${pdaf}" ];then
+  if [ "${sub_srcname}" = "parflow" ] && [ -n "${pdaf}" ];then
      submodule_name=$(echo "models/${sub_srcname}_pdaf")
   else
-    if [ "${comp_name}" = "oasis3-mct" ] && [ -n "${clm35}" ];then
+    if [ "${sub_srcname}" = "oasis3-mct" ] && [ -n "${clm35}" ];then
       submodule_name=$(echo "models/${sub_srcname}-clm35")
     else
       submodule_name=$(echo "models/"${sub_srcname})
