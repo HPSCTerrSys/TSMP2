@@ -69,7 +69,11 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
   if [ "${comp_name}" = "parflow" ] && [ -n "${pdaf}" ];then
      submodule_name=$(echo "models/${sub_srcname}_pdaf")
   else
-     submodule_name=$(echo "models/"${sub_srcname})
+    if [ "${comp_name}" = "oasis3-mct" ] && [ -n "${clm35}" ];then
+      submodule_name=$(echo "models/${sub_srcname}-clm35")
+    else
+      submodule_name=$(echo "models/"${sub_srcname})
+    fi
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
      echo "submodule ${submodule_name} aleady exist. Do you want overwrite it? (y/n)"
