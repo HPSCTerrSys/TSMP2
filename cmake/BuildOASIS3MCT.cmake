@@ -56,14 +56,25 @@ set(OASIS_MAKE_COMMON ${OASIS_BLD_DIR}/make.common)
 file(WRITE   ${OASIS_MAKE_COMMON} "LIBBUILD        ?= $(ARCHDIR)/lib\n")
 file(APPEND  ${OASIS_MAKE_COMMON} "LIBBUILDSHARED  ?= $(ARCHDIR)/build-shared/lib\n")
 
-ExternalProject_Add(OASIS3_MCT
-  PREFIX            OASIS3_MCT
-  SOURCE_DIR        ${OASIS_SRC}
-  BUILD_IN_SOURCE   FALSE
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
-  INSTALL_COMMAND   ""
-)
+if(${CLM3.5})
+  ExternalProject_Add(OASIS3_MCT
+    PREFIX            OASIS3_MCT
+    SOURCE_DIR        ${OASIS_SRC}
+    BUILD_IN_SOURCE   FALSE
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 oasis3_psmile -C ${OASIS_BLD_DIR}
+    INSTALL_COMMAND   ""
+  )
+else()
+  ExternalProject_Add(OASIS3_MCT
+    PREFIX            OASIS3_MCT
+    SOURCE_DIR        ${OASIS_SRC}
+    BUILD_IN_SOURCE   FALSE
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
+    INSTALL_COMMAND   ""
+  )
+endif()
 
 set(OASIS_ROOT ${OASIS_INSTALL_PREFIX} CACHE PATH "Full path to the root directory containing OASIS3-MCT include files and libraries.")
 set(OASIS_LIBRARIES "-L${OASIS_ROOT}/lib -lpsmile.MPI1 -lmct -lmpeu -lscrip" CACHE STRING "OASIS3-MCT linker options")
