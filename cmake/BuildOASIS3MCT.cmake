@@ -90,7 +90,7 @@ if(${CLM3.5})
   file(APPEND ${OASIS_MAKE_INC} "#\n")
   file(APPEND ${OASIS_MAKE_INC} "# MPP_IOOPT needed for compiling mpp_io\n")
 
-  file(APPEND  ${OASIS_MAKE_INC} "MPI_IOOPT         = -i4 -r8\n")
+  file(APPEND  ${OASIS_MAKE_INC} "MPP_IOOPT         = -i4 -r8\n")
 
   file(APPEND ${OASIS_MAKE_INC} "#\n")
   file(APPEND ${OASIS_MAKE_INC} "#  External libraies for linking\n")
