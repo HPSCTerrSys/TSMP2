@@ -19,7 +19,7 @@ file(MAKE_DIRECTORY ${OASIS_INSTALL_PREFIX})
 
 
 if(${CLM3.5})
-  file(APPEND ${OASIS_MAKE_INC} "#\n")
+  file(WRITE ${OASIS_MAKE_INC} "#\n")
   file(APPEND ${OASIS_MAKE_INC} "# Include file for OASIS3 Makefile for a Linux system using \n")
   file(APPEND ${OASIS_MAKE_INC} "# INTEL Fortran Compiler and Open MPI \n")
   file(APPEND ${OASIS_MAKE_INC} "#\n")
@@ -27,7 +27,7 @@ if(${CLM3.5})
   file(APPEND ${OASIS_MAKE_INC} "#\n")
   file(APPEND ${OASIS_MAKE_INC} "# CHAN : MPI1/MPI2\n")
 
-  file(WRITE   ${OASIS_MAKE_INC} "CHAN            = MPI1\n")
+  file(APPEND ${OASIS_MAKE_INC} "CHAN            = MPI1\n")
 
   file(APPEND ${OASIS_MAKE_INC} "#\n")
   file(APPEND ${OASIS_MAKE_INC} "# Paths for libraries, object files and binaries\n")
