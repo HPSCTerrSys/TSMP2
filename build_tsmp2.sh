@@ -139,9 +139,9 @@ message "set model-id and component string"
 set_component icon "ICON"
 set_component eclm "eCLM"
 set_component parflow "ParFlow"
-set_component pdaf "PDAF"
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
+set_component pdaf "PDAF"
 
 if [ $model_count = 0 ];then
   echo "No model component is chosen"
@@ -168,7 +168,7 @@ dwn_compsrc parflow parflow_src "parflow"
 dwn_compsrc oasis oasis_src "oasis3-mct"
 dwn_compsrc pdaf pdaf_src "pdaf"
 dwn_compsrc cosmo cosmo_src "cosmo"
-dwn_compsrc clm35 clm35_src "clm35"
+dwn_compsrc clm35 clm35_src "CLM3.5"
 
 ## CMAKE options
 
