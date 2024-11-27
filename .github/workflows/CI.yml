@@ -29,7 +29,7 @@ jobs:
       MODEL_DIR: ${{ github.workspace }}/component-models
       VER_OASIS: tsmp-patches-v0.1
       VER_eCLM: beta-0.1
-      VER_PARFLOW: 499ea4465e91aab96261679f3c26b3d73b159892 # points to commit "Upgrade OASIS3-MCT CI to Ubuntu22.04"
+      VER_PARFLOW: ed3974987902ef24c1f7519eb0ba5f8f66380c8c # points to commit "Supported Ubuntu 24.04 and added LLVM to CI"
       VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
