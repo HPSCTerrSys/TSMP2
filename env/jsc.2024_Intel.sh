@@ -9,7 +9,7 @@ module load ParaStationMPI/5.9.2-1
 #module load IntelMPI/2021.10.0
 
 #
-module load Hypre/2.29.0
+module load Hypre/2.31.0-cpu
 module load Silo/4.11.1
 module load Tcl/8.6.13
 #
