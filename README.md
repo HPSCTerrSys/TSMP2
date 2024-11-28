@@ -7,6 +7,7 @@
 
 ```bash
 git clone https://github.com/HPSCTerrSys/TSMP2.git
+export TSMP2_DIR=$(realpath TSMP2)
 cd $TSMP2_DIR
 ```
 
