@@ -30,7 +30,7 @@ function help_tsmp2() {
   echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
-  echo "  --tsmp2_env      Set model environment."
+  echo "  --tsmp2_env      Set model environment. Path relative to tsmp2_dir."
   echo ""
   echo "Example: $0 --ICON --eCLM --ParFlow"
   exit 1
@@ -215,7 +215,7 @@ message "source environment"
 if [ -z "${tsmp2_env}" ]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
 else
-  tsmp2_env="${tsmp2_env}"
+  tsmp2_env="${cmake_tsmp2_dir}/${tsmp2_env}"
 fi # tsmp2_env
 source $tsmp2_env
 
