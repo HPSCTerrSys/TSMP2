@@ -19,10 +19,6 @@ else()
                              -DPARFLOW_HAVE_CLM=ON)
 endif()
 
-if(${PDAF})
-  list(APPEND PF_PDAF_FLAGS  -DUSE_PDAF=True)
-endif()
-
 #
 # TODO: Add compile switches for ParFlow GPU
 #
@@ -64,7 +60,6 @@ ExternalProject_Add(ParFlow
                 -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
                 -DCMAKE_EXE_LINKER_FLAGS=${PF_LDFLAGS}
                 ${PF_CLM_FLAGS}
-		${PF_PDAF_FLAGS}
                 ${JSC_FLAGS}
     DEPENDS     ${MODEL_DEPENDENCIES}
 )

@@ -142,7 +142,6 @@ else()
   endif()
 endif()
 
-# list(APPEND PDAF_DEFS "-DUSE_PDAF")
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   # Debug run: Define `PDAF_DEBUG`
   list(APPEND PDAF_DEFS "-DPDAF_DEBUG")
