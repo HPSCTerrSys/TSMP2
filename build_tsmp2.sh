@@ -215,7 +215,8 @@ if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" |
 else
   tsmp2_env="${tsmp2_env}"
 fi # tsmp2_env
-if [ ! -z "{tsmp2_env}" ]; then
+if [ ! -z "${tsmp2_env}" ]; then
+  echo "tsmp2_env=${tsmp2_env}"
   message "source environment"
   source $tsmp2_env
 fi
