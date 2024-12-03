@@ -94,7 +94,7 @@ git clone -b v3.12.0 https://github.com/parflow/parflow.git models/parflow
 PARFLOW_SRC=`realpath models/parflow`
 
 # ParFlow (PDAF-patched)
-git clone -b v3.12.0-tsmp https://github.com/HPSCTerrSys/parflow models/parflow_pdaf
+git clone -b v3.13.0-pdaf https://github.com/HPSCTerrSys/parflow models/parflow_pdaf
 PARFLOW_SRC=`realpath models/parflow_pdaf`
 
 # CLM3.5
