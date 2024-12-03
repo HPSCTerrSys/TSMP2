@@ -215,7 +215,7 @@ message "source environment"
 if [ -z "${tsmp2_env}" ]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
 else
-  tsmp2_env="${tsmp2_env}"
+  tsmp2_env="$(realpath ${tsmp2_env})"
 fi # tsmp2_env
 source $tsmp2_env
 
