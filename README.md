@@ -90,7 +90,7 @@ git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git models/
 ICON_SRC=`realpath models/icon`
 
 # ParFlow
-git clone -b v3.12.0 https://github.com/parflow/parflow.git models/parflow
+git clone https://github.com/parflow/parflow.git models/parflow
 PARFLOW_SRC=`realpath models/parflow`
 
 # ParFlow (PDAF-patched)
