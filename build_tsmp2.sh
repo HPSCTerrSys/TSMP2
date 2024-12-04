@@ -213,7 +213,7 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
 else
-  tsmp2_env="${tsmp2_env}"
+  tsmp2_env="$(realpath ${tsmp2_env})"
 fi # tsmp2_env
 if [ ! -z "${tsmp2_env}" ]; then
   message "source environment"
