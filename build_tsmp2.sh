@@ -72,8 +72,7 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     echo "submodule ${submodule_name} aleady exist. Do you want overwrite it? (y/n)"
-     read yn
+     read -p "submodule ${submodule_name} aleady exists. Do you want overwrite it? (y/n) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
@@ -188,7 +187,7 @@ else
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME="UNKN"; fi
+if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname); fi
 
 if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${SYSTEMNAME^^}_${model_id}" 
@@ -210,14 +209,16 @@ fi # Makefile verbosity
 
 build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log"
 
-## source environment
-message "source environment"
-if [ -z "${tsmp2_env}" ]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
+## source environment if on JSC or env file is provided
+if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
+  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
 else
   tsmp2_env="$(realpath ${tsmp2_env})"
 fi # tsmp2_env
-source $tsmp2_env
+if [ ! -z "${tsmp2_env}" ]; then
+  message "source environment"
+  source $tsmp2_env
+fi
 
 ## CMAKE config
 # rm -rf ${cmake_build_dir}

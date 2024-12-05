@@ -56,7 +56,7 @@ cd $TSMP2_DIR
 2. Load the environment variables required for the build.
 
 ```bash
-source env/jsc.2023_Intel.sh
+source env/jsc.2024_Intel.sh
 ```
 
 3. Specify build and install directories.
@@ -82,7 +82,7 @@ mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone https://github.com/HPSCTerrSys/eCLM.git models/eCLM
+git clone -b beta-0.1 https://github.com/HPSCTerrSys/eCLM.git models/eCLM
 eCLM_SRC=`realpath models/eCLM`
 
 # ICON
@@ -90,11 +90,11 @@ git clone https://icg4geo.icg.kfa-juelich.de/spoll/icon2.6.4_oascoup.git models/
 ICON_SRC=`realpath models/icon`
 
 # ParFlow
-git clone -b v3.12.0 https://github.com/parflow/parflow.git models/parflow
+git clone https://github.com/parflow/parflow.git models/parflow
 PARFLOW_SRC=`realpath models/parflow`
 
 # ParFlow (PDAF-patched)
-git clone -b v3.12.0-tsmp https://github.com/HPSCTerrSys/parflow models/parflow_pdaf
+git clone -b v3.13.0-pdaf https://github.com/HPSCTerrSys/parflow models/parflow_pdaf
 PARFLOW_SRC=`realpath models/parflow_pdaf`
 
 # CLM3.5

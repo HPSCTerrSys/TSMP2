@@ -1,5 +1,6 @@
 find_package(ecCodes REQUIRED)
 find_package(NetCDF REQUIRED)
+find_package(OpenMP REQUIRED)
 
 set(COSMO_BLD_DIR ${CMAKE_BINARY_DIR}/COSMO5_1/bld)
 set(COSMO_Fopts ${COSMO_BLD_DIR}/Fopts)
@@ -15,7 +16,7 @@ file(APPEND ${COSMO_Fopts} "COMFLG4      = $(COMFLG1)\n")
 file(APPEND ${COSMO_Fopts} "COMFLG       = $(COMFLG1)\n")
 file(APPEND ${COSMO_Fopts} "COMFLG5      = $(COMFLG1)\n")
 file(APPEND ${COSMO_Fopts} "LDPAR        = ${CMAKE_Fortran_COMPILER}\n")
-file(APPEND ${COSMO_Fopts} "LDFLG        = -qopenmp\n")
+file(APPEND ${COSMO_Fopts} "LDFLG        = ${OpenMP_Fortran_FLAGS}\n")
 file(APPEND ${COSMO_Fopts} "PROGRAM      = lmparbin\n")
 file(APPEND ${COSMO_Fopts} "LIBPATH      = ${ecCodes_LIBRARIES} ${NetCDF_LIBRARIES} ${OASIS_LIBRARIES}\n")
 
