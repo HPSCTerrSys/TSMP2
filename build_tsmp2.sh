@@ -222,7 +222,7 @@ fi
 
 ## CMAKE config
 # rm -rf ${cmake_build_dir}
-mkdir -pv ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
