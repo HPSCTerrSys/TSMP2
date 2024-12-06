@@ -212,11 +212,8 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 ## source environment if on JSC or env file is provided
 if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
-elif [[ -n "${tsmp2_env}" ]]; then
-  tsmp2_env="$(realpath ${tsmp2_env})"
 else
-  echo "ABORT: Specify environment ($0 --tsmp2_env env/MY-ENV-FILE)"
-  exit 1
+  tsmp2_env="$(realpath ${tsmp2_env})"
 fi # tsmp2_env
 if [ ! -z "${tsmp2_env}" ]; then
   message "Sourcing environment..."
