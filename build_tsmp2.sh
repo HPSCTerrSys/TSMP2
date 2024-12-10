@@ -133,7 +133,7 @@ model_id=""
 model_count=0
 cmake_comp_str=""
 
-message "set model-id and component string"
+message "Setting model-id and component string..."
 # fun set_component shell_name cmake_name
 set_component icon "ICON"
 set_component eclm "eCLM"
@@ -143,14 +143,14 @@ set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
 
 if [ $model_count = 0 ];then
-  echo "No model component is chosen"
+  echo "ABORT: No model component is chosen"
   exit 1
 elif [ $model_count -ge 2 ];then
   oasis=y
 fi
 
 ## CONCADINATE SOURCE CODE STRING
-message "set component source dir"
+message "Setting component source dir..."
 cmake_compsrc_str=""
 set_compsrc icon_src "ICON_SRC"
 set_compsrc eclm_src "eCLM_SRC"
@@ -171,7 +171,7 @@ dwn_compsrc clm35 clm35_src "CLM3.5"
 
 ## CMAKE options
 
-message "set CMAKE options"
+message "Setting CMAKE options..."
 # build_type
 if [ -z "$build_type" ];then
    cmake_build_type=""
@@ -212,17 +212,16 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 ## source environment if on JSC or env file is provided
 if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
-else
-  tsmp2_env="$(realpath ${tsmp2_env})"
-fi # tsmp2_env
-if [ ! -z "${tsmp2_env}" ]; then
-  message "source environment"
-  source $tsmp2_env
+fi
+if [ -n "${tsmp2_env}" ]; then
+  message "Sourcing environment..."
+  tsmp2_env="$(realpath "${tsmp2_env}")"
+  source "$tsmp2_env"
 fi
 
 ## CMAKE config
 # rm -rf ${cmake_build_dir}
-mkdir -pv ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
@@ -260,7 +259,7 @@ cmake --install ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE INSTALL finished"
 
 ## Copy log and environment
-message "Copy log and environment to install_dir"
+message "Copying log and environment to install_dir..."
 cp ${tsmp2_env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 
