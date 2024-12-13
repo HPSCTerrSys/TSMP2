@@ -86,7 +86,8 @@ list(JOIN PDAF_LINK_LIBS " " PDAF_LINK_LIBS)
 
 # Set PDAF_FOPT for Makefile header
 # ----------------------------------
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
 
   # using Intel Compiler
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
@@ -97,6 +98,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     list(APPEND PDAF_FOPT "-O0")
     list(APPEND PDAF_FOPT "-g")
     list(APPEND PDAF_FOPT "-traceback")
+    list(APPEND PDAF_FOPT "-fpe0") # compare eCLM debug flags
+    list(APPEND PDAF_FOPT "-check all") # compare eCLM debug flags
   else()
     message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
   endif()
@@ -132,7 +135,8 @@ list(JOIN PDAF_FOPT " " PDAF_FOPT)
 
 # Set PDAF_COPT for Makefile header
 # ----------------------------------
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
 
   # using Intel Compiler
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
@@ -178,7 +182,8 @@ list(JOIN PDAF_COPT " " PDAF_COPT)
 
 # Set PDAF_DOUBLEPRECISION for Makefile header
 # --------------------------------------------
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
 
   list(APPEND PDAF_DOUBLEPRECISION "-r8")
 

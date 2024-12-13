@@ -72,8 +72,7 @@ if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     echo "submodule ${submodule_name} aleady exist. Do you want overwrite it? (y/n)"
-     read yn
+     read -p "submodule ${submodule_name} aleady exists. Do you want overwrite it? (y/n) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
@@ -134,7 +133,7 @@ model_id=""
 model_count=0
 cmake_comp_str=""
 
-message "set model-id and component string"
+message "Setting model-id and component string..."
 # fun set_component shell_name cmake_name
 set_component icon "ICON"
 set_component eclm "eCLM"
@@ -144,14 +143,14 @@ set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
 
 if [ $model_count = 0 ];then
-  echo "No model component is chosen"
+  echo "ABORT: No model component is chosen"
   exit 1
 elif [ $model_count -ge 2 ];then
   oasis=y
 fi
 
 ## CONCADINATE SOURCE CODE STRING
-message "set component source dir"
+message "Setting component source dir..."
 cmake_compsrc_str=""
 set_compsrc icon_src "ICON_SRC"
 set_compsrc eclm_src "eCLM_SRC"
@@ -172,7 +171,7 @@ dwn_compsrc clm35 clm35_src "CLM3.5"
 
 ## CMAKE options
 
-message "set CMAKE options"
+message "Setting CMAKE options..."
 # build_type
 if [ -z "$build_type" ];then
    cmake_build_type=""
@@ -188,7 +187,7 @@ else
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z "${SYSTEMNAME}" ]; then SYSTEMNAME="UNKN"; fi
+if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname); fi
 
 if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${SYSTEMNAME^^}_${model_id}" 
@@ -210,18 +209,19 @@ fi # Makefile verbosity
 
 build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log"
 
-## source environment
-message "source environment"
-if [ -z "${tsmp2_env}" ]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2023_Intel.sh"
-else
-  tsmp2_env="$(realpath ${tsmp2_env})"
-fi # tsmp2_env
-source $tsmp2_env
+## source environment if on JSC or env file is provided
+if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
+  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
+fi
+if [ -n "${tsmp2_env}" ]; then
+  message "Sourcing environment..."
+  tsmp2_env="$(realpath "${tsmp2_env}")"
+  source "$tsmp2_env"
+fi
 
 ## CMAKE config
 # rm -rf ${cmake_build_dir}
-mkdir -pv ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
@@ -259,7 +259,7 @@ cmake --install ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE INSTALL finished"
 
 ## Copy log and environment
-message "Copy log and environment to install_dir"
+message "Copying log and environment to install_dir..."
 cp ${tsmp2_env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 
