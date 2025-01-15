@@ -238,10 +238,10 @@ list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # make pdaf
 ExternalProject_Add(PDAF
   PREFIX            PDAF
-  SOURCE_DIR        ${PDAF_SRC}/src
+  SOURCE_DIR        ${PDAF_SRC}
   BUILD_IN_SOURCE   TRUE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean ../lib/libpdaf-d.a
+  BUILD_COMMAND     make ${PDAF_ENV_VARS} veryclean directories libpdaf
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES}
 )
