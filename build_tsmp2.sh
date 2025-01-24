@@ -183,7 +183,7 @@ fi
 if [ -z "$compiler" ];then
    cmake_compiler=""
 else
-   cmake_comiler=" -DCMAKE_CXX_COMPILER_ID=${compiler}"
+   cmake_compiler=" -DCMAKE_CXX_COMPILER_ID=${compiler}"
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)

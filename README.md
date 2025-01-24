@@ -1,7 +1,7 @@
 ## Quickstart
 
 > [!TIP]
-> `build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputed CMake command or directly head over to [Building TSMP2 with CMake](#Building-TSMP2-with-CMake).
+> `build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputted CMake command or directly head over to [Building TSMP2 with CMake](#Building-TSMP2-with-CMake).
 
 1. Clone this repository.
 
@@ -44,6 +44,8 @@ To build a model component one need to activate the component model `--<COMP>`. 
 
 > [!NOTE]
 > For experienced users.
+> The result of the following commands may be different from the Quickstart above, most notably because the branches/commits in the `git clone` commands are not kept in sync with those in the `build_tsmp2.sh` script.
+> The [Quickstart](#Quickstart) is the tested and supported method.
 
 1. Clone this repository.
 
@@ -69,7 +71,7 @@ MODEL_ID="ICON-eCLM-ParFlow"
 BUILD_DIR="./bld/${SYSTEMNAME^^}_${MODEL_ID}"
 
 # Model executables and libraries will be installed here
-INSTALL_DIR="./run/${SYSTEMNAME^^}_${MODEL_ID}"
+INSTALL_DIR="./bin/${SYSTEMNAME^^}_${MODEL_ID}"
 
 # Create build and install directories
 mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
