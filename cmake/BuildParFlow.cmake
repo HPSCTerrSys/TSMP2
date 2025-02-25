@@ -23,8 +23,8 @@ endif()
 # TODO: Add compile switches for ParFlow GPU
 #
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    # Flags were based from https://github.com/parflow/parflow/blob/77316043227b95215744e58fe9005d35145432ab/.github/workflows/linux.yml#L305
-    set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-result -Wno-unused-function")
+    # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
+    set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
     #TODO: These flags are specific to JSC system. This should be set in an env or build script!
     set(PF_LDFLAGS "")
