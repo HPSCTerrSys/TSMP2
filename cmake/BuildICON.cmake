@@ -4,40 +4,57 @@ set(ICON_FCFLAGS "-I${OASIS_ROOT}/include -gdwarf-4 -march=native -pc64 -fp-mode
 set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed ${OASIS_LIBRARIES}")
 set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
+# Control compiler optimization depending on CMAKE_BUILD_TYPE
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   string(PREPEND ICON_CFLAGS "-g ")
   string(PREPEND ICON_FCFLAGS "-g ")
 elseif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-  string(PREPEND ICON_CFLAGS "-O3 ")
-  string(PREPEND ICON_FCFLAGS "-O3 ")
+  string(PREPEND ICON_CFLAGS "-O2 ")
+  string(PREPEND ICON_FCFLAGS "-O2 ")
 else()
   # Assume CMAKE_BUILD_TYPE=RELEASE if CMAKE_BUILD_TYPE is unknown
-  string(PREPEND ICON_CFLAGS "-O3 ")
-  string(PREPEND ICON_FCFLAGS "-O3 ")
+  string(PREPEND ICON_CFLAGS "-O2 ")
+  string(PREPEND ICON_FCFLAGS "-O2 ")
   message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by ICON")
 endif()
 
+# -Wl specifies linker options. '--as-needed' means only libraries 
+# required by the program are linked, i.e. libraries passed to the
+# linker that are unused won't be recorded on the ELF header.
 list(APPEND ICON_LIBS "-Wl,--as-needed")
 
-find_package(HDF5 REQUIRED)
-list(APPEND ICON_LIBS "${HDF5_LIBRARIES}")
+# Link HDF5 Fortran libraries
+if (CMAKE_MESSAGE_LOG_LEVEL STREQUAL "DEBUG")
+  set(HDF5_FIND_DEBUG "TRUE")
+endif()
+set(HDF5_PREFER_PARALLEL "TRUE")
+find_package(HDF5 REQUIRED COMPONENTS Fortran HL)
+list(APPEND ICON_LIBS "${HDF5_Fortran_HL_LIBRARIES}")
 
+# libXML2 - XML parsing library
 find_package(LibXml2 REQUIRED)
 list(APPEND ICON_LIBS "${LIBXML2_LIBRARIES}")
 
+# libLZMA - XZ compression library 
 find_package(LibLZMA REQUIRED)
 list(APPEND ICON_LIBS "${LIBLZMA_LIBRARIES}")
 
+# BLAS
 set(BLA_VENDOR Intel10_64lp)
 find_package(BLAS REQUIRED)
 list(APPEND ICON_LIBS "${BLAS_LIBRARIES}")
 
+# OASIS3-MCT
 list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
+
+# NetCDF
 find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
+# Assemble linker options
 list(JOIN ICON_LIBS " " ICON_LIBS)
 
+# Enable/disable model-specific features
 list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-ecrad --enable-parallel-netcdf)
 if( ${eCLM} OR ${CLM3.5} )
   list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
