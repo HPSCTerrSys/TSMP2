@@ -50,7 +50,7 @@ jobs:
       - name: Download HDF5 headers and MPI Fortran compiler
         run: |
           sudo apt-get update
-          sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-103 hdf5-helpers
+          sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-hl-fortran-100t64 hdf5-helpers
 
       - name: Create directories for component model and dependencies
         run: |
