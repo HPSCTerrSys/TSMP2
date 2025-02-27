@@ -43,7 +43,7 @@ jobs:
       - name: Install TSMP2 dependencies on Ubuntu
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev
+          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblapack-dev
           version: 1.0
           execute_install_scripts: true
 
