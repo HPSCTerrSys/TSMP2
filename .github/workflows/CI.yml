@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ ubuntu-24.04 ]
         config:
         - {
             name: "eCLM-ParFlow",
@@ -24,11 +24,12 @@ jobs:
       CXX: mpicxx
       FC: mpifort
       F77: mpif77
+      MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
       BUILD_DIR: bld
       INSTALL_DIR: install
       MODEL_DIR: ${{ github.workspace }}/component-models
       VER_OASIS: tsmp-patches-v0.1
-      VER_eCLM: beta-0.1
+      VER_eCLM: mct-build-fixes
       VER_PARFLOW: ed3974987902ef24c1f7519eb0ba5f8f66380c8c # points to commit "Supported Ubuntu 24.04 and added LLVM to CI"
       VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
