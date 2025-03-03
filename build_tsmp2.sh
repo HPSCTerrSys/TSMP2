@@ -26,7 +26,8 @@ function help_tsmp2() {
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
   echo "  --OASIS_SRC      Set OASIS3-MCT directory"
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
-  echo "  --build_type   Set build configuration: 'DEBUG' 'RELEASE'"
+  echo "  --no_update      Skip component model download"
+  echo "  --build_type     Set build configuration: 'DEBUG' 'RELEASE'"
   echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
@@ -62,10 +63,10 @@ fi # compsrc
 
 function dwn_compsrc(){
 comp_name=$1
-local -n comp_namey=$1
+local -n comp_name=$1
 local -n comp_srcname=$2
 sub_srcname=$3
-if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
+if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
   if [ "${sub_srcname}" = "parflow" ] && [ -n "${pdaf}" ];then
      submodule_name=$(echo "models/${sub_srcname}_pdaf")
   else
@@ -108,6 +109,7 @@ while [[ "$#" -gt 0 ]]; do
 	--pdaf) pdaf=y;;
 	--cosmo) cosmo=y;;
 	--clm35) clm35=y;;
+        --no_update) update_compsrc=n;;
 	--icon_src) icon_src="$2"; shift ;;
 	--eclm_src) eclm_src="$2"; shift ;;
 	--parflow_src) parflow_src="$2"; shift ;;
@@ -149,7 +151,7 @@ elif [ $model_count -ge 2 ];then
   oasis=y
 fi
 
-## CONCADINATE SOURCE CODE STRING
+## CONCATENATE SOURCE CODE STRING
 message "Setting component source dir..."
 cmake_compsrc_str=""
 set_compsrc icon_src "ICON_SRC"
@@ -161,13 +163,15 @@ set_compsrc cosmo_src "COSMO_SRC"
 set_compsrc clm35_src "CLM35_SRC"
 
 ## download model components
-dwn_compsrc icon icon_src "icon"
-dwn_compsrc eclm eclm_src "eCLM"
-dwn_compsrc parflow parflow_src "parflow"
-dwn_compsrc oasis oasis_src "oasis3-mct"
-dwn_compsrc pdaf pdaf_src "pdaf"
-dwn_compsrc cosmo cosmo_src "cosmo"
-dwn_compsrc clm35 clm35_src "CLM3.5"
+if [ "$update_compsrc" != n ]; then
+  dwn_compsrc icon icon_src "icon"
+  dwn_compsrc eclm eclm_src "eCLM"
+  dwn_compsrc parflow parflow_src "parflow"
+  dwn_compsrc oasis oasis_src "oasis3-mct"
+  dwn_compsrc pdaf pdaf_src "pdaf"
+  dwn_compsrc cosmo cosmo_src "cosmo"
+  dwn_compsrc clm35 clm35_src "CLM3.5"
+fi
 
 ## CMAKE options
 
@@ -211,7 +215,15 @@ build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log
 
 ## source environment if on JSC or env file is provided
 if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
+  # Make the --compiler option work only for Stages/2025.
+  # We still want to keep Stages/2024 the default Stage.
+  if [[ "${compiler}" == "gnu" ]]; then
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
+  elif [[ "${compiler}" == "intel" ]]; then
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
+  else
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
+  fi
 fi
 if [ -n "${tsmp2_env}" ]; then
   message "Sourcing environment..."
