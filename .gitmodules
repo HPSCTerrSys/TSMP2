@@ -1,7 +1,7 @@
 [submodule "models/icon"]
 	path = models/icon
-	url = https://gitlab.jsc.fz-juelich.de/sdlts/tsmp_components_mirrors/icon2.6.4_oascoup
-	branch = master
+	url = https://github.com/HPSCTerrSys/icon-model_coup-oas.git
+	branch = icon-2024.07-public_coup-oas
 [submodule "models/parflow"]
 	path = models/parflow
 	url = https://github.com/parflow/parflow.git
