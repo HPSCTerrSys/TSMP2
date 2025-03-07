@@ -26,10 +26,12 @@ function help_tsmp2() {
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
   echo "  --OASIS_SRC      Set OASIS3-MCT directory"
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
-  echo "  --build_type   Set build configuration: 'DEBUG' 'RELEASE'"
+  echo "  --no_update      Skip component model download"
+  echo "  --build_type     Set build configuration: 'DEBUG' 'RELEASE'"
   echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
+  echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --tsmp2_env      Set model environment."
   echo ""
   echo "Example: $0 --ICON --eCLM --ParFlow"
@@ -62,10 +64,10 @@ fi # compsrc
 
 function dwn_compsrc(){
 comp_name=$1
-local -n comp_namey=$1
+local -n comp_name=$1
 local -n comp_srcname=$2
 sub_srcname=$3
-if [ -n "${comp_namey}" ] && [ -z "${comp_srcname}" ];then
+if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
   if [ "${sub_srcname}" = "parflow" ] && [ -n "${pdaf}" ];then
      submodule_name=$(echo "models/${sub_srcname}_pdaf")
   else
@@ -108,6 +110,8 @@ while [[ "$#" -gt 0 ]]; do
 	--pdaf) pdaf=y;;
 	--cosmo) cosmo=y;;
 	--clm35) clm35=y;;
+        --no_update) update_compsrc=n;;
+        --clean_first) clean_first=y;;
 	--icon_src) icon_src="$2"; shift ;;
 	--eclm_src) eclm_src="$2"; shift ;;
 	--parflow_src) parflow_src="$2"; shift ;;
@@ -149,7 +153,7 @@ elif [ $model_count -ge 2 ];then
   oasis=y
 fi
 
-## CONCADINATE SOURCE CODE STRING
+## CONCATENATE SOURCE CODE STRING
 message "Setting component source dir..."
 cmake_compsrc_str=""
 set_compsrc icon_src "ICON_SRC"
@@ -161,13 +165,33 @@ set_compsrc cosmo_src "COSMO_SRC"
 set_compsrc clm35_src "CLM35_SRC"
 
 ## download model components
-dwn_compsrc icon icon_src "icon"
-dwn_compsrc eclm eclm_src "eCLM"
-dwn_compsrc parflow parflow_src "parflow"
-dwn_compsrc oasis oasis_src "oasis3-mct"
-dwn_compsrc pdaf pdaf_src "pdaf"
-dwn_compsrc cosmo cosmo_src "cosmo"
-dwn_compsrc clm35 clm35_src "CLM3.5"
+if [ "${update_compsrc}" != n ]; then
+  dwn_compsrc icon icon_src "icon"
+  dwn_compsrc eclm eclm_src "eCLM"
+  dwn_compsrc parflow parflow_src "parflow"
+  dwn_compsrc oasis oasis_src "oasis3-mct"
+  dwn_compsrc pdaf pdaf_src "pdaf"
+  dwn_compsrc cosmo cosmo_src "cosmo"
+  dwn_compsrc clm35 clm35_src "CLM3.5"
+fi
+
+## source environment if on JSC or env file is provided
+if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" ) ]]; then
+  # Make the --compiler option work only for Stages/2025.
+  # We still want to keep Stages/2024 the default Stage.
+  if [[ "${compiler}" == "gnu" ]]; then
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
+  elif [[ "${compiler}" == "intel" ]]; then
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
+  else
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
+  fi
+fi
+if [ -n "${tsmp2_env}" ]; then
+  message "Sourcing environment..."
+  tsmp2_env="$(realpath "${tsmp2_env}")"
+  source "$tsmp2_env"
+fi
 
 ## CMAKE options
 
@@ -179,24 +203,18 @@ else
    cmake_build_type=" -DCMAKE_BUILD_TYPE=${build_type^^}"
 fi
 
-# set compiler
-if [ -z "$compiler" ];then
-   cmake_compiler=""
-else
-   cmake_compiler=" -DCMAKE_CXX_COMPILER_ID=${compiler}"
-fi
-
 # set INSTALL and BUILD DIR (neccesary for building)
 if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname); fi
 
+BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
 if [ -z "${build_dir}" ]; then
-  cmake_build_dir="${cmake_tsmp2_dir}/bld/${SYSTEMNAME^^}_${model_id}" 
+  cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
 else
   cmake_build_dir="${build_dir}"
 fi # build_dir
 
 if [ -z "${install_dir}" ]; then
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${SYSTEMNAME^^}_${model_id}"
+  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${BUILD_ID}"
 else
   cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
 fi # install_dir
@@ -207,20 +225,14 @@ else
   cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
 fi # Makefile verbosity
 
-build_log="$(dirname ${cmake_build_dir})/${model_id}_$(date +%Y-%m-%d_%H-%M).log"
+build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
-## source environment if on JSC or env file is provided
-if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf") ]]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
-fi
-if [ -n "${tsmp2_env}" ]; then
-  message "Sourcing environment..."
-  tsmp2_env="$(realpath "${tsmp2_env}")"
-  source "$tsmp2_env"
-fi
 
 ## CMAKE config
-# rm -rf ${cmake_build_dir}
+if [[ -d "${cmake_build_dir}" && "${clean_first}" == y ]]; then
+  message "Deleting previous build directory..."
+  rm -rf ${cmake_build_dir}
+fi
 mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 message "===================="
 message "== TSMP2 settings =="
@@ -231,14 +243,14 @@ message "TSMP2_ENV: $tsmp2_env"
 message "BUILD_DIR: $cmake_build_dir"
 message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
-message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_compiler} ${cmake_install_dir} ${cmake_verbose_makefile} |& tee ${build_log} "
+message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_install_dir} ${cmake_verbose_makefile} |& tee ${build_log} "
 message "== CMAKE GENERATE PROJECT start"
 
 cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
       ${cmake_build_type} \
       ${cmake_comp_str} \
       ${cmake_compsrc_str} \
-      ${cmake_compiler} ${cmake_install_dir} \
+      ${cmake_install_dir} \
       ${cmake_verbose_makefile} \
       |& tee ${build_log}
 
