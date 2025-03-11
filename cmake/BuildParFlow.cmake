@@ -25,6 +25,10 @@ endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
     set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    # Silence arch-specific compiler warnings
+    if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64|aarch64")
+      string(APPEND PF_CFLAGS " -Wno-maybe-uninitialized")
+    endif()     
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
     #TODO: These flags are specific to JSC system. This should be set in an env or build script!
     set(PF_LDFLAGS "")
