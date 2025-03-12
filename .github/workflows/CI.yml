@@ -16,14 +16,14 @@ jobs:
         os: [ ubuntu-24.04 ]
         config:
         - {
-            name: "eCLM-ParFlow",
+            name: "ICON-eCLM-ParFlow",
           }
 
     env:
-      CC: mpicc
-      CXX: mpicxx
-      FC: mpifort
-      F77: mpif77
+      CC: mpicc.openmpi
+      CXX: mpic++.openmpi
+      FC: mpifort.openmpi
+      F77: mpif77.openmpi
       MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
       BUILD_DIR: bld
       INSTALL_DIR: install
@@ -31,9 +31,11 @@ jobs:
       VER_OASIS: tsmp-patches-v0.1
       VER_eCLM: mct-build-fixes
       VER_PARFLOW: ed3974987902ef24c1f7519eb0ba5f8f66380c8c # points to commit "Supported Ubuntu 24.04 and added LLVM to CI"
+      VER_ICON: icon-2024.07-public_coup-oas_cplv2.0.1
       VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
+      VER_ECCODES: 2.40.0
       CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
       SYSTEMNAME: ${{ matrix.os }}
 
@@ -43,7 +45,7 @@ jobs:
       - name: Install TSMP2 dependencies on Ubuntu
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblapack-dev
+          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblapack-dev liblzma-dev
           version: 1.0
           execute_install_scripts: true
 
@@ -137,6 +139,59 @@ jobs:
           key: cache-${{ matrix.config.name }}-${{ env.VER_OASIS }}
 
       #
+      # Hypre
+      #
+      - name: Restore cached Hypre ${{ env.VER_HYPRE }}
+        uses: actions/cache/restore@v4
+        id: cache-hypre-restore
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+
+      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
+        name: Install Hypre ${{ env.VER_HYPRE }}
+        run: |
+          wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
+          tar xf v${VER_HYPRE}.tar.gz
+          cd hypre-${VER_HYPRE}/src
+          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+          make -j4 install
+
+      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
+        name: Cache Hypre ${{ env.VER_HYPRE }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+
+      #
+      # ecCodes
+      #
+      - name: Restore cached ecCodes ${{ env.VER_ECCODES }}
+        uses: actions/cache/restore@v4
+        id: cache-eccodes-restore
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
+
+      - if: steps.cache-eccodes-restore.outputs.cache-hit != 'true'
+        name: Install ecCodes ${{ env.VER_ECCODES }}
+        run: |
+          wget https://github.com/ecmwf/eccodes/archive/refs/tags/${VER_ECCODES}.tar.gz
+          tar xf ${VER_ECCODES}.tar.gz
+          cd eccodes-${VER_ECCODES}
+          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${CMAKE_PREFIX_PATH}
+          cmake --build bld --parallel 4
+          cmake --install bld
+
+      - if: steps.cache-eccodes-restore.outputs.cache-hit != 'true'
+        name: Cache ecCodes ${{ env.VER_ECCODES }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CMAKE_PREFIX_PATH }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
+
+      #
       # eCLM
       #
       - name: Restore cached eCLM ${{ env.VER_eCLM }}
@@ -188,30 +243,28 @@ jobs:
           key: cache-${{ matrix.config.name }}-${{ env.VER_PARFLOW }}
 
       #
-      # Hypre
+      # ICON
       #
-      - name: Restore cached Hypre ${{ env.VER_HYPRE }}
+      - name: Restore cached ICON ${{ env.VER_eCLM }}
         uses: actions/cache/restore@v4
-        id: cache-hypre-restore
+        id: cache-icon-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          path: ${{ env.MODEL_DIR }}/ICON
+          key: cache-${{ matrix.config.name }}-${{ env.VER_ICON }}
 
-      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Install Hypre ${{ env.VER_HYPRE }}
+      - if: steps.cache-icon-restore.outputs.cache-hit != 'true'
+        name: Download ICON ${{ env.VER_ICON }}
+        working-directory: ${{ env.MODEL_DIR }}
         run: |
-          wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
-          tar xf v${VER_HYPRE}.tar.gz
-          cd hypre-${VER_HYPRE}/src
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
-          make -j4 install
+          git clone -b $VER_ICON https://github.com/HPSCTerrSys/icon-model_coup-oas.git icon
+          echo "ICON version: $(cd icon && git describe --tags --always)"
 
-      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Cache Hypre ${{ env.VER_HYPRE }}
+      - if: steps.cache-icon-restore.outputs.cache-hit != 'true'
+        name: Cache ICON ${{ env.VER_ICON }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          path: ${{ env.MODEL_DIR }}/icon
+          key: cache-${{ matrix.config.name }}-${{ env.VER_ICON }}
 
       #
       # TSMP2
@@ -226,6 +279,8 @@ jobs:
           -DeCLM_SRC=${MODEL_DIR}/eCLM
           -DParFlow="ON"
           -DPARFLOW_SRC=${MODEL_DIR}/parflow
+          -DICON="ON"
+          -DICON_SRC=${MODEL_DIR}/icon
 
       - name: Build TSMP2
         run: |
