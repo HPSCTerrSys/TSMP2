@@ -5,9 +5,15 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   #       DWD build script!). These flags should be validated and pruned whenever possible.
   #
   # [1] https://github.com/HPSCTerrSys/icon-model_coup-oas/blob/ce5c8f8ba75d2e7db73e41cbb186d98ec34171c8/config/dwd/rcl.VH.gcc-12.3.0_mpi-3.5_oper#L82
-  set(ICON_CFLAGS "")
+
+  set(ICON_CFLAGS "-w")
   set(ICON_FCFLAGS "-std=gnu -fno-range-check -fallow-invalid-boz -fallow-argument-mismatch -fmodule-private -fbacktrace -fimplicit-none -fmax-identifier-length=63 -ffree-line-length-none -Wall -Wcharacter-truncation -Wconversion -Wunderflow -Wunused-parameter -Wno-surprising -fall-intrinsics")
-if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64|amd64")
+
+  # TODO: ICON build produces too many warnings and makes it difficult to spot the actual compiler error. These warnings
+  #       should be fixed in ICON upstream. For now we supress warnings logs to prevent drowning the logs with irrelevant info.
+  string(APPEND ICON_FCFLAGS " -w")
+
+  if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64|amd64")
     string(APPEND ICON_CFLAGS " -mavx2 -mno-fma")
     string(APPEND ICON_FCFLAGS " -mavx2 -mno-fma -mpc64")
 endif() 
