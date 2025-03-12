@@ -28,7 +28,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Silence arch-specific compiler warnings
     if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64|aarch64")
       string(APPEND PF_CFLAGS " -Wno-maybe-uninitialized")
-    endif()     
+    endif()
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
     #TODO: These flags are specific to JSC system. This should be set in an env or build script!
     set(PF_LDFLAGS "")

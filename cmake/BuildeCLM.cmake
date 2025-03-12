@@ -26,7 +26,7 @@ ExternalProject_Add(eCLM
                       ${COUP_OAS_FLAGS}
 		              ${PDAF_FLAGS}
     BUILD_ALWAYS      YES
-    BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
+    BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice.
                            # This happens because INSTALL_COMMAND triggers rebuild
                            # which is abnormal. This is a problem in eCLM and should be fixed.
     DEPENDS           ${MODEL_DEPENDENCIES}

@@ -16,7 +16,7 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64|amd64")
     string(APPEND ICON_CFLAGS " -mavx2 -mno-fma")
     string(APPEND ICON_FCFLAGS " -mavx2 -mno-fma -mpc64")
-endif() 
+  endif()
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
   set(ICON_CFLAGS "-gdwarf-4 -qno-opt-dynamic-align -ftz -march=native")
   set(ICON_FCFLAGS "-gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
@@ -38,7 +38,7 @@ else()
   message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by ICON")
 endif()
 
-# -Wl specifies linker options. '--as-needed' means only libraries 
+# -Wl specifies linker options. '--as-needed' means only libraries
 # required by the program are linked, i.e. libraries passed to the
 # linker that are unused won't be recorded on the ELF header.
 list(APPEND ICON_LIBS "-Wl,--as-needed")
@@ -55,7 +55,7 @@ list(APPEND ICON_LIBS "${HDF5_Fortran_HL_LIBRARIES}")
 find_package(LibXml2 REQUIRED)
 list(APPEND ICON_LIBS "${LIBXML2_LIBRARIES}")
 
-# libLZMA - XZ compression library 
+# libLZMA - XZ compression library
 find_package(LibLZMA REQUIRED)
 list(APPEND ICON_LIBS "${LIBLZMA_LIBRARIES}")
 
