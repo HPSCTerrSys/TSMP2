@@ -69,6 +69,7 @@ list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
 # NetCDF
 find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
+string(PREPEND ICON_CFLAGS "-I${NetCDF_C_ROOT}/include ")
 string(PREPEND ICON_FCFLAGS "-I${NetCDF_F90_ROOT}/include ")
 
 # Assemble linker options
@@ -98,7 +99,7 @@ ExternalProject_Add(ICON
                       MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
                       --prefix=${CMAKE_INSTALL_PREFIX}
                       ${EXTRA_CONFIG_ARGS}
-    BUILD_COMMAND     make -j8 install
+    BUILD_COMMAND     make install
     INSTALL_COMMAND   ""
     BUILD_ALWAYS      YES
     DEPENDS           ${MODEL_DEPENDENCIES}
