@@ -1,0 +1,49 @@
+# --------------------------------------------------------------------------
+# Loads GNU+OpenMPI build environment for TSMP2.
+# This environment is tailored for the Marvin [1] supercomputer.
+#
+# [1] https://www.hpc.uni-bonn.de/en/systems/marvin
+#
+# Usage: source uni-bonn.gnu.openmpi
+# --------------------------------------------------------------------------
+
+module --force purge
+
+# Primary compiler toolchain
+module load GCC/12.3.0
+module load OpenMPI/4.1.5-GCC-12.3.0
+
+# Basic scripting and build tools
+module load Python/3.11.3-GCCcore-12.3.0
+module load CMake/3.26.3-GCCcore-12.3.0
+module load git/2.41.0-GCCcore-12.3.0-nodocs
+
+# Storage libraries
+module load HDF5/1.14.0-gompi-2023a
+module load netCDF/4.9.2-gompi-2023a
+module load netCDF-Fortran/4.6.1-gompi-2023a
+module load PnetCDF/1.12.3-gompi-2023a
+
+# ParFlow additional libraries
+module load Hypre/2.29.0-foss-2023a
+module load Tcl/8.6.13-GCCcore-12.3.0
+
+# ICON additional libraries
+module load ecCodes/2.31.0-gompi-2023a
+
+# Set default compilers
+export CC=mpicc
+export FC=mpif90
+export CXX=mpicxx
+export MPI_HOME=$EBROOTOPENMPI
+
+# Display compiler settings
+module list
+echo "=============== COMPILER SETTINGS  ===============" 
+echo " Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo " MPI lib: $(mpichversion | head -n 1 | tr -d =)"
+echo "       C: $($CC --version | head -n 1)"
+echo "     C++: $($CXX --version | head -n 1)"
+echo " Fortran: $($FC --version | head -n 1)"
+echo "=================================================="
+echo ""
