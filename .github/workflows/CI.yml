@@ -42,17 +42,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # These apt packages have post-install step which can't be triggered by GitHub cache.
       - name: Install TSMP2 dependencies on Ubuntu
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblapack-dev liblzma-dev
-          version: 1.0
-          execute_install_scripts: true
-
-      - name: Download HDF5 headers and MPI Fortran compiler
         run: |
           sudo apt-get update
-          sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-hl-fortran-100t64 hdf5-helpers
+          sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-hl-fortran-100t64 hdf5-helpers liblapack-dev libblas-dev
+
+      # These apt packages can be safely cached.
+      - name: Install extra TSMP2 dependencies on Ubuntu
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblzma-dev
+          version: 1.0
+          execute_install_scripts: true
 
       - name: Create directories for component model and dependencies
         run: |
