@@ -37,6 +37,9 @@ To build a model component one need to activate the component model `--<COMP>`. 
 
 # ICON (with source code)
 ./build_tsmp2.sh --ICON --ICON_SRC ${ICON_SRC}
+
+# ParFlow on Marvin (Uni Bonn)
+./build_tsmp2.sh --ParFlow --tsmp2_env env/uni-bonn.gnu.openmpi
 ```
 
 
