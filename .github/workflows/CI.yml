@@ -20,10 +20,10 @@ jobs:
           }
 
     env:
-      CC: mpicc.openmpi
-      CXX: mpic++.openmpi
-      FC: mpifort.openmpi
-      F77: mpif77.openmpi
+      CC: mpicc
+      CXX: mpic++
+      FC: mpifort
+      F77: mpif77
       MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
       BUILD_DIR: bld
       INSTALL_DIR: install
