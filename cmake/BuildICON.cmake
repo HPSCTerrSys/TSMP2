@@ -7,7 +7,7 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   # [1] https://github.com/HPSCTerrSys/icon-model_coup-oas/blob/ce5c8f8ba75d2e7db73e41cbb186d98ec34171c8/config/dwd/rcl.VH.gcc-12.3.0_mpi-3.5_oper#L82
 
   set(ICON_CFLAGS "-w")
-  set(ICON_FCFLAGS "-std=gnu -fno-range-check -fallow-invalid-boz -fallow-argument-mismatch -fmodule-private -fbacktrace -fimplicit-none -fmax-identifier-length=63 -ffree-line-length-none -Wall -Wcharacter-truncation -Wconversion -Wunderflow -Wunused-parameter -Wno-surprising -fall-intrinsics")
+  set(ICON_FCFLAGS "-std=gnu -fno-range-check -fallow-invalid-boz -fallow-argument-mismatch -fbacktrace -fimplicit-none -fmax-identifier-length=63 -ffree-line-length-none -Wall -Wcharacter-truncation -Wconversion -Wunderflow -Wunused-parameter -Wno-surprising -fall-intrinsics")
 
   # TODO: ICON build produces too many warnings and makes it difficult to spot the actual compiler error. These warnings
   #       should be fixed in ICON upstream. For now we supress warnings logs to prevent drowning the logs with irrelevant info.
@@ -21,7 +21,6 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID S
   set(ICON_CFLAGS "-gdwarf-4 -qno-opt-dynamic-align -ftz -march=native")
   set(ICON_FCFLAGS "-gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
 endif()
-set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed ${OASIS_LIBRARIES}")
 set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
 # Control compiler optimization depending on CMAKE_BUILD_TYPE
@@ -41,7 +40,7 @@ endif()
 # -Wl specifies linker options. '--as-needed' means only libraries
 # required by the program are linked, i.e. libraries passed to the
 # linker that are unused won't be recorded on the ELF header.
-list(APPEND ICON_LIBS "-Wl,--as-needed")
+list(APPEND ICON_LIBS "-Wl,--copy-dt-needed-entries,--as-needed")
 
 # Link HDF5 Fortran libraries
 if (CMAKE_MESSAGE_LOG_LEVEL STREQUAL "DEBUG")
@@ -71,9 +70,14 @@ find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 string(PREPEND ICON_CFLAGS "-I${NetCDF_C_ROOT}/include ")
 string(PREPEND ICON_FCFLAGS "-I${NetCDF_F90_ROOT}/include ")
-
-# Assemble linker options
-list(JOIN ICON_LIBS " " ICON_LIBS)
+# TODO: Make this snippet work. ICON's configure script complains about missing parallel
+#       NetCDF even though the library itself already supports parallel. This problem
+#       must be either caused by ICON configure or FindNetCDF.cmake
+# if (${NetCDF_HAS_PARALLEL})
+#    list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf)
+# else()
+#    list(APPEND EXTRA_CONFIG_ARGS --disable-parallel-netcdf)
+# endif()
 
 # Enable/disable model-specific features
 list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
@@ -81,8 +85,12 @@ list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --disable-ocean --disable
 # Coupling-specific options
 if( ${eCLM} OR ${CLM3.5} OR ${ParFlow} )
   string(PREPEND ICON_FCFLAGS "-I${OASIS_ROOT}/include ")
+  list(APPEND ICON_LIBS " ${OASIS_LIBRARIES}")
   list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
 endif()
+
+# Assemble linker options
+list(JOIN ICON_LIBS " " ICON_LIBS)
 
 ExternalProject_Add(ICON
     PREFIX            ICON
@@ -94,7 +102,6 @@ ExternalProject_Add(ICON
                       CFLAGS=${ICON_CFLAGS}
                       FCFLAGS=${ICON_FCFLAGS}
                       ICON_ECRAD_FCFLAGS=${ICON_ECRAD_FCFLAGS}
-                      LDFLAGS=${ICON_LDFLAGS}
                       LIBS=${ICON_LIBS}
                       MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
                       --prefix=${CMAKE_INSTALL_PREFIX}
