@@ -80,8 +80,40 @@ INSTALL_DIR="./bin/${SYSTEMNAME^^}_${MODEL_ID}"
 mkdir -p ${BUILD_DIR} ${INSTALL_DIR}
 ```
 
-4. Download the OASIS3-MCT coupling library and the component models that you wish
-   to use. Then save the full path to each model source code to `<model-name>_SRC`.
+4. Download the OASIS3-MCT coupling library and the component models
+you wish to use. You can check out the supported submodule commits
+using
+
+```bash
+# eCLM
+git submodule update --init -- models/eCLM
+
+# ICON
+git submodule update --init -- models/icon
+
+# ParFlow
+git submodule update --init -- models/parflow
+
+# ParFlow (PDAF-patched)
+git submodule update --init -- models/parflow_pdaf
+
+# CLM3.5
+git submodule update --init -- models/CLM3.5
+
+# COSMO5.01
+git submodule update --init -- models/cosmo5.01_fresh
+
+# OASIS3-MCT (required for coupled models)
+git submodule update --init -- models/oasis3-mct
+
+# PDAF
+git submodule update --init -- models/pdaf
+```
+
+If you wish to use alternative (possibly unsupported) commits of
+component models, clone them explicitly. Then save the full path to
+each model source code to `<model-name>_SRC`. Examples are given
+below:
 
 ```bash
 ## NOTE: Download only the component models that you need! ##
