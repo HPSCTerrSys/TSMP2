@@ -291,3 +291,4 @@ jobs:
       - name: Install TSMP2
         run: |
           cmake --install ${BUILD_DIR}
+          tree -L 2 ${INSTALL_DIR}
