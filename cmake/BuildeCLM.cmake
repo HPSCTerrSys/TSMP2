@@ -32,14 +32,6 @@ ExternalProject_Add(eCLM
     DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
-ExternalProject_Add_Step(eCLM install-scripts
-    COMMAND       pip3 install --user ${eCLM_SRC}/namelist_generator
-    COMMENT       "Installing clm5nl-gen ..."
-    DEPENDEES     install
-    ALWAYS        TRUE
-    USES_TERMINAL TRUE
-)
-
 if(${PDAF})
     ExternalProject_Add_Step(eCLM pdaf-workaround
         COMMAND       mv ${CMAKE_INSTALL_PREFIX}/lib/libmct.a ${CMAKE_INSTALL_PREFIX}/lib/libmct2.a
