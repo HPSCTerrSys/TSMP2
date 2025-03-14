@@ -1,4 +1,3 @@
-# ICON 2.6.4
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   # TODO: These flags were based from a DWD build script. There are too many warning supression flags and
   #       the flags seems to be inconsistent (e.g. both optimization and debug flags were enabled in the
@@ -8,7 +7,7 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
 
   set(ICON_CFLAGS "-w")
   set(ICON_FCFLAGS "-std=gnu -fno-range-check -fallow-invalid-boz -fallow-argument-mismatch -fbacktrace -fimplicit-none -fmax-identifier-length=63 -ffree-line-length-none -Wall -Wcharacter-truncation -Wconversion -Wunderflow -Wunused-parameter -Wno-surprising -fall-intrinsics")
-
+  set(ICON_LDFLAGS "-Wl,--copy-dt-needed-entries,--as-needed")
   # TODO: ICON build produces too many warnings and makes it difficult to spot the actual compiler error. These warnings
   #       should be fixed in ICON upstream. For now we supress warnings logs to prevent drowning the logs with irrelevant info.
   string(APPEND ICON_FCFLAGS " -w")
@@ -40,7 +39,7 @@ endif()
 # -Wl specifies linker options. '--as-needed' means only libraries
 # required by the program are linked, i.e. libraries passed to the
 # linker that are unused won't be recorded on the ELF header.
-list(APPEND ICON_LIBS "-Wl,--copy-dt-needed-entries,--as-needed")
+list(APPEND ICON_LIBS "-Wl,--as-needed")
 
 # Link HDF5 Fortran libraries
 if (CMAKE_MESSAGE_LOG_LEVEL STREQUAL "DEBUG")
@@ -62,9 +61,6 @@ list(APPEND ICON_LIBS "${LIBLZMA_LIBRARIES}")
 find_package(LAPACK REQUIRED)
 list(APPEND ICON_LIBS "${LAPACK_LIBRARIES}")
 
-# OASIS3-MCT
-list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
-
 # NetCDF
 find_package(NetCDF REQUIRED)
 list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
@@ -80,12 +76,13 @@ string(PREPEND ICON_FCFLAGS "-I${NetCDF_F90_ROOT}/include ")
 # endif()
 
 # Enable/disable model-specific features
-list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
+list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --enable-openmp --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
 
 # Coupling-specific options
 if( ${eCLM} OR ${CLM3.5} OR ${ParFlow} )
   string(PREPEND ICON_FCFLAGS "-I${OASIS_ROOT}/include ")
-  list(APPEND ICON_LIBS " ${OASIS_LIBRARIES}")
+  string(APPEND ICON_LDFLAGS " ${OASIS_LIBRARIES}")
+  list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
   list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
 endif()
 
@@ -101,6 +98,7 @@ ExternalProject_Add(ICON
                       FC=${CMAKE_Fortran_COMPILER}
                       CFLAGS=${ICON_CFLAGS}
                       FCFLAGS=${ICON_FCFLAGS}
+                      LDFLAGS=${ICON_LDFLAGS}
                       ICON_ECRAD_FCFLAGS=${ICON_ECRAD_FCFLAGS}
                       LIBS=${ICON_LIBS}
                       MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
