@@ -66,7 +66,14 @@ list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
 list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
 list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
 list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
-list(APPEND PDAF_LINK_LIBS "-qmkl")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+  list(APPEND PDAF_LINK_LIBS "-qmkl")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  list(APPEND PDAF_LINK_LIBS "-mkl")
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
 list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 
 # Explicit libraries named in comments should be handed over by the
