@@ -79,7 +79,10 @@ list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 # Explicit libraries named in comments should be handed over by the
 # variables. For checking this, search `$BUILD_DIR/CMakeCache.txt`.
 list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
-list(APPEND PDAF_LINK_LIBS "-lmpich")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+  list(APPEND PDAF_LINK_LIBS "-lmpich")
+endif()
 list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
 # Use locally set NetCDF libraries variable
 list(APPEND PDAF_LINK_LIBS "${NetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff"
