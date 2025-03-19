@@ -18,6 +18,7 @@ function help_tsmp2() {
   echo "  --ICON           Compile with ICON"
   echo "  --eCLM           Compile with eCLM"
   echo "  --ParFlow        Compile with ParFlow"
+  echo "  --ParFlow-GPU    Compile with ParFlow-GPU"
   echo "  --PDAF           Compile with PDAF"
   echo "  --COSMO          Compile with COSMO"
   echo "  --CLM35          Compile with CLM3.5"
@@ -48,7 +49,7 @@ if [ "${component}" = "y" ];then
       model_id+="-${cmake_name}"
   fi # model_id
   cmake_comp_str+=" -D${cmake_name}=ON"
-  if [[ $cmake_name = @(ICON|eCLM|ParFlow|COSMO|CLM3.5) ]]; then
+  if [[ $cmake_name = @(ICON|eCLM|ParFlow|ParFlowGPU|COSMO|CLM3.5) ]]; then
      model_count=$(( $model_count + 1 ))
   fi # cmake_name
 fi # component
@@ -107,6 +108,7 @@ while [[ "$#" -gt 0 ]]; do
         --icon) icon=y;;
         --eclm) eclm=y;;
 	--parflow) parflow=y;;
+	--parflowgpu) parflowGPU=y;;
 	--pdaf) pdaf=y;;
 	--cosmo) cosmo=y;;
 	--clm35) clm35=y;;
@@ -142,6 +144,7 @@ message "Setting model-id and component string..."
 set_component icon "ICON"
 set_component eclm "eCLM"
 set_component parflow "ParFlow"
+set_component parflowGPU "ParFlowGPU" #TODO: check if only one ParFlow option is enabled (either --parflow or --parflow-gpu)
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
@@ -175,32 +178,19 @@ if [ "${update_compsrc}" != n ]; then
   dwn_compsrc clm35 clm35_src "CLM3.5"
 fi
 
-## source environment if on JSC or env file is provided
-if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" ) ]]; then
-  # Make the --compiler option work only for Stages/2025.
-  # We still want to keep Stages/2024 the default Stage.
-  if [[ "${compiler}" == "gnu" ]]; then
-    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
-  elif [[ "${compiler}" == "intel" ]]; then
-    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
-  else
-    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
-  fi
-fi
-if [ -n "${tsmp2_env}" ]; then
-  message "Sourcing environment..."
-  tsmp2_env="$(realpath "${tsmp2_env}")"
-  source "$tsmp2_env"
-fi
 
 ## CMAKE options
-
 message "Setting CMAKE options..."
+
 # build_type
 if [ -z "$build_type" ];then
-   cmake_build_type=""
-else
+   build_type="RELEASE"
+fi
+if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" ]]; then
    cmake_build_type=" -DCMAKE_BUILD_TYPE=${build_type^^}"
+else
+   echo "ABORT: Unsupported build_type=${build_type}"
+   exit 1
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
@@ -227,6 +217,28 @@ fi # Makefile verbosity
 
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
+## source environment if on JSC or env file is provided
+if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" ) ]]; then
+  # Make the --compiler option work only for Stages/2025.
+  # We still want to keep Stages/2024 the default Stage.
+  if [[ "${compiler}" == "gnu" ]]; then
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
+  elif [[ "${compiler}" == "intel" ]]; then
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
+  else
+    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
+  fi
+fi
+if [ -n "${tsmp2_env}" ]; then
+  message "Sourcing environment..."
+  tsmp2_env="$(realpath "${tsmp2_env}")"
+  if [[ "$parflowGPU" == "y" ]];then
+    source "$tsmp2_env" --parflow-gpu
+    tsmp2_env="${tsmp2_env} --parflow-gpu" # for logging-purposes
+  else
+    source "$tsmp2_env"
+  fi
+fi
 
 ## CMAKE config
 if [[ -d "${cmake_build_dir}" && "${clean_first}" == y ]]; then
