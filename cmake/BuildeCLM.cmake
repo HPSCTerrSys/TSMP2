@@ -1,6 +1,6 @@
-if(${ICON} OR ${ParFlow})
+if(${ICON} OR ${ParFlow} OR ${ParFlowGPU})
     list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=True)
-    if(${ParFlow})
+    if(${ParFlow} OR ${ParFlowGPU})
         list(APPEND COUP_OAS_FLAGS  -DCOUP_OAS_PFL=True)
     endif()
     if(${ICON})

@@ -79,7 +79,7 @@ string(PREPEND ICON_FCFLAGS "-I${NetCDF_F90_ROOT}/include ")
 list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --enable-openmp --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
 
 # Coupling-specific options
-if( ${eCLM} OR ${CLM3.5} OR ${ParFlow} )
+if( ${eCLM} OR ${CLM3.5} OR ${ParFlow} OR ${ParFlowGPU} )
   string(PREPEND ICON_FCFLAGS "-I${OASIS_ROOT}/include ")
   string(APPEND ICON_LDFLAGS " ${OASIS_LIBRARIES}")
   list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
