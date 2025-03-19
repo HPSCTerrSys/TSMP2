@@ -29,7 +29,24 @@ module load netCDF-Fortran
 module load PnetCDF
 
 # ParFlow additional libraries
-module load Hypre/2.31.0-cpu
+if [[ "$1" == "--parflowgpu" ]]; then
+  module load CUDA
+  module load UCX-settings/RC-CUDA
+  module load Hypre/2.31.0
+
+  # TODO: Request JSC to install this package
+  export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/${SYSTEMNAME^^}_$STAGE"
+
+  # TODO: Verify these values
+  if [[ $SYSTEMNAME == "jedi" ]]; then
+    export CUDAARCHS="90"
+  else
+    export CUDAARCHS="80"
+  fi
+  export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
+else
+  module load Hypre/2.31.0-cpu
+fi
 module load Tcl
 
 # ICON additional libraries
@@ -47,11 +64,16 @@ export MPI_HOME=$EBROOTOPENMPI
 # Display compiler settings
 module list
 echo "=============== COMPILER SETTINGS  ===============" 
-echo " Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo " MPI lib: $(mpirun --version | head -n 1)"
-echo "       C: $($CC --version | head -n 1)"
-echo "     C++: $($CXX --version | head -n 1)"
-echo " Fortran: $($FC --version | head -n 1)"
+echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "   MPI lib: $(mpirun --version | head -n 1)"
+echo "         C: $($CC --version | head -n 1)"
+echo "       C++: $($CXX --version | head -n 1)"
+echo "   Fortran: $($FC --version | head -n 1)"
+if [[ "$1" == "--parflowgpu" ]]; then
+  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo " CUDAARCHS: $CUDAARCHS"
+  echo "  RMM_ROOT: ${RMM_ROOT}"
+fi
 echo "=================================================="
 echo ""
 

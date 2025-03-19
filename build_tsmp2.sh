@@ -144,7 +144,7 @@ message "Setting model-id and component string..."
 set_component icon "ICON"
 set_component eclm "eCLM"
 set_component parflow "ParFlow"
-set_component parflowGPU "ParFlowGPU" #TODO: check if only one ParFlow option is enabled (either --parflow or --parflow-gpu)
+set_component parflowGPU "ParFlowGPU" #TODO: check if only one ParFlow option is enabled (either --parflow or --parflowgpu)
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
@@ -233,8 +233,8 @@ if [ -n "${tsmp2_env}" ]; then
   message "Sourcing environment..."
   tsmp2_env="$(realpath "${tsmp2_env}")"
   if [[ "$parflowGPU" == "y" ]];then
-    source "$tsmp2_env" --parflow-gpu
-    tsmp2_env="${tsmp2_env} --parflow-gpu" # for logging-purposes
+    source "$tsmp2_env" --parflowgpu
+    tsmp2_env="${tsmp2_env} --parflowgpu" # for logging-purposes
   else
     source "$tsmp2_env"
   fi
