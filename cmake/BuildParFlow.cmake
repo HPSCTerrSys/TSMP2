@@ -18,12 +18,29 @@ endif()
 
 # Set GPU-specific options
 if (${ParFlowGPU})
-  set(PF_ACC_BACKEND "cuda")
+  # TODO: Add option to specify CUDA or Kokkos
+  include(FindCUDAToolkit)
+  if (CUDAToolkit_FOUND)
+    set(PF_ACC_BACKEND "cuda")
+  else()
+    # Search for Kokkos (untested)
+    find_package(Kokkos)
+    if (Kokkos_FOUND)
+      set(PF_ACC_BACKEND "kokkos")
+    else()
+      message(FATAL_ERROR "BuildParFlow: ParFlow GPU is enabled, but neither CUDA nor Kokkos was found.")
+    endif()
+  endif()
+
   # TODO: Don't rely on env variables!
   list(APPEND PF_GPU_FLAGS -DRMM_ROOT=$ENV{RMM_ROOT})
 else()
-  find_package(OpenMP REQUIRED)
-  set(PF_ACC_BACKEND "omp") 
+  find_package(OpenMP)
+  if (OpenMP_FOUND)
+    set(PF_ACC_BACKEND "omp") 
+  else()
+    set(PF_ACC_BACKEND "none") 
+  endif()
   #TODO: also support backends 'kokkos' and 'none'
 endif()
 
