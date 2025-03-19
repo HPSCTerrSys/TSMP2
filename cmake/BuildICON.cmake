@@ -38,7 +38,7 @@ list(APPEND ICON_LIBS "${NetCDF_LIBRARIES}")
 
 list(JOIN ICON_LIBS " " ICON_LIBS)
 
-list(APPEND EXTRA_CONFIG_ARGS --disable-coupling --disable-ocean --disable-jsbach --enable-ecrad --enable-parallel-netcdf)
+list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
 if( ${eCLM} OR ${CLM3.5} )
   list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
 endif()
