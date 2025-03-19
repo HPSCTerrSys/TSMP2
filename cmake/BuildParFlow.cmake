@@ -1,10 +1,7 @@
 find_package(NetCDF REQUIRED)
 find_package(Hypre REQUIRED)
-find_package(OpenMP REQUIRED)
 
-#
 # Choose which CLM to enable
-#
 if(DEFINED eCLM_SRC)
     list(APPEND PF_CLM_FLAGS -DPARFLOW_AMPS_LAYER=oas3
                              -DOAS3_ROOT=${OASIS_ROOT}
@@ -19,32 +16,41 @@ else()
                              -DPARFLOW_HAVE_CLM=ON)
 endif()
 
-#
-# TODO: Add compile switches for ParFlow GPU
-#
+# Set GPU-specific options
+if (${ParFlowGPU})
+  set(PF_ACC_BACKEND "cuda")
+  # TODO: Don't rely on env variables!
+  list(APPEND PF_GPU_FLAGS -DRMM_ROOT=$ENV{RMM_ROOT})
+else()
+  find_package(OpenMP REQUIRED)
+  set(PF_ACC_BACKEND "omp") 
+  #TODO: also support backends 'kokkos' and 'none'
+endif()
+
+# Set compiler flags
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
-    set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
     # Silence arch-specific compiler warnings
     if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64|aarch64")
       string(APPEND PF_CFLAGS " -Wno-maybe-uninitialized")
     endif()
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
-    #TODO: These flags are specific to JSC system. This should be set in an env or build script!
-    set(PF_LDFLAGS "")
-    set(ENABLE_SLURM "OFF")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
-    set(PF_CFLAGS "${OpenMP_Fortran_FLAGS} -Wall -Werror -Wno-unused-function -Wno-unused-variable")
-    #TODO: These flags are specific to JSC system. This should be set in an env or build script!
-    set(PF_LDFLAGS "-lcudart -lcusparse -lcurand")
-    set(ENABLE_SLURM "ON")
+    set(PF_CFLAGS "-Wall -Werror -Wno-unused-function -Wno-unused-variable")
 else()
   message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
 endif()
 
-#
+# Enable/disable SLURM
+find_program(SLURM_SRUN srun DOC "Path to the SLURM srun executable")
+if(SLURM_SRUN)
+  set(ENABLE_SLURM "ON")
+else()
+  set(ENABLE_SLURM "OFF")
+endif()
+
 # Pass options to ParFlow CMake
-#
 ExternalProject_Add(ParFlow
     PREFIX      ParFlow
     SOURCE_DIR  ${PARFLOW_SRC}
@@ -59,14 +65,14 @@ ExternalProject_Add(ParFlow
                 -DNETCDF_DIR=${NetCDF_C_ROOT}
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=on
                 -DPARFLOW_ENABLE_TIMING=TRUE
+                -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
-                -DCMAKE_EXE_LINKER_FLAGS=${PF_LDFLAGS}
                 ${PF_CLM_FLAGS}
-                ${JSC_FLAGS}
+                ${PF_GPU_FLAGS}
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
 
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)
-list(APPEND TSMP2_MODEL_VERSIONS "ParFlow: ${PARFLOW_VERSION}")
+list(APPEND TSMP2_MODEL_VERSIONS "${PARFLOW_ID}: ${PARFLOW_VERSION}")
