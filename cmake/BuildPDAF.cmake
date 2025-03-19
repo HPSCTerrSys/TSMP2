@@ -126,6 +126,14 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_FOPT "-finit-local-zero")
   list(APPEND PDAF_FOPT "-mcmodel=large")
 
+  # Flags from eCLM, `Setbuildoptions.cmake:29`
+  list(APPEND PDAF_FOPT "-fconvert=big-endian")
+  list(APPEND PDAF_FOPT "-ffree-line-length-none")
+  list(APPEND PDAF_FOPT "-ffixed-line-length-none")
+  list(APPEND PDAF_FOPT "-ffree-form")
+  # list(APPEND PDAF_FOPT "-fopenmp")
+  list(APPEND PDAF_FOPT "-fallow-argument-mismatch")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
