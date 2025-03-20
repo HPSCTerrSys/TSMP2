@@ -51,10 +51,6 @@ jobs:
       VER_NETCDF_F90: 4.6.1
       VER_HYPRE: 2.26.0
       VER_ECCODES: 2.40.0
-      ID_NETCDF_C: netcdf-c-${{ env.VER_NETCDF_C }}
-      ID_NETCDF_F90: netcdf-f90-${{ env.VER_NETCDF_C }}
-      ID_HYPRE: hypre-${{ env.VER_HYPRE }}
-      ID_ECCODES: eccodes-${{ env.VER_ECCODES }}
 
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +69,7 @@ jobs:
           version: 1.0
           execute_install_scripts: true
 
-      - name: Create directory for dependencies
+      - name: Initialized dependency directory and variables
         run: |
           TSMP2_ROOT=$(git rev-parse --show-toplevel)
           DEPENDENCIES_ROOT=${TSMP2_ROOT}/dependencies
@@ -81,6 +77,10 @@ jobs:
           tree -L 1 ${TSMP2_ROOT}
           echo "TSMP2_ROOT=${TSMP2_ROOT}" >> $GITHUB_ENV
           echo "DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT}" >> $GITHUB_ENV
+          echo "ID_NETCDF_C=netcdf-c-${VER_NETCDF_C}" >> $GITHUB_ENV
+          echo "ID_NETCDF_F90=netcdf-f90-${VER_NETCDF_F90}" >> $GITHUB_ENV
+          echo "ID_HYPRE=hypre-${VER_HYPRE}" >> $GITHUB_ENV
+          echo "ID_ECCODES=eccodes-${VER_ECCODES}" >> $GITHUB_ENV
 
       #
       # NetCDF C
