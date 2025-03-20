@@ -12,32 +12,47 @@ jobs:
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-24.04 ]
         config:
         - {
-            name: "ICON-eCLM-ParFlow",
+            name: "CLM3.5-PDAF",
+            use_oasis: "False"
           }
-
+        - {
+            name: "eCLM-PDAF",
+            use_oasis: "False"
+          }
+        - {
+            name: "ICON-eCLM-ParFlow",
+            use_oasis: "True",
+            parflow_dir: "parflow"
+          }
+        - {
+            name: "CLM3.5-ParFlow-PDAF",
+            use_oasis: "True",
+            parflow_dir: "parflow_pdaf"
+          }
+        - {
+            name: "eCLM-ParFlow-PDAF",
+            use_oasis: "True",
+            parflow_dir: "parflow_pdaf"
+          }
     env:
+      SYSTEMNAME: UBUNTU
+      STAGE: 24.04
       CC: mpicc
       CXX: mpic++
       FC: mpifort
       F77: mpif77
       MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
-      BUILD_DIR: bld
-      INSTALL_DIR: install
-      MODEL_DIR: ${{ github.workspace }}/component-models
-      VER_OASIS: tsmp-patches-v0.1
-      VER_eCLM: mct-build-fixes
-      VER_PARFLOW: ed3974987902ef24c1f7519eb0ba5f8f66380c8c # points to commit "Supported Ubuntu 24.04 and added LLVM to CI"
-      VER_ICON: icon-2024.07-public_coup-oas_cplv2.0.1
       VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
       VER_ECCODES: 2.40.0
+      MODEL_DIR: ${{ github.workspace }}/models
       CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
-      SYSTEMNAME: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -56,9 +71,9 @@ jobs:
           version: 1.0
           execute_install_scripts: true
 
-      - name: Create directories for component model and dependencies
+      - name: Create directory for dependencies
         run: |
-          mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
+          mkdir -pv ${CMAKE_PREFIX_PATH}
 
       #
       # NetCDF C
@@ -68,7 +83,7 @@ jobs:
         id: cache-netcdf-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+          key: cache-${{ env.VER_NETCDF_C }}
 
       - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
         name: Install NetCDF C ${{ env.VER_NETCDF_C }}
@@ -86,7 +101,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+          key: cache-${{ env.VER_NETCDF_C }}
 
       #
       # NetCDF Fortran
@@ -96,7 +111,7 @@ jobs:
         id: cache-netcdff90-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
+          key: cache-${{ env.VER_NETCDF_F90 }}
 
       - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
         name: Install NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
@@ -114,43 +129,20 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
-
-      #
-      # OASIS3-MCT
-      #
-      - name: Restore cached OASIS3-MCT ${{ env.VER_OASIS }}
-        uses: actions/cache/restore@v4
-        id: cache-oasis-restore
-        with:
-          path: ${{ env.MODEL_DIR }}/oasis3-mct
-          key: cache-${{ matrix.config.name }}-${{ env.VER_OASIS }}
-
-      - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
-        name: Download OASIS3-MCT ${{ env.VER_OASIS }}
-        working-directory: ${{ env.MODEL_DIR }}
-        run: |
-          git clone -b $VER_OASIS https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
-          echo "OASIS3-MCT version: $(cd oasis3-mct && git describe --tags --always)"
-
-      - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
-        name: Cache OASIS3-MCT ${{ env.VER_OASIS }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.MODEL_DIR }}/oasis3-mct
-          key: cache-${{ matrix.config.name }}-${{ env.VER_OASIS }}
+          key: cache-${{ env.VER_NETCDF_F90 }}
 
       #
       # Hypre
       #
-      - name: Restore cached Hypre ${{ env.VER_HYPRE }}
+      - if: contains(matrix.config.name, 'ParFlow')
+        name: Restore cached Hypre ${{ env.VER_HYPRE }}
         uses: actions/cache/restore@v4
         id: cache-hypre-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          key: cache-${{ env.VER_HYPRE }}
 
-      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Install Hypre ${{ env.VER_HYPRE }}
         run: |
           wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
@@ -159,24 +151,25 @@ jobs:
           ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
           make -j4 install
 
-      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Cache Hypre ${{ env.VER_HYPRE }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          key: cache-${{ env.VER_HYPRE }}
 
       #
       # ecCodes
       #
-      - name: Restore cached ecCodes ${{ env.VER_ECCODES }}
+      - if: contains(matrix.config.name, 'ICON')
+        name: Restore cached ecCodes ${{ env.VER_ECCODES }}
         uses: actions/cache/restore@v4
         id: cache-eccodes-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
+          key: cache-${{ env.VER_ECCODES }}
 
-      - if: steps.cache-eccodes-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
         name: Install ecCodes ${{ env.VER_ECCODES }}
         run: |
           wget https://github.com/ecmwf/eccodes/archive/refs/tags/${VER_ECCODES}.tar.gz
@@ -186,109 +179,218 @@ jobs:
           cmake --build bld --parallel 4
           cmake --install bld
 
-      - if: steps.cache-eccodes-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
         name: Cache ecCodes ${{ env.VER_ECCODES }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
+          key: cache-${{ env.VER_ECCODES }}
+
+      #
+      # Check component model versions
+      #
+      - name: Extract required component model versions
+        working-directory: ${{ env.MODEL_DIR }}
+        run: |
+          git submodule status | cut -c2- > model_versions
+
+          if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
+            VER_OASIS=$(cat model_versions | grep oasis3-mct | cut -d' ' -f1)
+            echo "VER_OASIS=${VER_OASIS}"
+            echo "VER_OASIS=${VER_OASIS}" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"eCLM"* ]]; then
+            VER_eCLM=$(cat model_versions | grep eCLM | cut -d' ' -f1)
+            echo "VER_eCLM=${VER_eCLM}"
+            echo "VER_eCLM=${VER_eCLM}" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"CLM3.5"* ]]; then
+            VER_CLM35=$(cat model_versions | grep CLM3.5 | cut -d' ' -f1)
+            echo "VER_CLM35=${VER_CLM35}"
+            echo "VER_CLM35=${VER_CLM35}" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"ParFlow"* ]]; then
+            VER_PARFLOW=$(cat model_versions | grep ${{ matrix.config.parflow_dir }} | cut -d' ' -f1)
+            echo "VER_PARFLOW=${VER_PARFLOW}"
+            echo "VER_PARFLOW=${VER_PARFLOW}" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"ICON"* ]]; then
+            VER_ICON=$(cat model_versions | grep icon | cut -d' ' -f1)
+            echo "VER_ICON=${VER_ICON}"
+            echo "VER_ICON=${VER_ICON}" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
+            VER_PDAF=$(cat model_versions | grep pdaf | cut -d' ' -f1)
+            echo "VER_PDAF=${VER_PDAF}"
+            echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_ENV
+          fi
+
+      #
+      # OASIS3-MCT
+      #
+      - if: matrix.config.use_oasis == 'True'
+        name: Restore cached OASIS3-MCT submodule ${{ env.VER_OASIS }}
+        uses: actions/cache/restore@v4
+        id: cache-oasis-restore
+        with:
+          path: ${{ env.MODEL_DIR }}/oasis3-mct
+          key: cache-${{ env.VER_OASIS }}
+
+      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
+        name: Update OASIS3-MCT submodule ${{ env.VER_OASIS }}
+        working-directory: ${{ env.MODEL_DIR }}/oasis3-mct
+        run: |
+          git submodule update --init --force .
+
+      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
+        name: Cache OASIS3-MCT submodule ${{ env.VER_OASIS }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.MODEL_DIR }}/oasis3-mct
+          key: cache-${{ env.VER_OASIS }}
 
       #
       # eCLM
       #
-      - name: Restore cached eCLM ${{ env.VER_eCLM }}
+      - if: contains(matrix.config.name, 'eCLM')
+        name: Restore cached eCLM
         uses: actions/cache/restore@v4
         id: cache-eclm-restore
         with:
           path: ${{ env.MODEL_DIR }}/eCLM
-          key: cache-${{ matrix.config.name }}-${{ env.VER_eCLM }}
+          key: cache-${{ env.VER_eCLM }}
 
-      - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
-        name: Download eCLM ${{ env.VER_eCLM }}
-        working-directory: ${{ env.MODEL_DIR }}
+      - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
+        name: Update eCLM submodule ${{ env.VER_eCLM }}
+        working-directory: ${{ env.MODEL_DIR }}/eCLM
         run: |
-          git clone -b $VER_eCLM https://github.com/HPSCTerrSys/eCLM.git
-          echo "eCLM version: $(cd eCLM && git describe --tags --always)"
+          git submodule update --init --force .
+          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --eCLM" >> $GITHUB_ENV
 
-      - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
-        name: Cache eCLM ${{ env.VER_eCLM }}
+      - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
+        name: Cache eCLM submodule ${{ env.VER_eCLM }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.MODEL_DIR }}/eCLM
-          key: cache-${{ matrix.config.name }}-${{ env.VER_eCLM }}
+          key: cache-${{ env.VER_eCLM }}
+
+      #
+      # CLM3.5
+      #
+      - if: contains(matrix.config.name, 'CLM3.5')
+        name: Restore cached CLM3.5 submodule ${{ env.VER_CLM35 }}
+        uses: actions/cache/restore@v4
+        id: cache-clm35-restore
+        with:
+          path: ${{ env.MODEL_DIR }}/CLM3.5
+          key: cache-${{ env.VER_CLM35 }}
+
+      - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
+        name: Update CLM3.5 submodule ${{ env.VER_CLM35 }}
+        working-directory: ${{ env.MODEL_DIR }}/CLM3.5
+        run: |
+          git submodule update --init --force .
+          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --CLM35" >> $GITHUB_ENV
+
+      - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
+        name: Cache CLM3.5 submodule ${{ env.VER_CLM35 }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.MODEL_DIR }}/CLM3.5
+          key: cache-${{ env.VER_CLM35 }}
 
       #
       # ParFlow
       #
-      - name: Restore cached ParFlow ${{ env.VER_PARFLOW }}
+      - if: contains(matrix.config.name, 'ParFlow')
+        name: Restore cached ParFlow submodule ${{ env.VER_ParFlow }}
         uses: actions/cache/restore@v4
         id: cache-parflow-restore
         with:
-          path: ${{ env.MODEL_DIR }}/parflow
-          key: cache-${{ matrix.config.name }}-${{ env.VER_PARFLOW }}
+          path: ${{ env.MODEL_DIR }}/${{ matrix.config.parflow_dir }}
+          key: cache-${{ env.VER_ParFlow }}
 
-      # TODO: Must use upstream repo https://github.com/parflow/parflow.git
-      - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Download ParFlow ${{ env.VER_PARFLOW }}
-        working-directory: ${{ env.MODEL_DIR }}
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
+        name: Update ParFlow submodule ${{ env.VER_ParFlow }}
+        working-directory: ${{ env.MODEL_DIR }}/${{ matrix.config.parflow_dir }}
         run: |
-          git clone https://github.com/parflow/parflow.git
-          cd parflow
-          git checkout $VER_PARFLOW
-          echo "ParFlow version: $(git describe --tags --always)"
+          git submodule update --init --force .
+          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ParFlow" >> $GITHUB_ENV
 
-      - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Cache ParFlow ${{ env.VER_PARFLOW }}
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
+        name: Cache ParFlow submodule ${{ env.VER_ParFlow }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/parflow
-          key: cache-${{ matrix.config.name }}-${{ env.VER_PARFLOW }}
+          path: ${{ env.MODEL_DIR }}/${{ matrix.config.parflow_dir }}
+          key: cache-${{ env.VER_ParFlow }}
 
       #
       # ICON
       #
-      - name: Restore cached ICON ${{ env.VER_eCLM }}
+      - if: contains(matrix.config.name, 'ICON')
+        name: Restore cached ICON submodule ${{ env.VER_ICON }}
         uses: actions/cache/restore@v4
         id: cache-icon-restore
         with:
-          path: ${{ env.MODEL_DIR }}/ICON
-          key: cache-${{ matrix.config.name }}-${{ env.VER_ICON }}
+          path: ${{ env.MODEL_DIR }}/icon
+          key: cache-${{ env.VER_ICON }}
 
-      - if: steps.cache-icon-restore.outputs.cache-hit != 'true'
-        name: Download ICON ${{ env.VER_ICON }}
-        working-directory: ${{ env.MODEL_DIR }}
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
+        name: Update ICON submodule ${{ env.VER_ICON }}
+        working-directory: ${{ env.MODEL_DIR }}/icon
         run: |
-          git clone -b $VER_ICON https://github.com/HPSCTerrSys/icon-model_coup-oas.git icon
-          echo "ICON version: $(cd icon && git describe --tags --always)"
+          git submodule update --init --force .
+          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ICON" >> $GITHUB_ENV
 
-      - if: steps.cache-icon-restore.outputs.cache-hit != 'true'
-        name: Cache ICON ${{ env.VER_ICON }}
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
+        name: Cache ICON submodule ${{ env.VER_ICON }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.MODEL_DIR }}/icon
-          key: cache-${{ matrix.config.name }}-${{ env.VER_ICON }}
+          key: cache-${{ env.VER_ICON }}
+
+      #
+      # PDAF
+      #
+      - if: contains(matrix.config.name, 'PDAF')
+        name: Restore cached PDAF submodule ${{ env.VER_PDAF }}
+        uses: actions/cache/restore@v4
+        id: cache-pdaf-restore
+        with:
+          path: ${{ env.MODEL_DIR }}/pdaf
+          key: cache-${{ env.VER_PDAF }}
+
+      - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
+        name: Update PDAF submodule ${{ env.VER_PDAF }}
+        working-directory: ${{ env.MODEL_DIR }}/pdaf
+        run: |
+          git submodule update --init --force .
+          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --PDAF" >> $GITHUB_ENV
+
+      - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
+        name: Cache PDAF submodule ${{ env.VER_PDAF }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.MODEL_DIR }}/pdaf
+          key: cache-${{ env.VER_PDAF }}
 
       #
       # TSMP2
       #
-      - name: Configure TSMP2
-        run: >-
-          cmake -S . -B ${BUILD_DIR}
-          -DCMAKE_BUILD_TYPE="RELEASE"
-          -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-          -DOASIS_SRC=${MODEL_DIR}/oasis3-mct
-          -DeCLM="ON"
-          -DeCLM_SRC=${MODEL_DIR}/eCLM
-          -DParFlow="ON"
-          -DPARFLOW_SRC=${MODEL_DIR}/parflow
-          -DICON="ON"
-          -DICON_SRC=${MODEL_DIR}/icon
-
-      - name: Build TSMP2
+      - name: Verify component model versions
+        working-directory: ${{ env.MODEL_DIR }}
         run: |
-          cmake --build ${BUILD_DIR}
+          git submodule foreach 'git rev-parse HEAD'
+          echo ""
+          git submodule status | grep -vE "^-"
 
-      - name: Install TSMP2
+      - name: Build ${{ matrix.config.name }}
         run: |
-          cmake --install ${BUILD_DIR}
-          tree -L 2 ${INSTALL_DIR}
+          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS}"
+          ./build_tsmp2.sh ${TSMP2_MODEL_OPTS} --no_update --compiler gnu
+          tree -L 4 bin
