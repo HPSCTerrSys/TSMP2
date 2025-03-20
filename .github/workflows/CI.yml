@@ -240,37 +240,37 @@ jobs:
           git submodule status | cut -c2- | tee model_versions
 
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
-            VER_OASIS=$(cat model_versions | grep " oasis3-mct " | cut -d' ' -f1)
+            VER_OASIS=$(cat model_versions | grep " oasis3-mct" | cut -d' ' -f1)
             echo "VER_OASIS=${VER_OASIS}"
             echo "VER_OASIS=${VER_OASIS}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"eCLM"* ]]; then
-            VER_eCLM=$(cat model_versions | grep " eCLM " | cut -d' ' -f1)
+            VER_eCLM=$(cat model_versions | grep " eCLM" | cut -d' ' -f1)
             echo "VER_eCLM=${VER_eCLM}"
             echo "VER_eCLM=${VER_eCLM}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"CLM3.5"* ]]; then
-            VER_CLM35=$(cat model_versions | grep " CLM3.5 " | cut -d' ' -f1)
+            VER_CLM35=$(cat model_versions | grep " CLM3.5" | cut -d' ' -f1)
             echo "VER_CLM35=${VER_CLM35}"
             echo "VER_CLM35=${VER_CLM35}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"ParFlow"* ]]; then
-            VER_ParFlow=$(cat model_versions | grep " ${{ matrix.config.parflow_dir }} "  | cut -d' ' -f1)
+            VER_ParFlow=$(cat model_versions | grep " ${{ matrix.config.parflow_dir }}"  | cut -d' ' -f1)
             echo "VER_ParFlow=${VER_ParFlow}"
             echo "VER_ParFlow=${VER_ParFlow}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"ICON"* ]]; then
-            VER_ICON=$(cat model_versions | grep " icon " | cut -d' ' -f1)
+            VER_ICON=$(cat model_versions | grep " icon" | cut -d' ' -f1)
             echo "VER_ICON=${VER_ICON}"
             echo "VER_ICON=${VER_ICON}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
-            VER_PDAF=$(cat model_versions | grep " pdaf " | cut -d' ' -f1)
+            VER_PDAF=$(cat model_versions | grep " pdaf" | cut -d' ' -f1)
             echo "VER_PDAF=${VER_PDAF}"
             echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_OUTPUT
           fi
