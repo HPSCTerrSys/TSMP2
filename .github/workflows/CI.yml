@@ -374,5 +374,5 @@ jobs:
             MODEL_OPTS="${MODEL_OPTS} --OASIS_SRC ${TSMP2_ROOT}/oasis3-mct"
           fi
           echo "Model options: ${MODEL_OPTS}"
-          ./build_tsmp2.sh ${{ matrix.config.model_opts }} --no_update --compiler gnu
+          ./build_tsmp2.sh ${MODEL_OPTS} --no_update --compiler gnu
           tree -L 4 bin

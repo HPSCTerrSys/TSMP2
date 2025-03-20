@@ -100,35 +100,35 @@ fi # quiet
 
 ## get params
 while [[ "$#" -gt 0 ]]; do
-    case "${1,,}" in
-	-h|--help) help_tsmp2;;
-	-q|--quiet) quiet=y;;
-	-v|--verbose) verbose_makefile=y;;
-	--version) echo "$0 version 0.1.0"; exit 1;;
-        --icon) icon=y;;
-        --eclm) eclm=y;;
-	--parflow) parflow=y;;
-	--parflowgpu) parflowGPU=y;;
-	--pdaf) pdaf=y;;
-	--cosmo) cosmo=y;;
-	--clm35) clm35=y;;
-        --no_update) update_compsrc=n;;
-        --clean_first) clean_first=y;;
-	--icon_src) icon_src="$2"; shift ;;
-	--eclm_src) eclm_src="$2"; shift ;;
-	--parflow_src) parflow_src="$2"; shift ;;
-	--cosmo_src) cosmo_src="$2"; shift ;;
-	--clm35_src) clm35_src="$2"; shift ;;
-	--pdaf_src) pdaf_src="$2"; shift ;;
-	--oasis_src) oasis_src="$2"; shift ;;
-	--build_type) build_type="$2"; shift ;;
-	--compiler) compiler="$2"; shift ;; 
-	--build_dir) build_dir="$2"; shift ;;
-	--install_dir) install_dir="$2"; shift ;;
-	--tsmp2_env) tsmp2_env="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1"; exit 1 ;;
-    esac
-    shift
+  case "${1,,}" in
+    -h|--help) help_tsmp2;;
+    -q|--quiet) quiet=y;;
+    -v|--verbose) verbose_makefile=y;;
+    --version) echo "$0 version 0.1.0"; exit 1;;
+    --icon) icon=y;;
+    --eclm) eclm=y;;
+    --parflow) parflow=y;;
+    --parflowgpu) parflowGPU=y;;
+    --pdaf) pdaf=y;;
+    --cosmo) cosmo=y;;
+    --clm35) clm35=y;;
+    --no_update) update_compsrc=n;;
+    --clean_first) clean_first=y;;
+    --icon_src) icon_src="$2"; shift ;;
+    --eclm_src) eclm_src="$2"; shift ;;
+    --parflow_src) parflow_src="$2"; shift ;;
+    --cosmo_src) cosmo_src="$2"; shift ;;
+    --clm35_src) clm35_src="$2"; shift ;;
+    --pdaf_src) pdaf_src="$2"; shift ;;
+    --oasis_src) oasis_src="$2"; shift ;;
+    --build_type) build_type="$2"; shift ;;
+    --compiler) compiler="$2"; shift ;;
+    --build_dir) build_dir="$2"; shift ;;
+    --install_dir) install_dir="$2"; shift ;;
+    --tsmp2_env) tsmp2_env="$2"; shift ;;
+    *) echo "Unknown parameter passed: $1"; exit 1 ;;
+  esac
+  shift
 done
 
 # Get tsmp2_dir (full path) from location of $0
