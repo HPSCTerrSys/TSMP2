@@ -77,23 +77,19 @@ jobs:
           tree -L 1 ${TSMP2_ROOT}
           echo "TSMP2_ROOT=${TSMP2_ROOT}" >> $GITHUB_ENV
           echo "DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT}" >> $GITHUB_ENV
-          echo "ID_NETCDF_C=netcdf-c-${VER_NETCDF_C}" >> $GITHUB_ENV
-          echo "ID_NETCDF_F90=netcdf-f90-${VER_NETCDF_F90}" >> $GITHUB_ENV
-          echo "ID_HYPRE=hypre-${VER_HYPRE}" >> $GITHUB_ENV
-          echo "ID_ECCODES=eccodes-${VER_ECCODES}" >> $GITHUB_ENV
 
       #
       # NetCDF C
       #
-      - name: Restore cached ${{ env.ID_NETCDF_C }}
+      - name: Restore cached netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/restore@v4
-        id: cache-${{ env.ID_NETCDF_C }}-restore
+        id: cache-netcdf-c-${{ env.VER_NETCDF_C }}-restore
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_NETCDF_C }}
-          key: ${{ matrix.config.name }}_${{ env.ID_NETCDF_C }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-c-${{ env.VER_NETCDF_C }}
+          key: ${{ matrix.config.name }}_netcdf-c-${{ env.VER_NETCDF_C }}
 
-      - if: steps.cache-${{ env.ID_NETCDF_C }}-restore.outputs.cache-hit != 'true'
-        name: Install ${{ env.ID_NETCDF_C }}
+      - if: steps.cache-netcdf-c-${{ env.VER_NETCDF_C }}-restore.outputs.cache-hit != 'true'
+        name: Install netcdf-c-${{ env.VER_NETCDF_C }}
         working-directory: /tmp
         run: |
           # Download
@@ -104,34 +100,34 @@ jobs:
           # Install
           CPPFLAGS=-I/usr/include/hdf5/openmpi
           LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
-          ./configure --prefix=${DEPENDENCIES_ROOT}/${ID_NETCDF_C}
+          ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
           make -j4 install
 
           # Verify
-          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_NETCDF_C}
+          tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
 
           # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_NETCDF_C}" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}" >> $GITHUB_ENV
 
-      - if: steps.cache-${{ env.ID_NETCDF_C }}-restore.outputs.cache-hit != 'true'
-        name: Cache ${{ env.ID_NETCDF_C }}
+      - if: steps.cache-netcdf-c-${{ env.VER_NETCDF_C }}-restore.outputs.cache-hit != 'true'
+        name: Cache netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_NETCDF_C }}
-          key: ${{ matrix.config.name }}_${{ env.ID_NETCDF_C }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-c-${{ env.VER_NETCDF_C }}
+          key: ${{ matrix.config.name }}_netcdf-c-${{ env.VER_NETCDF_C }}
 
       #
       # NetCDF Fortran
       #
-      - name: Restore cached ${{ env.ID_NETCDF_F90 }}
+      - name: Restore cached netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/restore@v4
-        id: cache-${{ env.ID_NETCDF_F90 }}-restore
+        id: cache-netcdf-f90-${{ env.VER_NETCDF_F90 }}-restore
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/{{ env.ID_NETCDF_F90 }}
-          key: ${{ matrix.config.name }}_{{ env.ID_NETCDF_F90 }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-f90-${{ env.VER_NETCDF_F90 }}
+          key: ${{ matrix.config.name }}_netcdf-f90-${{ env.VER_NETCDF_F90 }}
 
-      - if: steps.cache-${{ env.ID_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
-        name: Install ${{ env.ID_NETCDF_F90 }}
+      - if: steps.cache-netcdf-f90-${{ env.VER_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
+        name: Install netcdf-f90-${{ env.VER_NETCDF_F90 }}
         working-directory: /tmp
         run: |
           # Download
@@ -140,37 +136,37 @@ jobs:
           cd netcdf-fortran-${VER_NETCDF_F90}
 
           # Install
-          CPPFLAGS=-I${DEPENDENCIES_ROOT}/${ID_NETCDF_C}/include
-          LDFLAGS=-L${DEPENDENCIES_ROOT}/${ID_NETCDF_C}/lib
-          ./configure --prefix=${DEPENDENCIES_ROOT}/${ID_NETCDF_F90}
+          CPPFLAGS=-I${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/include
+          LDFLAGS=-L${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/lib
+          ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
           make -j4 install
 
           # Verify
-          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_NETCDF_F90}
+          tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
 
           # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_NETCDF_F90}" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}" >> $GITHUB_ENV
 
-      - if: steps.cache-${{ env.ID_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
-        name: Cache ${{ env.ID_NETCDF_F90 }}
+      - if: steps.cache-netcdf-f90-${{ env.VER_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
+        name: Cache netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/{{ env.ID_NETCDF_F90 }}
-          key: ${{ matrix.config.name }}_{{ env.ID_NETCDF_F90 }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-f90-${{ env.VER_NETCDF_F90 }}
+          key: ${{ matrix.config.name }}_netcdf-f90-${{ env.VER_NETCDF_F90 }}
 
       #
       # Hypre
       #
       - if: contains(matrix.config.name, 'ParFlow')
-        name: Restore cached ${{ env.ID_HYPRE }}
+        name: Restore cached hypre-${{ env.VER_HYPRE }}
         uses: actions/cache/restore@v4
-        id: cache-${{ env.ID_HYPRE }}-restore
+        id: cache-hypre-${{ env.VER_HYPRE }}-restore
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_HYPRE }}
-          key: ${{ matrix.config.name }}_${{ env.ID_HYPRE }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}
+          key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-${{ env.ID_HYPRE }}-restore.outputs.cache-hit != 'true'
-        name: Install ${{ env.ID_HYPRE }}
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-${{ env.VER_HYPRE }}-restore.outputs.cache-hit != 'true'
+        name: Install hypre-${{ env.VER_HYPRE }}
         working-directory: /tmp
         run: |
           # Download
@@ -179,35 +175,35 @@ jobs:
           cd hypre-${VER_HYPRE}/src
 
           # Install
-          ./configure --prefix=${DEPENDENCIES_ROOT}/${ID_HYPRE}
+          ./configure --prefix=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }
           make -j4 install
 
           # Verify
-          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_HYPRE}
+          tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }
 
           # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_HYPRE}" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }" >> $GITHUB_ENV
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-${{ env.ID_HYPRE }}-restore.outputs.cache-hit != 'true'
-        name: Cache ${{ env.ID_HYPRE }}
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-${{ env.VER_HYPRE }}-restore.outputs.cache-hit != 'true'
+        name: Cache hypre-${{ env.VER_HYPRE }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_HYPRE }}
-          key: ${{ matrix.config.name }}_${{ env.ID_HYPRE }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}
+          key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}
 
       #
       # ecCodes
       #
       - if: contains(matrix.config.name, 'ICON')
-        name: Restore cached ${{ env.ID_ECCODES }}
+        name: Restore cached eccodes-${{ env.VER_ECCODES }}
         uses: actions/cache/restore@v4
-        id: cache-${{ env.ID_ECCODES }}-restore
+        id: cache-eccodes-${{ env.VER_ECCODES }}-restore
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_ECCODES }}
-          key: ${{ matrix.config.name }}_${{ env.ID_ECCODES }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/eccodes-${{ env.VER_ECCODES }}
+          key: ${{ matrix.config.name }}_eccodes-${{ env.VER_ECCODES }}
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-${{ env.ID_ECCODES }}-restore.outputs.cache-hit != 'true'
-        name: Install ${{ env.ID_ECCODES }}
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-${{ env.VER_ECCODES }}-restore.outputs.cache-hit != 'true'
+        name: Install eccodes-${{ env.VER_ECCODES }}
         working-directory: /tmp
         run: |
           # Download
@@ -216,22 +212,22 @@ jobs:
           cd eccodes-${VER_ECCODES}
 
           # Install
-          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/${ID_ECCODES}
+          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }
           cmake --build bld --parallel 4
           cmake --install bld
 
           # Verify
-          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_ECCODES}
+          tree -L 2 ${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }
 
           # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_ECCODES}" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }" >> $GITHUB_ENV
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-${{ env.ID_ECCODES }}-restore.outputs.cache-hit != 'true'
-        name: Cache ${{ env.ID_ECCODES }}
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-${{ env.VER_ECCODES }}-restore.outputs.cache-hit != 'true'
+        name: Cache eccodes-${{ env.VER_ECCODES }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_ECCODES }}
-          key: ${{ matrix.config.name }}_${{ env.ID_ECCODES }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/eccodes-${{ env.VER_ECCODES }}
+          key: ${{ matrix.config.name }}_eccodes-${{ env.VER_ECCODES }}
 
       #
       # Check component model versions
