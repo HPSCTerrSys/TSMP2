@@ -83,12 +83,12 @@ jobs:
       #
       - name: Restore cached netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/restore@v4
-        id: cache-netcdf-c-${{ env.VER_NETCDF_C }}-restore
+        id: cache-netcdf-c-restore
         with:
           path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-c-${{ env.VER_NETCDF_C }}
           key: ${{ matrix.config.name }}_netcdf-c-${{ env.VER_NETCDF_C }}
 
-      - if: steps.cache-netcdf-c-${{ env.VER_NETCDF_C }}-restore.outputs.cache-hit != 'true'
+      - if: steps.cache-netcdf-c-restore.outputs.cache-hit != 'true'
         name: Install netcdf-c-${{ env.VER_NETCDF_C }}
         working-directory: /tmp
         run: |
@@ -109,7 +109,7 @@ jobs:
           # For TSMP2 dependency discovery
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}" >> $GITHUB_ENV
 
-      - if: steps.cache-netcdf-c-${{ env.VER_NETCDF_C }}-restore.outputs.cache-hit != 'true'
+      - if: steps.cache-netcdf-c-restore.outputs.cache-hit != 'true'
         name: Cache netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/save@v4
         with:
@@ -121,12 +121,12 @@ jobs:
       #
       - name: Restore cached netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/restore@v4
-        id: cache-netcdf-f90-${{ env.VER_NETCDF_F90 }}-restore
+        id: cache-netcdf-f90-restore
         with:
           path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-f90-${{ env.VER_NETCDF_F90 }}
           key: ${{ matrix.config.name }}_netcdf-f90-${{ env.VER_NETCDF_F90 }}
 
-      - if: steps.cache-netcdf-f90-${{ env.VER_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
+      - if: steps.cache-netcdf-f90-restore.outputs.cache-hit != 'true'
         name: Install netcdf-f90-${{ env.VER_NETCDF_F90 }}
         working-directory: /tmp
         run: |
@@ -147,7 +147,7 @@ jobs:
           # For TSMP2 dependency discovery
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}" >> $GITHUB_ENV
 
-      - if: steps.cache-netcdf-f90-${{ env.VER_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
+      - if: steps.cache-netcdf-f90-restore.outputs.cache-hit != 'true'
         name: Cache netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/save@v4
         with:
@@ -160,12 +160,12 @@ jobs:
       - if: contains(matrix.config.name, 'ParFlow')
         name: Restore cached hypre-${{ env.VER_HYPRE }}
         uses: actions/cache/restore@v4
-        id: cache-hypre-${{ env.VER_HYPRE }}-restore
+        id: cache-hypre-restore
         with:
           path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}
           key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-${{ env.VER_HYPRE }}-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Install hypre-${{ env.VER_HYPRE }}
         working-directory: /tmp
         run: |
@@ -184,7 +184,7 @@ jobs:
           # For TSMP2 dependency discovery
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }" >> $GITHUB_ENV
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-${{ env.VER_HYPRE }}-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Cache hypre-${{ env.VER_HYPRE }}
         uses: actions/cache/save@v4
         with:
@@ -197,12 +197,12 @@ jobs:
       - if: contains(matrix.config.name, 'ICON')
         name: Restore cached eccodes-${{ env.VER_ECCODES }}
         uses: actions/cache/restore@v4
-        id: cache-eccodes-${{ env.VER_ECCODES }}-restore
+        id: cache-eccodes-restore
         with:
           path: ${{ env.DEPENDENCIES_ROOT }}/eccodes-${{ env.VER_ECCODES }}
           key: ${{ matrix.config.name }}_eccodes-${{ env.VER_ECCODES }}
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-${{ env.VER_ECCODES }}-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
         name: Install eccodes-${{ env.VER_ECCODES }}
         working-directory: /tmp
         run: |
@@ -222,7 +222,7 @@ jobs:
           # For TSMP2 dependency discovery
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }" >> $GITHUB_ENV
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-${{ env.VER_ECCODES }}-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
         name: Cache eccodes-${{ env.VER_ECCODES }}
         uses: actions/cache/save@v4
         with:
