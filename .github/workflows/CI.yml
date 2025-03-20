@@ -18,26 +18,31 @@ jobs:
         config:
         - {
             name: "CLM3.5-PDAF",
-            use_oasis: "False"
+            use_oasis: "False",
+            model_opts: "--CLM35 --PDAF"
           }
         - {
             name: "eCLM-PDAF",
-            use_oasis: "False"
+            use_oasis: "False",
+            model_opts: "--eCLM --PDAF"
           }
         - {
             name: "ICON-eCLM-ParFlow",
             use_oasis: "True",
-            parflow_dir: "parflow"
+            parflow_dir: "parflow",
+            model_opts: "--ICON --eCLM --ParFlow"
           }
         - {
             name: "CLM3.5-ParFlow-PDAF",
             use_oasis: "True",
-            parflow_dir: "parflow_pdaf"
+            parflow_dir: "parflow_pdaf",
+            model_opts: "--CLM35 --ParFlow --PDAF"
           }
         - {
             name: "eCLM-ParFlow-PDAF",
             use_oasis: "True",
-            parflow_dir: "parflow_pdaf"
+            parflow_dir: "parflow_pdaf",
+            model_opts: "--eCLM --ParFlow --PDAF"
           }
     env:
       SYSTEMNAME: UBUNTU
@@ -69,7 +74,7 @@ jobs:
           version: 1.0
           execute_install_scripts: true
 
-      - name: Initialized dependency directory and variables
+      - name: Initialize dependency directory and variables
         run: |
           TSMP2_ROOT=$(git rev-parse --show-toplevel)
           DEPENDENCIES_ROOT=${TSMP2_ROOT}/dependencies
@@ -106,9 +111,6 @@ jobs:
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
 
-          # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}" >> $GITHUB_ENV
-
       - if: steps.cache-netcdf-c-restore.outputs.cache-hit != 'true'
         name: Cache netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/save@v4
@@ -144,9 +146,6 @@ jobs:
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
 
-          # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}" >> $GITHUB_ENV
-
       - if: steps.cache-netcdf-f90-restore.outputs.cache-hit != 'true'
         name: Cache netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/save@v4
@@ -180,9 +179,6 @@ jobs:
 
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }
-
-          # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Cache hypre-${{ env.VER_HYPRE }}
@@ -218,9 +214,6 @@ jobs:
 
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }
-
-          # For TSMP2 dependency discovery
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
         name: Cache eccodes-${{ env.VER_ECCODES }}
@@ -315,7 +308,6 @@ jobs:
         working-directory: ${{ env.TSMP2_ROOT }}/models/eCLM
         run: |
           pwd && git submodule update --init --force .
-          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --eCLM" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Cache eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
@@ -340,7 +332,6 @@ jobs:
         working-directory: ${{ env.TSMP2_ROOT }}/models/CLM3.5
         run: |
           pwd && git submodule update --init --force .
-          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --CLM35" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
         name: Cache CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
@@ -365,7 +356,6 @@ jobs:
         working-directory: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
         run: |
           pwd && git submodule update --init --force .
-          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ParFlow" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Cache ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
@@ -390,7 +380,6 @@ jobs:
         working-directory: ${{ env.TSMP2_ROOT }}/models/icon
         run: |
           pwd && git submodule update --init --force .
-          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ICON" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
         name: Cache ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
@@ -415,7 +404,6 @@ jobs:
         working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
         run: |
           pwd && git submodule update --init --force .
-          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --PDAF" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
         name: Cache PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
@@ -435,17 +423,19 @@ jobs:
           echo ""
           git submodule status | grep -vE "^-"
 
-      - name: Check TSMP2 dependencies and build_tsmp2 model flags
+      - name: Check TSMP2 dependencies
+        path: ${{ env.DEPENDENCIES_ROOT }}
         run: |
-          tree -L 2 ${DEPENDENCIES_ROOT}
+          tree -L 2 .
+          CMAKE_PREFIX_PATH=$(ls -1 | xargs realpath | paste -sd ":" -)
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-          echo "Model flags: ${TSMP2_MODEL_OPTS}"
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> $GITHUB_ENV
 
       #
       # Build TSMP2
       #
       - name: Build ${{ matrix.config.name }}
         run: |
-          echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS}"
-          ./build_tsmp2.sh ${TSMP2_MODEL_OPTS} --no_update --compiler gnu
+          echo "Model combination: ${{ matrix.config.model_opts }}"
+          ./build_tsmp2.sh ${{ matrix.config.model_opts }} --no_update --compiler gnu
           tree -L 4 bin
