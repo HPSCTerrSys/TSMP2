@@ -272,145 +272,55 @@ jobs:
       # OASIS3-MCT
       #
       - if: matrix.config.use_oasis == 'True'
-        name: Restore cached OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
-        uses: actions/cache/restore@v4
-        id: cache-oasis-restore
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
-          key: ${{ matrix.config.name }}_oasis-${{ steps.model-versions.outputs.VER_OASIS }}
-
-      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Update OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
         run: |
           pwd && git submodule update --init --force .
 
-      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
-        name: Cache OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
-          key: ${{ matrix.config.name }}_oasis-${{ steps.model-versions.outputs.VER_OASIS }}
-
       #
       # eCLM
       #
       - if: contains(matrix.config.name, 'eCLM')
-        name: Restore cached eCLM
-        uses: actions/cache/restore@v4
-        id: cache-eclm-restore
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/eCLM
-          key: ${{ matrix.config.name }}_eclm-${{ steps.model-versions.outputs.VER_eCLM }}
-
-      - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Update eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/eCLM
         run: |
           pwd && git submodule update --init --force .
 
-      - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
-        name: Cache eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/eCLM
-          key: ${{ matrix.config.name }}_eclm-${{ steps.model-versions.outputs.VER_eCLM }}
-
       #
       # CLM3.5
       #
       - if: contains(matrix.config.name, 'CLM3.5')
-        name: Restore cached CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
-        uses: actions/cache/restore@v4
-        id: cache-clm35-restore
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/CLM3.5
-          key: ${{ matrix.config.name }}_clm3.5-${{ steps.model-versions.outputs.VER_CLM35 }}
-
-      - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
         name: Update CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/CLM3.5
         run: |
           pwd && git submodule update --init --force .
 
-      - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
-        name: Cache CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/CLM3.5
-          key: ${{ matrix.config.name }}_clm3.5-${{ steps.model-versions.outputs.VER_CLM35 }}
-
       #
       # ParFlow
       #
       - if: contains(matrix.config.name, 'ParFlow')
-        name: Restore cached ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
-        uses: actions/cache/restore@v4
-        id: cache-parflow-restore
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
-          key: ${{ matrix.config.name }}_${{ matrix.config.parflow_dir }}-${{ steps.model-versions.outputs.VER_ParFlow }}
-
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Update ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
         run: |
           pwd && git submodule update --init --force .
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Cache ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
-          key: ${{ matrix.config.name }}_${{ matrix.config.parflow_dir }}-${{ steps.model-versions.outputs.VER_ParFlow }}
-
       #
       # ICON
       #
       - if: contains(matrix.config.name, 'ICON')
-        name: Restore cached ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
-        uses: actions/cache/restore@v4
-        id: cache-icon-restore
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/icon
-          key: ${{ matrix.config.name }}_icon-${{ steps.model-versions.outputs.VER_ICON }}
-
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
         name: Update ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/icon
         run: |
           pwd && git submodule update --init --force .
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
-        name: Cache ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/icon
-          key: ${{ matrix.config.name }}_icon-${{ steps.model-versions.outputs.VER_ICON }}
-
       #
       # PDAF
       #
       - if: contains(matrix.config.name, 'PDAF')
-        name: Restore cached PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
-        uses: actions/cache/restore@v4
-        id: cache-pdaf-restore
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/pdaf
-          key: ${{ matrix.config.name }}_pdaf-${{ steps.model-versions.outputs.VER_PDAF }}
-
-      - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
         name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
         run: |
           pwd && git submodule update --init --force .
-
-      - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
-        name: Cache PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.TSMP2_ROOT }}/models/pdaf
-          key: ${{ matrix.config.name }}_pdaf-${{ steps.model-versions.outputs.VER_PDAF }}
 
       #
       # Pre-build checks
