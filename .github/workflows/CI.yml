@@ -267,7 +267,7 @@ jobs:
           fi
 
           if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
-            VER_PDAF=$(cat model_versions | grep "pdaf" | cut -d' ' -f1)
+            VER_PDAF=$(cat model_versions | grep "pdaf" | grep -v "parflow_pdaf" | cut -d' ' -f1)
             echo "VER_PDAF=${VER_PDAF}"
             echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_OUTPUT
           fi
