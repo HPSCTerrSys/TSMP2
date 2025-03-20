@@ -47,12 +47,14 @@ jobs:
       FC: mpifort
       F77: mpif77
       MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
-      VER_HYPRE: 2.26.0
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
+      VER_HYPRE: 2.26.0
       VER_ECCODES: 2.40.0
-      MODEL_DIR: ${{ github.workspace }}/models
-      CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
+      ID_NETCDF_C: netcdf-c-${{ env.VER_NETCDF_C }}
+      ID_NETCDF_F90: netcdf-f90-${{ env.VER_NETCDF_C }}
+      ID_HYPRE: hypre-${{ env.VER_HYPRE }}
+      ID_ECCODES: eccodes-${{ env.VER_ECCODES }}
 
     steps:
       - uses: actions/checkout@v4
@@ -73,128 +75,173 @@ jobs:
 
       - name: Create directory for dependencies
         run: |
-          mkdir -pv ${CMAKE_PREFIX_PATH}
+          TSMP2_ROOT=$(git rev-parse --show-toplevel)
+          DEPENDENCIES_ROOT=${TSMP2_ROOT}/dependencies
+          mkdir -v ${DEPENDENCIES_ROOT}
+          tree -L 1 ${TSMP2_ROOT}
+          echo "TSMP2_ROOT=${TSMP2_ROOT}" >> $GITHUB_ENV
+          echo "DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT}" >> $GITHUB_ENV
 
       #
       # NetCDF C
       #
-      - name: Restore cached NetCDF C ${{ env.VER_NETCDF_C }}
+      - name: Restore cached ${{ env.ID_NETCDF_C }}
         uses: actions/cache/restore@v4
-        id: cache-netcdf-restore
+        id: cache-${{ env.ID_NETCDF_C }}-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_NETCDF_C }}
+          key: ${{ matrix.config.name }}_${{ env.ID_NETCDF_C }}
 
-      - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
-        name: Install NetCDF C ${{ env.VER_NETCDF_C }}
+      - if: steps.cache-${{ env.ID_NETCDF_C }}-restore.outputs.cache-hit != 'true'
+        name: Install ${{ env.ID_NETCDF_C }}
+        working-directory: /tmp
         run: |
+          # Download
           wget https://github.com/Unidata/netcdf-c/archive/v${VER_NETCDF_C}.tar.gz
           tar xf v${VER_NETCDF_C}.tar.gz
           cd netcdf-c-${VER_NETCDF_C}
-          export CPPFLAGS=-I/usr/include/hdf5/openmpi
-          export LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+
+          # Install
+          CPPFLAGS=-I/usr/include/hdf5/openmpi
+          LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+          ./configure --prefix=${DEPENDENCIES_ROOT}/${ID_NETCDF_C}
           make -j4 install
 
-      - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
-        name: Cache NetCDF ${{ env.VER_NETCDF_C }}
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_NETCDF_C}
+
+          # For TSMP2 dependency discovery
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_NETCDF_C}" >> $GITHUB_ENV
+
+      - if: steps.cache-${{ env.ID_NETCDF_C }}-restore.outputs.cache-hit != 'true'
+        name: Cache ${{ env.ID_NETCDF_C }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_NETCDF_C }}
+          key: ${{ matrix.config.name }}_${{ env.ID_NETCDF_C }}
 
       #
       # NetCDF Fortran
       #
-      - name: Restore cached NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+      - name: Restore cached ${{ env.ID_NETCDF_F90 }}
         uses: actions/cache/restore@v4
-        id: cache-netcdff90-restore
+        id: cache-${{ env.ID_NETCDF_F90 }}-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/{{ env.ID_NETCDF_F90 }}
+          key: ${{ matrix.config.name }}_{{ env.ID_NETCDF_F90 }}
 
-      - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
-        name: Install NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+      - if: steps.cache-${{ env.ID_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
+        name: Install ${{ env.ID_NETCDF_F90 }}
+        working-directory: /tmp
         run: |
+          # Download
           wget https://github.com/Unidata/netcdf-fortran/archive/v${VER_NETCDF_F90}.tar.gz
           tar xf v${VER_NETCDF_F90}.tar.gz
           cd netcdf-fortran-${VER_NETCDF_F90}
-          export CPPFLAGS=-I${CMAKE_PREFIX_PATH}/include
-          export LDFLAGS=-L${CMAKE_PREFIX_PATH}/lib
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+
+          # Install
+          CPPFLAGS=-I${DEPENDENCIES_ROOT}/${ID_NETCDF_C}/include
+          LDFLAGS=-L${DEPENDENCIES_ROOT}/${ID_NETCDF_C}/lib
+          ./configure --prefix=${DEPENDENCIES_ROOT}/${ID_NETCDF_F90}
           make -j4 install
 
-      - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
-        name: Cache NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_NETCDF_F90}
+
+          # For TSMP2 dependency discovery
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_NETCDF_F90}" >> $GITHUB_ENV
+
+      - if: steps.cache-${{ env.ID_NETCDF_F90 }}-restore.outputs.cache-hit != 'true'
+        name: Cache ${{ env.ID_NETCDF_F90 }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/{{ env.ID_NETCDF_F90 }}
+          key: ${{ matrix.config.name }}_{{ env.ID_NETCDF_F90 }}
 
       #
       # Hypre
       #
       - if: contains(matrix.config.name, 'ParFlow')
-        name: Restore cached Hypre ${{ env.VER_HYPRE }}
+        name: Restore cached ${{ env.ID_HYPRE }}
         uses: actions/cache/restore@v4
-        id: cache-hypre-restore
+        id: cache-${{ env.ID_HYPRE }}-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_HYPRE }}
+          key: ${{ matrix.config.name }}_${{ env.ID_HYPRE }}
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Install Hypre ${{ env.VER_HYPRE }}
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-${{ env.ID_HYPRE }}-restore.outputs.cache-hit != 'true'
+        name: Install ${{ env.ID_HYPRE }}
+        working-directory: /tmp
         run: |
+          # Download
           wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
           tar xf v${VER_HYPRE}.tar.gz
           cd hypre-${VER_HYPRE}/src
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+
+          # Install
+          ./configure --prefix=${DEPENDENCIES_ROOT}/${ID_HYPRE}
           make -j4 install
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Cache Hypre ${{ env.VER_HYPRE }}
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_HYPRE}
+
+          # For TSMP2 dependency discovery
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_HYPRE}" >> $GITHUB_ENV
+
+      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-${{ env.ID_HYPRE }}-restore.outputs.cache-hit != 'true'
+        name: Cache ${{ env.ID_HYPRE }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_HYPRE }}
+          key: ${{ matrix.config.name }}_${{ env.ID_HYPRE }}
 
       #
       # ecCodes
       #
       - if: contains(matrix.config.name, 'ICON')
-        name: Restore cached ecCodes ${{ env.VER_ECCODES }}
+        name: Restore cached ${{ env.ID_ECCODES }}
         uses: actions/cache/restore@v4
-        id: cache-eccodes-restore
+        id: cache-${{ env.ID_ECCODES }}-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_ECCODES }}
+          key: ${{ matrix.config.name }}_${{ env.ID_ECCODES }}
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
-        name: Install ecCodes ${{ env.VER_ECCODES }}
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-${{ env.ID_ECCODES }}-restore.outputs.cache-hit != 'true'
+        name: Install ${{ env.ID_ECCODES }}
+        working-directory: /tmp
         run: |
+          # Download
           wget https://github.com/ecmwf/eccodes/archive/refs/tags/${VER_ECCODES}.tar.gz
           tar xf ${VER_ECCODES}.tar.gz
           cd eccodes-${VER_ECCODES}
-          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${CMAKE_PREFIX_PATH}
+
+          # Install
+          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/${ID_ECCODES}
           cmake --build bld --parallel 4
           cmake --install bld
 
-      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
-        name: Cache ecCodes ${{ env.VER_ECCODES }}
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/${ID_ECCODES}
+
+          # For TSMP2 dependency discovery
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:${DEPENDENCIES_ROOT}/${ID_ECCODES}" >> $GITHUB_ENV
+
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-${{ env.ID_ECCODES }}-restore.outputs.cache-hit != 'true'
+        name: Cache ${{ env.ID_ECCODES }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/${{ env.ID_ECCODES }}
+          key: ${{ matrix.config.name }}_${{ env.ID_ECCODES }}
 
       #
       # Check component model versions
       #
       - name: Extract required component model versions
         id: model-versions
-        working-directory: ./models
+        working-directory: ${{ env.TSMP2_ROOT }}/models
         run: |
-          realpath .. && tree -L 2 ..
-          git submodule status | cut -c2- > model_versions
+          pwd && ls
+          git submodule status | cut -c2- | tee model_versions
 
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
             VER_OASIS=$(cat model_versions | grep " oasis3-mct " | cut -d' ' -f1)
@@ -240,21 +287,21 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-oasis-restore
         with:
-          path: ./models/oasis3-mct
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_OASIS }}
+          path: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
+          key: ${{ matrix.config.name }}_oasis-${{ steps.model-versions.outputs.VER_OASIS }}
 
       - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Update OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
-        working-directory: ./models/oasis3-mct
+        working-directory: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
         run: |
-          git submodule update --init --force .
+          pwd && git submodule update --init --force .
 
       - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Cache OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
         uses: actions/cache/save@v4
         with:
-          path: ./models/oasis3-mct
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_OASIS }}
+          path: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
+          key: ${{ matrix.config.name }}_oasis-${{ steps.model-versions.outputs.VER_OASIS }}
 
       #
       # eCLM
@@ -264,22 +311,22 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-eclm-restore
         with:
-          path: ./models/eCLM
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_eCLM }}
+          path: ${{ env.TSMP2_ROOT }}/models/eCLM
+          key: ${{ matrix.config.name }}_eclm-${{ steps.model-versions.outputs.VER_eCLM }}
 
       - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Update eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
-        working-directory: ./models/eCLM
+        working-directory: ${{ env.TSMP2_ROOT }}/models/eCLM
         run: |
-          git submodule update --init --force .
+          pwd && git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --eCLM" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Cache eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
         uses: actions/cache/save@v4
         with:
-          path: ./models/eCLM
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_eCLM }}
+          path: ${{ env.TSMP2_ROOT }}/models/eCLM
+          key: ${{ matrix.config.name }}_eclm-${{ steps.model-versions.outputs.VER_eCLM }}
 
       #
       # CLM3.5
@@ -289,47 +336,47 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-clm35-restore
         with:
-          path: ./models/CLM3.5
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_CLM35 }}
+          path: ${{ env.TSMP2_ROOT }}/models/CLM3.5
+          key: ${{ matrix.config.name }}_clm3.5-${{ steps.model-versions.outputs.VER_CLM35 }}
 
       - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
         name: Update CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
-        working-directory: ./models/CLM3.5
+        working-directory: ${{ env.TSMP2_ROOT }}/models/CLM3.5
         run: |
-          git submodule update --init --force .
+          pwd && git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --CLM35" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
         name: Cache CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
         uses: actions/cache/save@v4
         with:
-          path: ./models/CLM3.5
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_CLM35 }}
+          path: ${{ env.TSMP2_ROOT }}/models/CLM3.5
+          key: ${{ matrix.config.name }}_clm3.5-${{ steps.model-versions.outputs.VER_CLM35 }}
 
       #
       # ParFlow
       #
       - if: contains(matrix.config.name, 'ParFlow')
-        name: Restore cached ParFlow submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
+        name: Restore cached ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
         uses: actions/cache/restore@v4
         id: cache-parflow-restore
         with:
-          path: ./models/${{ matrix.config.parflow_dir }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ParFlow }}
+          path: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
+          key: ${{ matrix.config.name }}_${{ matrix.config.parflow_dir }}-${{ steps.model-versions.outputs.VER_ParFlow }}
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Update ParFlow submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
-        working-directory: ./models/${{ matrix.config.parflow_dir }}
+        name: Update ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
         run: |
-          git submodule update --init --force .
+          pwd && git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ParFlow" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Cache ParFlow submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
+        name: Cache ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
         uses: actions/cache/save@v4
         with:
-          path: ./models/${{ matrix.config.parflow_dir }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ParFlow }}
+          path: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
+          key: ${{ matrix.config.name }}_${{ matrix.config.parflow_dir }}-${{ steps.model-versions.outputs.VER_ParFlow }}
 
       #
       # ICON
@@ -339,22 +386,22 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-icon-restore
         with:
-          path: ./models/icon
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ICON }}
+          path: ${{ env.TSMP2_ROOT }}/models/icon
+          key: ${{ matrix.config.name }}_icon-${{ steps.model-versions.outputs.VER_ICON }}
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
         name: Update ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
-        working-directory: ./models/icon
+        working-directory: ${{ env.TSMP2_ROOT }}/models/icon
         run: |
-          git submodule update --init --force .
+          pwd && git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ICON" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
         name: Cache ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
         uses: actions/cache/save@v4
         with:
-          path: ./models/icon
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ICON }}
+          path: ${{ env.TSMP2_ROOT }}/models/icon
+          key: ${{ matrix.config.name }}_icon-${{ steps.model-versions.outputs.VER_ICON }}
 
       #
       # PDAF
@@ -364,34 +411,43 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-pdaf-restore
         with:
-          path: ./models/pdaf
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_PDAF }}
+          path: ${{ env.TSMP2_ROOT }}/models/pdaf
+          key: ${{ matrix.config.name }}_pdaf-${{ steps.model-versions.outputs.VER_PDAF }}
 
       - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
         name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
-        working-directory: ./models/pdaf
+        working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
         run: |
-          git submodule update --init --force .
+          pwd && git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --PDAF" >> $GITHUB_ENV
 
       - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
         name: Cache PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
         uses: actions/cache/save@v4
         with:
-          path: ./models/pdaf
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_PDAF }}
+          path: ${{ env.TSMP2_ROOT }}/models/pdaf
+          key: ${{ matrix.config.name }}_pdaf-${{ steps.model-versions.outputs.VER_PDAF }}
 
       #
-      # TSMP2
+      # Pre-build checks
       #
-      - name: Verify component model versions
-        working-directory: ./models
+      - name: Check component model versions
+        working-directory: ${{ env.TSMP2_ROOT }}/models
         run: |
-          realpath .. && tree -L 2 ..
+          pwd && ls
           git submodule foreach 'git rev-parse HEAD'
           echo ""
           git submodule status | grep -vE "^-"
 
+      - name: Check TSMP2 dependencies and build_tsmp2 model flags
+        run: |
+          tree -L 2 ${DEPENDENCIES_ROOT}
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+          echo "Model flags: ${TSMP2_MODEL_OPTS}"
+
+      #
+      # Build TSMP2
+      #
       - name: Build ${{ matrix.config.name }}
         run: |
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS}"
