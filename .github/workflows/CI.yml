@@ -78,15 +78,15 @@ jobs:
       #
       # NetCDF C
       #
-      - name: Restore cached NetCDF C ${{ steps.model-versions.outputs.VER_NETCDF_C }}
+      - name: Restore cached NetCDF C ${{ env.VER_NETCDF_C }}
         uses: actions/cache/restore@v4
         id: cache-netcdf-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_NETCDF_C }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
 
       - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
-        name: Install NetCDF C ${{ steps.model-versions.outputs.VER_NETCDF_C }}
+        name: Install NetCDF C ${{ env.VER_NETCDF_C }}
         run: |
           wget https://github.com/Unidata/netcdf-c/archive/v${VER_NETCDF_C}.tar.gz
           tar xf v${VER_NETCDF_C}.tar.gz
@@ -97,24 +97,24 @@ jobs:
           make -j4 install
 
       - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
-        name: Cache NetCDF ${{ steps.model-versions.outputs.VER_NETCDF_C }}
+        name: Cache NetCDF ${{ env.VER_NETCDF_C }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_NETCDF_C }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
 
       #
       # NetCDF Fortran
       #
-      - name: Restore cached NetCDF Fortran ${{ steps.model-versions.outputs.VER_NETCDF_F90 }}
+      - name: Restore cached NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/restore@v4
         id: cache-netcdff90-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_NETCDF_F90 }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
 
       - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
-        name: Install NetCDF Fortran ${{ steps.model-versions.outputs.VER_NETCDF_F90 }}
+        name: Install NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
         run: |
           wget https://github.com/Unidata/netcdf-fortran/archive/v${VER_NETCDF_F90}.tar.gz
           tar xf v${VER_NETCDF_F90}.tar.gz
@@ -125,25 +125,25 @@ jobs:
           make -j4 install
 
       - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
-        name: Cache NetCDF Fortran ${{ steps.model-versions.outputs.VER_NETCDF_F90 }}
+        name: Cache NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_NETCDF_F90 }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
 
       #
       # Hypre
       #
       - if: contains(matrix.config.name, 'ParFlow')
-        name: Restore cached Hypre ${{ steps.model-versions.outputs.VER_HYPRE }}
+        name: Restore cached Hypre ${{ env.VER_HYPRE }}
         uses: actions/cache/restore@v4
         id: cache-hypre-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_HYPRE }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Install Hypre ${{ steps.model-versions.outputs.VER_HYPRE }}
+        name: Install Hypre ${{ env.VER_HYPRE }}
         run: |
           wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
           tar xf v${VER_HYPRE}.tar.gz
@@ -152,25 +152,25 @@ jobs:
           make -j4 install
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Cache Hypre ${{ steps.model-versions.outputs.VER_HYPRE }}
+        name: Cache Hypre ${{ env.VER_HYPRE }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_HYPRE }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
 
       #
       # ecCodes
       #
       - if: contains(matrix.config.name, 'ICON')
-        name: Restore cached ecCodes ${{ steps.model-versions.outputs.VER_ECCODES }}
+        name: Restore cached ecCodes ${{ env.VER_ECCODES }}
         uses: actions/cache/restore@v4
         id: cache-eccodes-restore
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ECCODES }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
-        name: Install ecCodes ${{ steps.model-versions.outputs.VER_ECCODES }}
+        name: Install ecCodes ${{ env.VER_ECCODES }}
         run: |
           wget https://github.com/ecmwf/eccodes/archive/refs/tags/${VER_ECCODES}.tar.gz
           tar xf ${VER_ECCODES}.tar.gz
@@ -180,20 +180,20 @@ jobs:
           cmake --install bld
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
-        name: Cache ecCodes ${{ steps.model-versions.outputs.VER_ECCODES }}
+        name: Cache ecCodes ${{ env.VER_ECCODES }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ECCODES }}
+          key: cache-${{ matrix.config.name }}-${{ env.VER_ECCODES }}
 
       #
       # Check component model versions
       #
       - name: Extract required component model versions
         id: model-versions
-        working-directory: ${{ env.MODEL_DIR }}
+        working-directory: ./models
         run: |
-          pwd
+          realpath .. && tree -L 2 ..
           git submodule status | cut -c2- > model_versions
 
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
@@ -240,12 +240,12 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-oasis-restore
         with:
-          path: ${{ env.MODEL_DIR }}/oasis3-mct
+          path: ./models/oasis3-mct
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_OASIS }}
 
       - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Update OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
-        working-directory: ${{ env.MODEL_DIR }}/oasis3-mct
+        working-directory: ./models/oasis3-mct
         run: |
           git submodule update --init --force .
 
@@ -253,7 +253,7 @@ jobs:
         name: Cache OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/oasis3-mct
+          path: ./models/oasis3-mct
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_OASIS }}
 
       #
@@ -264,12 +264,12 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-eclm-restore
         with:
-          path: ${{ env.MODEL_DIR }}/eCLM
+          path: ./models/eCLM
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_eCLM }}
 
       - if: contains(matrix.config.name, 'eCLM') && steps.cache-eclm-restore.outputs.cache-hit != 'true'
         name: Update eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
-        working-directory: ${{ env.MODEL_DIR }}/eCLM
+        working-directory: ./models/eCLM
         run: |
           git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --eCLM" >> $GITHUB_ENV
@@ -278,7 +278,7 @@ jobs:
         name: Cache eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/eCLM
+          path: ./models/eCLM
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_eCLM }}
 
       #
@@ -289,12 +289,12 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-clm35-restore
         with:
-          path: ${{ env.MODEL_DIR }}/CLM3.5
+          path: ./models/CLM3.5
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_CLM35 }}
 
       - if: contains(matrix.config.name, 'CLM3.5') && steps.cache-clm35-restore.outputs.cache-hit != 'true'
         name: Update CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
-        working-directory: ${{ env.MODEL_DIR }}/CLM3.5
+        working-directory: ./models/CLM3.5
         run: |
           git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --CLM35" >> $GITHUB_ENV
@@ -303,7 +303,7 @@ jobs:
         name: Cache CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/CLM3.5
+          path: ./models/CLM3.5
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_CLM35 }}
 
       #
@@ -314,12 +314,12 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-parflow-restore
         with:
-          path: ${{ env.MODEL_DIR }}/${{ matrix.config.parflow_dir }}
+          path: ./models/${{ matrix.config.parflow_dir }}
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ParFlow }}
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-parflow-restore.outputs.cache-hit != 'true'
         name: Update ParFlow submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
-        working-directory: ${{ env.MODEL_DIR }}/${{ matrix.config.parflow_dir }}
+        working-directory: ./models/${{ matrix.config.parflow_dir }}
         run: |
           git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ParFlow" >> $GITHUB_ENV
@@ -328,7 +328,7 @@ jobs:
         name: Cache ParFlow submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/${{ matrix.config.parflow_dir }}
+          path: ./models/${{ matrix.config.parflow_dir }}
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ParFlow }}
 
       #
@@ -339,12 +339,12 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-icon-restore
         with:
-          path: ${{ env.MODEL_DIR }}/icon
+          path: ./models/icon
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ICON }}
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-icon-restore.outputs.cache-hit != 'true'
         name: Update ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
-        working-directory: ${{ env.MODEL_DIR }}/icon
+        working-directory: ./models/icon
         run: |
           git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --ICON" >> $GITHUB_ENV
@@ -353,7 +353,7 @@ jobs:
         name: Cache ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/icon
+          path: ./models/icon
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_ICON }}
 
       #
@@ -364,12 +364,12 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-pdaf-restore
         with:
-          path: ${{ env.MODEL_DIR }}/pdaf
+          path: ./models/pdaf
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_PDAF }}
 
       - if: contains(matrix.config.name, 'PDAF') && steps.cache-pdaf-restore.outputs.cache-hit != 'true'
         name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
-        working-directory: ${{ env.MODEL_DIR }}/pdaf
+        working-directory: ./models/pdaf
         run: |
           git submodule update --init --force .
           echo "TSMP2_MODEL_OPTS=${TSMP2_MODEL_OPTS} --PDAF" >> $GITHUB_ENV
@@ -378,16 +378,16 @@ jobs:
         name: Cache PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/pdaf
+          path: ./models/pdaf
           key: cache-${{ matrix.config.name }}-${{ steps.model-versions.outputs.VER_PDAF }}
 
       #
       # TSMP2
       #
       - name: Verify component model versions
-        working-directory: ${{ env.MODEL_DIR }}
+        working-directory: ./models
         run: |
-          pwd
+          realpath .. && tree -L 2 ..
           git submodule foreach 'git rev-parse HEAD'
           echo ""
           git submodule status | grep -vE "^-"
