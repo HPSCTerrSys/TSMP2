@@ -424,7 +424,7 @@ jobs:
           git submodule status | grep -vE "^-"
 
       - name: Check TSMP2 dependencies
-        path: ${{ env.DEPENDENCIES_ROOT }}
+        working-directory: ${{ env.DEPENDENCIES_ROOT }}
         run: |
           tree -L 2 .
           CMAKE_PREFIX_PATH=$(ls -1 | xargs realpath | paste -sd ":" -)
