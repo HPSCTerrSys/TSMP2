@@ -174,11 +174,11 @@ jobs:
           cd hypre-${VER_HYPRE}/src
 
           # Install
-          ./configure --prefix=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }
+          ./configure --prefix=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
           make -j4 install
 
           # Verify
-          tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE }
+          tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Cache hypre-${{ env.VER_HYPRE }}
@@ -208,12 +208,12 @@ jobs:
           cd eccodes-${VER_ECCODES}
 
           # Install
-          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }
+          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES}
           cmake --build bld --parallel 4
           cmake --install bld
 
           # Verify
-          tree -L 2 ${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES }
+          tree -L 2 ${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES}
 
       - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
         name: Cache eccodes-${{ env.VER_ECCODES }}
