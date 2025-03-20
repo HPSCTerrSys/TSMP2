@@ -284,7 +284,9 @@ message "== CMAKE INSTALL finished"
 
 ## Copy log and environment
 message "Copying log and environment to install_dir..."
-cp ${tsmp2_env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+if [[ -n "${tsmp2_env}" ]]; then
+  cp ${tsmp2_env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+fi
 cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 
 ## message
