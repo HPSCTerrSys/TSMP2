@@ -98,8 +98,8 @@ jobs:
           cd netcdf-c-${VER_NETCDF_C}
 
           # Install
-          CPPFLAGS=-I/usr/include/hdf5/openmpi
-          LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+          export CPPFLAGS=-I/usr/include/hdf5/openmpi
+          export LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
           ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
           make -j4 install
 
@@ -136,8 +136,8 @@ jobs:
           cd netcdf-fortran-${VER_NETCDF_F90}
 
           # Install
-          CPPFLAGS=-I${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/include
-          LDFLAGS=-L${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/lib
+          export CPPFLAGS=-I${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/include
+          export LDFLAGS=-L${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/lib
           ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
           make -j4 install
 
