@@ -290,7 +290,7 @@ jobs:
         run: |
           pwd && git clone -b $VER_OASIS https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
 
-      - if: matrix.config.use_oasis == 'True' && && steps.cache-oasis-restore.outputs.cache-hit != 'true'
+      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Cache OASIS3-MCT ${{ env.VER_OASIS }}
         uses: actions/cache/save@v4
         with:
