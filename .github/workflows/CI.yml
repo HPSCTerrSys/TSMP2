@@ -56,6 +56,7 @@ jobs:
       VER_NETCDF_F90: 4.6.1
       VER_HYPRE: 2.26.0
       VER_ECCODES: 2.40.0
+      VER_OASIS: tsmp-patches-v0.1
 
     steps:
       - uses: actions/checkout@v4
@@ -276,10 +277,25 @@ jobs:
       # OASIS3-MCT
       #
       - if: matrix.config.use_oasis == 'True'
+        name: Restore cached OASIS3-MCT ${{ env.VER_OASIS }}
+        uses: actions/cache/restore@v4
+        id: cache-oasis-restore
+        with:
+          path: ${{ env.TSMP2_ROOT }}/oasis3-mct
+          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}
+
+      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Update OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
-        working-directory: ${{ env.TSMP2_ROOT }}/models/oasis3-mct
+        working-directory: ${{ env.TSMP2_ROOT }}
         run: |
-          pwd && git submodule update --init --force .
+          pwd && git clone -b $VER_OASIS https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
+
+      - if: matrix.config.use_oasis == 'True' && && steps.cache-oasis-restore.outputs.cache-hit != 'true'
+        name: Cache OASIS3-MCT ${{ env.VER_OASIS }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.TSMP2_ROOT }}/oasis3-mct
+          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}
 
       #
       # eCLM
@@ -334,6 +350,9 @@ jobs:
         run: |
           pwd && ls
           git submodule foreach 'git rev-parse HEAD'
+          if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
+            echo "OASIS3-MCT version: $(git -C ../oasis3-mct describe --tags --always)"
+          fi
           echo ""
           git submodule status | grep -vE "^-"
 
@@ -350,6 +369,10 @@ jobs:
       #
       - name: Build ${{ matrix.config.name }}
         run: |
-          echo "Model combination: ${{ matrix.config.model_opts }}"
+          MODEL_OPTS="${{ matrix.config.model_opts }}"
+          if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
+            MODEL_OPTS="${MODEL_OPTS} --OASIS_SRC ${TSMP2_ROOT}/oasis3-mct"
+          fi
+          echo "Model options: ${MODEL_OPTS}"
           ./build_tsmp2.sh ${{ matrix.config.model_opts }} --no_update --compiler gnu
           tree -L 4 bin
