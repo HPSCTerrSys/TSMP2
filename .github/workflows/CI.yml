@@ -3,9 +3,12 @@ name: TSMP2 Build
 # Controls when the action will run.
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches
+      - master
+      - stages-2025-pdaf
 
 jobs:
   eclm_build_job:
@@ -230,46 +233,44 @@ jobs:
         id: model-versions
         working-directory: ${{ env.TSMP2_ROOT }}/models
         run: |
-          pwd && ls
-          git submodule status | cut -c2- | tee model_versions
+          pwd
+          echo ""
+          git submodule status | cut -c2- | cut -d' ' -f1-2 | tee model_versions
+          echo ""
 
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
-            VER_OASIS=$(cat model_versions | grep "oasis3-mct" | cut -d' ' -f1)
-            echo "VER_OASIS=${VER_OASIS}"
+            VER_OASIS=$(cat model_versions | grep -w "oasis3-mct" | cut -d' ' -f1)
+            echo "${VER_OASIS} => VER_OASIS"
             echo "VER_OASIS=${VER_OASIS}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"eCLM"* ]]; then
-            VER_eCLM=$(cat model_versions | grep "eCLM" | cut -d' ' -f1)
-            echo "VER_eCLM=${VER_eCLM}"
+            VER_eCLM=$(cat model_versions | grep -w "eCLM" | cut -d' ' -f1)
+            echo "${VER_eCLM} => VER_eCLM"
             echo "VER_eCLM=${VER_eCLM}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"CLM3.5"* ]]; then
-            VER_CLM35=$(cat model_versions | grep "CLM3.5" | cut -d' ' -f1)
-            echo "VER_CLM35=${VER_CLM35}"
+            VER_CLM35=$(cat model_versions | grep -w "CLM3.5" | cut -d' ' -f1)
+            echo "${VER_CLM35} => VER_CLM35"
             echo "VER_CLM35=${VER_CLM35}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"ParFlow"* ]]; then
-            if [[ "${{ matrix.config.name }}" != *"PDAF"* ]]; then
-              VER_ParFlow=$(cat model_versions | grep "${{ matrix.config.parflow_dir }}"  | grep -v "pdaf" | cut -d' ' -f1)
-            else
-              VER_ParFlow=$(cat model_versions | grep "${{ matrix.config.parflow_dir }}"  | cut -d' ' -f1)
-            fi
-            echo "VER_ParFlow=${VER_ParFlow}"
+            VER_ParFlow=$(cat model_versions | grep -w "${{ matrix.config.parflow_dir }}"  | cut -d' ' -f1)
+            echo "${VER_ParFlow} => VER_ParFlow"
             echo "VER_ParFlow=${VER_ParFlow}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"ICON"* ]]; then
-            VER_ICON=$(cat model_versions | grep "icon" | cut -d' ' -f1)
-            echo "VER_ICON=${VER_ICON}"
+            VER_ICON=$(cat model_versions | grep -w "icon" | cut -d' ' -f1)
+            echo "${VER_ICON} => VER_ICON"
             echo "VER_ICON=${VER_ICON}" >> $GITHUB_OUTPUT
           fi
 
           if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
-            VER_PDAF=$(cat model_versions | grep "pdaf" | grep -v "parflow_pdaf" | cut -d' ' -f1)
-            echo "VER_PDAF=${VER_PDAF}"
+            VER_PDAF=$(cat model_versions | grep -w "pdaf" | cut -d' ' -f1)
+            echo "${VER_PDAF} => VER_PDAF"
             echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_OUTPUT
           fi
 
@@ -346,15 +347,13 @@ jobs:
       # Pre-build checks
       #
       - name: Check component model versions
-        working-directory: ${{ env.TSMP2_ROOT }}/models
+        working-directory: ${{ env.TSMP2_ROOT }}
         run: |
-          pwd && ls
-          git submodule foreach 'git rev-parse HEAD'
+          git submodule foreach 'git describe --tags --always && echo ""'
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
-            echo "OASIS3-MCT version: $(git -C ../oasis3-mct describe --tags --always)"
+            echo "Entering 'oasis3-mct'"
+            echo "$(git -C oasis3-mct describe --tags --always)"
           fi
-          echo ""
-          git submodule status | grep -vE "^-"
 
       - name: Check TSMP2 dependencies
         working-directory: ${{ env.DEPENDENCIES_ROOT }}
