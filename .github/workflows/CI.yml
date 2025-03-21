@@ -355,9 +355,9 @@ jobs:
       - name: Check TSMP2 dependencies
         working-directory: ${{ env.DEPENDENCIES_ROOT }}
         run: |
-          tree -L 2 .
+          tree -FUCh --du -L 2 $(pwd)
           CMAKE_PREFIX_PATH=$(ls -1 | xargs realpath | paste -sd ":" -)
-          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+          echo "" && echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> $GITHUB_ENV
 
       #
@@ -369,8 +369,9 @@ jobs:
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
             MODEL_OPTS="${MODEL_OPTS} --OASIS_SRC ${TSMP2_ROOT}/oasis3-mct"
           fi
-          echo "Model options: ${MODEL_OPTS}"
-          ./build_tsmp2.sh ${MODEL_OPTS} --no_update --compiler gnu
+          BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update --compiler gnu"
+          echo $BUILD_TSMP2_CMD && echo ""
+          eval $BUILD_TSMP2_CMD
 
       - name: Check installed binaries
         working-directory: ${{ env.TSMP2_ROOT }}/bin
