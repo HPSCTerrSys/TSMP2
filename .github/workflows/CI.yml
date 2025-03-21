@@ -371,4 +371,8 @@ jobs:
           fi
           echo "Model options: ${MODEL_OPTS}"
           ./build_tsmp2.sh ${MODEL_OPTS} --no_update --compiler gnu
-          tree -L 4 bin
+
+      - name: Check installed binaries
+        working-directory: ${{ env.TSMP2_ROOT }}/bin
+        run: |
+          tree -FUCh --du -L 3 $(pwd)
