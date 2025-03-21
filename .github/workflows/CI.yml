@@ -3,12 +3,9 @@ name: TSMP2 Build
 # Controls when the action will run.
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches
-      - master
-      - stages-2025-pdaf
+    branches: [ master, stages-2025-pdaf ]
 
 jobs:
   eclm_build_job:
