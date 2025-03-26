@@ -5,7 +5,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master, stages-2025-pdaf ]
+    branches: [ master, stages-2025 ]
 
 jobs:
   eclm_build_job:
