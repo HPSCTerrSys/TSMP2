@@ -4,8 +4,8 @@
 	branch = icon-2024.07-public_coup-oas
 [submodule "models/parflow"]
 	path = models/parflow
-	url = https://github.com/parflow/parflow.git
-	branch = master
+	url = https://github.com/HPSCTerrSys/parflow
+	branch = openmp-flag-fix
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
@@ -30,3 +30,5 @@
 	path = models/cosmo5.01_fresh
 	url = https://gitlab.jsc.fz-juelich.de/sdlts/tsmp_components_mirrors/cosmo5.01_fresh.git
 	branch = tsmp-oasis
+[submodule "models/parflow/"]
+	branch = openmp-flag-fix
