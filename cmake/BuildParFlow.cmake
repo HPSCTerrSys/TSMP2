@@ -78,9 +78,9 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                -DHYPRE_ROOT=${HYPRE_ROOT}
+                -DPARFLOW_ENABLE_HYPRE=ON
                 -DNETCDF_DIR=${NetCDF_C_ROOT}
-                -DPARFLOW_AMPS_SEQUENTIAL_IO=on
+                -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
                 -DPARFLOW_ENABLE_TIMING=TRUE
                 -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
