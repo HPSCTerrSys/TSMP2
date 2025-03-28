@@ -1,6 +1,3 @@
-find_package(NetCDF REQUIRED)
-find_package(Hypre REQUIRED)
-
 # Choose which CLM to enable
 if(DEFINED eCLM_SRC)
     list(APPEND PF_CLM_FLAGS -DPARFLOW_AMPS_LAYER=oas3
@@ -79,7 +76,7 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                 -DPARFLOW_ENABLE_HYPRE=ON
-                -DNETCDF_DIR=${NetCDF_C_ROOT}
+                -DPARFLOW_ENABLE_NETCDF=ON
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
                 -DPARFLOW_ENABLE_TIMING=TRUE
                 -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
