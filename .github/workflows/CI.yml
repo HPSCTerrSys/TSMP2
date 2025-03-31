@@ -360,6 +360,12 @@ jobs:
           echo "" && echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> $GITHUB_ENV
 
+      - name: Check installed NetCDF files
+        working-directory: ${{ env.DEPENDENCIES_ROOT }}
+        run: |
+          tree /home/runner/work/TSMP2/TSMP2/dependencies/netcdf-c-4.9.2
+          tree /home/runner/work/TSMP2/TSMP2/dependencies/netcdf-f90-4.6.1
+
       #
       # Build TSMP2
       #
