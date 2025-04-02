@@ -21,7 +21,7 @@
 [submodule "models/oasis3-mct"]
         path = models/oasis3-mct
         url = https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
-	branch = v5.0_patched
+	branch = v5.0_patched_debug_netcdf
 [submodule "models/CLM3.5"]
 	path = models/CLM3.5
 	url = https://github.com/HPSCTerrSys/CLM3.5.git
