@@ -194,7 +194,7 @@ else
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname); fi
+if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname -s | sed 's/[0-9]*$//'); fi
 
 BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
 if [ -z "${build_dir}" ]; then
