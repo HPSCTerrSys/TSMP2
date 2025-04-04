@@ -104,7 +104,7 @@ ExternalProject_Add(ICON
                       MPI_LAUNCH=${MPIEXEC_EXECUTABLE}
                       --prefix=${CMAKE_INSTALL_PREFIX}
                       ${EXTRA_CONFIG_ARGS}
-    BUILD_COMMAND     make install
+    BUILD_COMMAND     make -j8 install
     INSTALL_COMMAND   ""
     BUILD_ALWAYS      YES
     DEPENDS           ${MODEL_DEPENDENCIES}
