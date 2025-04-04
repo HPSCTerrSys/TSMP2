@@ -219,14 +219,20 @@ build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log
 
 ## source environment if on JSC or env file is provided
 if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" ) ]]; then
-  # Make the --compiler option work only for Stages/2025.
-  # We still want to keep Stages/2024 the default Stage.
   if [[ "${compiler}" == "gnu" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
   elif [[ "${compiler}" == "intel" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
   else
-    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2024_Intel.sh"
+    # Set machine-specific default environment
+    if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
+      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
+    elif [[ ($SYSTEMNAME = "jedi" ) ]]; then
+      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
+    # TODO: Add Marvin here
+    #elif [[ ($SYSTEMNAME = "marvin" ) ]]; then
+    #  tsmp2_env="${cmake_tsmp2_dir}/env/uni-bonn.gnu.openmpi"
+    fi
   fi
 fi
 if [ -n "${tsmp2_env}" ]; then
