@@ -13,7 +13,7 @@ module --force purge
 module use $OTHERSTAGES
 module load Stages/2025
 
-# MPI compilers
+# Primary compiler toolchain
 module load GCC
 module load OpenMPI
 

@@ -40,8 +40,8 @@ export MPI_HOME=$EBROOTOPENMPI
 # Display compiler settings
 module list
 echo "=============== COMPILER SETTINGS  ===============" 
-echo " Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo " MPI lib: $(mpichversion | head -n 1 | tr -d =)"
+echo " Machine: $(scontrol show config | grep ClusterName | awk -F= '{ print $2 }' | cut -c 2-64) on Stages/$STAGE"
+echo " MPI lib: $(mpirun --version | head -n 1)"
 echo "       C: $($CC --version | head -n 1)"
 echo "     C++: $($CXX --version | head -n 1)"
 echo " Fortran: $($FC --version | head -n 1)"
