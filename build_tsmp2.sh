@@ -194,7 +194,13 @@ else
 fi
 
 # set INSTALL and BUILD DIR (neccesary for building)
-if [ -z "${SYSTEMNAME}" ]; then export SYSTEMNAME=$(hostname -s | sed 's/[0-9]*$//'); fi
+if [ -z "${SYSTEMNAME}" ]; then
+   if [ $(command -v sinfo) ]; then
+      export SYSTEMNAME=$(scontrol show config | grep ClusterName | awk -F= '{ print $2 }' | cut -c 2-)
+   else
+      export SYSTEMNAME=$(hostname -s | sed 's/[0-9]*$//')
+   fi
+fi
 
 BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
 if [ -z "${build_dir}" ]; then
@@ -218,7 +224,7 @@ fi # Makefile verbosity
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
 ## source environment if on JSC or env file is provided
-if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" ) ]]; then
+if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" || $SYSTEMNAME = "marvin" ) ]]; then
   if [[ "${compiler}" == "gnu" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
   elif [[ "${compiler}" == "intel" ]]; then
@@ -229,9 +235,8 @@ if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" |
       tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
     elif [[ ($SYSTEMNAME = "jedi" ) ]]; then
       tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
-    # TODO: Add Marvin here
-    #elif [[ ($SYSTEMNAME = "marvin" ) ]]; then
-    #  tsmp2_env="${cmake_tsmp2_dir}/env/uni-bonn.gnu.openmpi"
+    elif [[ ($SYSTEMNAME = "marvin" ) ]]; then
+      tsmp2_env="${cmake_tsmp2_dir}/env/uni-bonn.gnu.openmpi"
     fi
   fi
 fi
