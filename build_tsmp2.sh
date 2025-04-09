@@ -212,10 +212,13 @@ if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" |
     # Set machine-specific default environment
     if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
       tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
+      compiler="intel"
     elif [[ ($SYSTEMNAME = "jedi" ) ]]; then
       tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
+      compiler="gnu"
     elif [[ ($SYSTEMNAME = "marvin" ) ]]; then
       tsmp2_env="${cmake_tsmp2_dir}/env/uni-bonn.gnu.openmpi"
+      compiler="gnu"
     fi
   fi
 fi
