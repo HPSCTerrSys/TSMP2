@@ -193,7 +193,7 @@ else
    exit 1
 fi
 
-# set INSTALL and BUILD DIR (neccesary for building)
+## set SYSTEMNAME if not yet set
 if [ -z "${SYSTEMNAME}" ]; then
    if [ $(command -v sinfo) ]; then
       export SYSTEMNAME=$(scontrol show config | grep ClusterName | awk -F= '{ print $2 }' | cut -c 2-)
@@ -202,28 +202,7 @@ if [ -z "${SYSTEMNAME}" ]; then
    fi
 fi
 
-BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
-if [ -z "${build_dir}" ]; then
-  cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
-else
-  cmake_build_dir="${build_dir}"
-fi # build_dir
-
-if [ -z "${install_dir}" ]; then
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${BUILD_ID}"
-else
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
-fi # install_dir
-
-if [ -z "${verbose_makefile}" ]; then
-  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
-else
-  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
-fi # Makefile verbosity
-
-build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
-
-## source environment if on JSC or env file is provided
+## set the environment for known machines if no env file is provided
 if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" || $SYSTEMNAME = "marvin" ) ]]; then
   if [[ "${compiler}" == "gnu" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
@@ -240,6 +219,8 @@ if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" |
     fi
   fi
 fi
+
+## source environment if on a known machine or env file is provided
 if [ -n "${tsmp2_env}" ]; then
   message "Sourcing environment..."
   tsmp2_env="$(realpath "${tsmp2_env}")"
@@ -250,6 +231,33 @@ if [ -n "${tsmp2_env}" ]; then
     source "$tsmp2_env"
   fi
 fi
+
+## set STAGE for non-JSC machines
+if [[ ($SYSTEMNAME = "marvin" ) ]]; then
+  STAGE="${EBVERSIONGOMPI}${EBVERSIONIIMPI}"
+fi
+
+## set INSTALL and BUILD DIR (necessary for building)
+BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
+if [ -z "${build_dir}" ]; then
+  cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
+else
+  cmake_build_dir="${build_dir}"
+fi
+
+if [ -z "${install_dir}" ]; then
+  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${BUILD_ID}"
+else
+  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
+fi
+
+if [ -z "${verbose_makefile}" ]; then
+  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
+else
+  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
+fi
+
+build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
 ## CMAKE config
 if [[ -d "${cmake_build_dir}" && "${clean_first}" == y ]]; then
