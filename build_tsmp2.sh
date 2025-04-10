@@ -75,7 +75,7 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     read -p "submodule ${submodule_name} aleady exists. Do you want overwrite it? (y/n) " yn
+     read -p "submodule ${submodule_name} aleady exists. Do you want to overwrite it? (y/N) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
@@ -263,11 +263,23 @@ fi
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
 ## CMAKE config
-if [[ -d "${cmake_build_dir}" && "${clean_first}" == y ]]; then
-  message "Deleting previous build directory..."
-  rm -rf ${cmake_build_dir}
+if [[ -d "${cmake_build_dir}" ]]; then
+  if [[ "${clean_first}" == y ]]; then
+    message "Deleting previous build directory..."
+    rm -rf ${cmake_build_dir}
+  else
+    read -p "${cmake_build_dir} aleady exists. Do you want to resume existing build? (Y/n) " yn
+    if [ "${yn,}" = "n" ];then
+      message "Deleting previous build directory..."
+      rm -rf ${cmake_build_dir}
+    else
+      message "Resuming previous build $(basename ${cmake_build_dir}.)"
+    fi
+  fi
 fi
+
 mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+message ""
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
