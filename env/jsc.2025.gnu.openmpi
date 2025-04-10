@@ -34,7 +34,11 @@ if [[ "$1" == "--parflowgpu" ]]; then
   module load UCX-settings/RC-CUDA
   module load Hypre/2.31.0
 
-  # TODO: Request JSC to install this package
+  #
+  # Workaround to make ParFlowGPU work. RMM is installed separately, and here we simply expose the path to the RMM binaries.
+  #
+  # RMM install script is at /p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/install_rmm.sh
+  #
   export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/${SYSTEMNAME^^}_$STAGE"
 
   # TODO: Verify these values
