@@ -10,7 +10,7 @@ export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
-export SYSTEMNAME=$(hostname)
+export SYSTEMNAME="UBUNTU"
 export STAGE=$(lsb_release -sr)
 
 # TODO: Find a nicer way of passing dependency information to TSMP2.

@@ -205,17 +205,14 @@ fi
 
 ## set the environment for known machines if no env file is provided
 if [[ -z "${tsmp2_env}" ]]; then
-  if [[ "${compiler}" == "gnu" ]]; then
-    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
-  elif [[ "${compiler}" == "intel" ]]; then
-    tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
-  else
-    tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
-    if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
-      # For now only these 3 machines use the Intel toolchain.
-      compiler="intel"
-    else
-      compiler="gnu"
+  tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
+
+  # Override default if using JSC machines and compiler is explicitly specified
+  if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
+    if [[ "${compiler}" == "gnu" ]]; then
+      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
+    elif [[ "${compiler}" == "intel" ]]; then
+      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
     fi
   fi
 fi
@@ -239,7 +236,14 @@ if [[ ($SYSTEMNAME = "marvin" ) ]]; then
 fi
 
 ## set INSTALL and BUILD DIR (necessary for building)
-BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
+if [[ -z "${compiler}" ]]; then
+  if [[ -n "${DEFAULT_COMPILER}" ]]; then
+    compiler=${DEFAULT_COMPILER}
+    BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
+  else
+    BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${model_id}"
+  fi
+fi
 if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
 else
