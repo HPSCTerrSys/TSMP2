@@ -211,6 +211,12 @@ if [[ -z "${tsmp2_env}" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
   else
     tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
+    if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
+      # For now only these 3 machines use the Intel toolchain.
+      compiler="intel"
+    else
+      compiler="gnu"
+    fi
   fi
 fi
 
