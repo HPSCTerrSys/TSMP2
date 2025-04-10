@@ -194,6 +194,7 @@ else
 fi
 
 ## set SYSTEMNAME if not yet set
+# TODO: Dont' set SYSTEMNAME here! Do this in the machine's env file instead
 if [ -z "${SYSTEMNAME}" ]; then
    if [ $(command -v sinfo) ]; then
       export SYSTEMNAME=$(scontrol show config | grep ClusterName | awk -F= '{ print $2 }' | cut -c 2-)
@@ -203,23 +204,13 @@ if [ -z "${SYSTEMNAME}" ]; then
 fi
 
 ## set the environment for known machines if no env file is provided
-if [[ -z "${tsmp2_env}" && ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" || $SYSTEMNAME = "jedi" || $SYSTEMNAME = "marvin" ) ]]; then
+if [[ -z "${tsmp2_env}" ]]; then
   if [[ "${compiler}" == "gnu" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
   elif [[ "${compiler}" == "intel" ]]; then
     tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
   else
-    # Set machine-specific default environment
-    if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
-      compiler="intel"
-    elif [[ ($SYSTEMNAME = "jedi" ) ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
-      compiler="gnu"
-    elif [[ ($SYSTEMNAME = "marvin" ) ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/uni-bonn.gnu.openmpi"
-      compiler="gnu"
-    fi
+    tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
   fi
 fi
 
@@ -236,6 +227,7 @@ if [ -n "${tsmp2_env}" ]; then
 fi
 
 ## set STAGE for non-JSC machines
+# TODO: Dont' set SYSTEMNAME here! Do this in the machine's env file instead
 if [[ ($SYSTEMNAME = "marvin" ) ]]; then
   STAGE="${EBVERSIONGOMPI}${EBVERSIONIIMPI}"
 fi
