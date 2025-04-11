@@ -28,7 +28,7 @@ list(APPEND CLM35_CONFIG_OPTS -verbose)
 
 set(CLM35_FFLAGS "-I${CMAKE_BINARY_DIR}/CLM3_5/bld")
 if (BUILD_OASIS)
-  list(APPEND CLM35_FFLAGS " -I${OASIS_ROOT}/include")
+  string(APPEND CLM35_FFLAGS " -I${OASIS_ROOT}/include")
 endif()
 list(APPEND CLM35_CONFIG_OPTS -fflags ${CLM35_FFLAGS})
 
