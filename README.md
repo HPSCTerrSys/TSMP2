@@ -119,7 +119,7 @@ below:
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone -b beta-0.1 https://github.com/HPSCTerrSys/eCLM.git models/eCLM
+git clone -b beta-0.2 https://github.com/HPSCTerrSys/eCLM.git models/eCLM
 eCLM_SRC=`realpath models/eCLM`
 
 # ICON
