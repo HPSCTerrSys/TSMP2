@@ -193,16 +193,6 @@ else
    exit 1
 fi
 
-## set SYSTEMNAME if not yet set
-# TODO: Dont' set SYSTEMNAME here! Do this in the machine's env file instead
-if [ -z "${SYSTEMNAME}" ]; then
-   if [ $(command -v sinfo) ]; then
-      export SYSTEMNAME=$(scontrol show config | grep ClusterName | awk -F= '{ print $2 }' | cut -c 2-)
-   else
-      export SYSTEMNAME=$(hostname -s | sed 's/[0-9]*$//')
-   fi
-fi
-
 ## set the environment for known machines if no env file is provided
 if [[ -z "${tsmp2_env}" ]]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
@@ -227,12 +217,6 @@ if [ -n "${tsmp2_env}" ]; then
   else
     source "$tsmp2_env"
   fi
-fi
-
-## set STAGE for non-JSC machines
-# TODO: Dont' set SYSTEMNAME here! Do this in the machine's env file instead
-if [[ ($SYSTEMNAME = "marvin" ) ]]; then
-  STAGE="${EBVERSIONGOMPI}${EBVERSIONIIMPI}"
 fi
 
 ## set INSTALL and BUILD DIR (necessary for building)
