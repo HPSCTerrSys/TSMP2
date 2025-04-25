@@ -25,7 +25,7 @@ list(APPEND CLM35_CONFIG_OPTS -rtm off)
 list(APPEND CLM35_CONFIG_OPTS -spmd)
 list(APPEND CLM35_CONFIG_OPTS -smp)
 
-if(${ParFlow})
+if(${ParFlow} OR ${ParFlowGPU})
   list(APPEND CLM35_CONFIG_OPTS -oas3_pfl)
 endif()
 if(${COSMO})

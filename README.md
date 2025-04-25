@@ -37,6 +37,9 @@ To build a model component one need to activate the component model `--<COMP>`. 
 
 # ICON (with source code)
 ./build_tsmp2.sh --ICON --ICON_SRC ${ICON_SRC}
+
+# ParFlow on Marvin (Uni Bonn)
+./build_tsmp2.sh --ParFlow --tsmp2_env env/uni-bonn.gnu.openmpi
 ```
 
 
@@ -116,7 +119,7 @@ below:
 ## NOTE: Download only the component models that you need! ##
 
 # eCLM
-git clone -b beta-0.1 https://github.com/HPSCTerrSys/eCLM.git models/eCLM
+git clone -b beta-0.2 https://github.com/HPSCTerrSys/eCLM.git models/eCLM
 eCLM_SRC=`realpath models/eCLM`
 
 # ICON

@@ -6,7 +6,7 @@ endif()
 # Count how many component models shoul be build, and if >=2 compile with OASIS
 function(check_build_oasis BUILD_OASIS)
    # Combine all options into a list
-   list(APPEND COMPONENT_MODELS ICON COSMO eCLM CLM3.5 ParFlow)
+   list(APPEND COMPONENT_MODELS ICON COSMO eCLM CLM3.5 ParFlow ParFlowGPU)
    # Count enabled models
    set(MODELCOUNT 0)
    foreach(comp_model IN LISTS COMPONENT_MODELS)
