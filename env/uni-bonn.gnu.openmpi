@@ -31,7 +31,8 @@ module load Tcl/8.6.13-GCCcore-12.3.0
 # ICON additional libraries
 module load ecCodes/2.31.0-gompi-2023a
 
-# Set STAGE for Marvin
+# Set SYSTEMNAME and STAGE for Marvin
+export SYSTEMNAME="Marvin"
 export STAGE="${EBVERSIONGOMPI}${EBVERSIONIIMPI}"
 
 # Set default compilers
