@@ -227,15 +227,16 @@ if [[ -d "${cmake_build_dir}" ]]; then
     rm -rf ${cmake_build_dir}
   elif [[ -f "${cmake_build_dir}/default.env" ]]; then
     build_env=$(realpath ${cmake_build_dir}/default.env)
+    bd=$(basename ${cmake_build_dir})
     if [[ "${build_env}" == "${TSMP2_ENV_FILE}" ]]; then
       # Case 2: Resume an existing build using the same environment it previously used.
-      message "Resuming build at $(basename ${cmake_build_dir}) ... "
+      message "Resuming build at ${bd} ... "
     else
       # Case 3: Existing build was configured with a different environment.
-      message "WARNING: Existing build directory $(basename ${cmake_build_dir}) was configured with the environment '$(basename ${build_env})' which is different from the current environment '$(basename ${TSMP2_ENV_FILE})'."
-      read -p "Do you want to overwrite existing build? (y/N) " yn
+      message "WARNING: Existing build directory ${bd} uses '$(basename ${build_env})' which is different from the current environment '$(basename ${TSMP2_ENV_FILE})'."
+      read -p "Do you want to overwrite ${bd}? (y/N) " yn
       if [ "${yn,}" = "y" ];then
-        message "Deleting previous build directory $(basename ${cmake_build_dir}) ..."
+        message "Deleting previous build directory ${bd} ..."
         rm -rf ${cmake_build_dir}
       else
         message "Halting build_tsmp2.sh. Either re-run build_tsmp2.sh with \"--env ${build_env}\", or backup/delete '${cmake_build_dir}' first before re-running build_tsmp2.sh."
@@ -253,32 +254,35 @@ fi
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
 #
-# 3. Set the rest of the CMake options
+# 4. Set the rest of the CMake options
 #
 message "Setting CMAKE options..."
 if [[ -z "$build_type" ]];then
    build_type="RELEASE"
 fi
 if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" ]]; then
-   cmake_build_type=" -DCMAKE_BUILD_TYPE=${build_type^^}"
+   cmake_build_type="${build_type^^}"
 else
    echo "ABORT: Unsupported build_type=${build_type}"
    exit 1
 fi
 
 if [ -z "${verbose_makefile}" ]; then
-  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
+  cmake_verbose_makefile="OFF" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
 else
-  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
+  cmake_verbose_makefile="ON"
 fi
 
 if [ -z "${install_dir}" ]; then
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${BUILD_ID}"
+  cmake_install_dir="${cmake_tsmp2_dir}/bin/${BUILD_ID}"
 else
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
+  cmake_install_dir="${install_dir}"
 fi
-mkdir -p $( echo "${cmake_install_dir}" |cut -d\= -f2)
+mkdir -p "${cmake_install_dir}"
 
+#
+# 5. CMake configure
+#
 message ""
 message "===================="
 message "== TSMP2 settings =="
@@ -289,21 +293,21 @@ message "TSMP2_ENV: ${TSMP2_ENV_FILE}"
 message "BUILD_DIR: $cmake_build_dir"
 message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
-message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_install_dir} ${cmake_verbose_makefile} |& tee ${build_log} "
+cmake_conf="cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}"
+cmake_conf+=" -DCMAKE_BUILD_TYPE=${cmake_build_type}"
+cmake_conf+=" -DCMAKE_INSTALL_PREFIX=${cmake_install_dir}"
+cmake_conf+=" -DCMAKE_VERBOSE_MAKEFILE=${cmake_verbose_makefile}"
+cmake_conf+=" ${cmake_comp_str}"
+cmake_conf+=" ${cmake_compsrc_str}"
+cmake_conf+=" |& tee ${build_log}"
+message "${cmake_conf}"
 message "== CMAKE GENERATE PROJECT start"
-
-cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
-      ${cmake_build_type} \
-      ${cmake_comp_str} \
-      ${cmake_compsrc_str} \
-      ${cmake_install_dir} \
-      ${cmake_verbose_makefile} \
-      |& tee ${build_log}
-
+eval "${cmake_conf}"
 message "== CMAKE GENERATE PROJECT finished"
 
-## Build and install
-
+#
+# 6. CMake build and install
+#
 message "CMAKE build:"
 message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
 message "== CMAKE BUILD start"
@@ -316,14 +320,15 @@ message "== CMAKE INSTALL start"
 cmake --install ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE INSTALL finished"
 
-## Copy log and environment
-message "Copying log and environment to install_dir..."
+#
+# 7. Post-installation steps
+#
+message "Copying build log and environment file to ${cmake_install_dir}..."
 if [[ -n "${env}" ]]; then
-  cp ${env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+  cp -v ${TSMP2_ENV_FILE} ${cmake_install_dir}
 fi
-cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+cp -v ${build_log} ${cmake_install_dir}
 
-## message
 message "Log can be found in: ${build_log}"
 message "Model environment used: ${TSMP2_ENV_FILE}"
-message "Model binaries can be found in: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
+message "Model binaries can be found in: ${cmake_install_dir}"
