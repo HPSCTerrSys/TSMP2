@@ -124,7 +124,7 @@ while [[ "$#" -gt 0 ]]; do
     --build_type) build_type="$2"; shift ;;
     --build_dir) build_dir="$2"; shift ;;
     --install_dir) install_dir="$2"; shift ;;
-    --env) tsmp2_env="$2"; shift ;;
+    --env) env="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
@@ -166,7 +166,9 @@ set_compsrc pdaf_src "PDAF_SRC"
 set_compsrc cosmo_src "COSMO_SRC"
 set_compsrc clm35_src "CLM35_SRC"
 
-## download model components
+#
+# 1. Download model components
+#
 if [ "${update_compsrc}" != n ]; then
   dwn_compsrc icon icon_src "icon"
   dwn_compsrc eclm eclm_src "eCLM"
@@ -177,12 +179,84 @@ if [ "${update_compsrc}" != n ]; then
   dwn_compsrc clm35 clm35_src "CLM3.5"
 fi
 
+#
+# 2. Source environment file
+#
 
-## CMAKE options
+# Use default environment file if --env is empty
+if [[ -z "${env}" ]]; then
+  env="${cmake_tsmp2_dir}/env/default.2025.env"
+fi
+
+# Check if the supplied environment file actually exists.
+if [[ -f "${env}" ]]; then
+  if [[ -z "${TSMP2_ENV_FILE}" ]]; then
+    TSMP2_ENV_FILE=$(realpath ${env})
+  fi
+else
+  message "ERROR: Environment file \"${env}\" not found". 
+  exit 1
+fi
+
+if [[ -n "${env}" ]]; then
+  message "Sourcing environment..."
+
+  # TODO: Fix this GPU thing on another PR
+  if [[ "$parflowGPU" == "y" ]];then
+    source "${env}" --parflowgpu
+  else
+    source "${env}"
+  fi
+fi
+
+#
+# 3. Set CMake build directory
+#
+BUILD_ID="${SYSTEMNAME^^}_${model_id}"
+if [[ -z "${build_dir}" ]]; then
+  cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
+else
+  cmake_build_dir="${build_dir}"
+fi
+
+# Decide how to deal with an existing build directory
+if [[ -d "${cmake_build_dir}" ]]; then
+  if [[ "${clean_first}" == y ]]; then
+    # Case 1: User wants to explicitly remove existing build directory
+    message "Deleting previous build directory $(basename ${cmake_build_dir}) ..."
+    rm -rf ${cmake_build_dir}
+  elif [[ -f "${cmake_build_dir}/default.env" ]]; then
+    build_env=$(realpath ${cmake_build_dir}/default.env)
+    if [[ "${build_env}" == "${TSMP2_ENV_FILE}" ]]; then
+      # Case 2: Resume an existing build using the same environment it previously used.
+      message "Resuming build at $(basename ${cmake_build_dir}) ... "
+    else
+      # Case 3: Existing build was configured with a different environment.
+      message "WARNING: Existing build directory $(basename ${cmake_build_dir}) was configured with the environment '$(basename ${build_env})' which is different from the current environment '$(basename ${TSMP2_ENV_FILE})'."
+      read -p "Do you want to overwrite existing build? (y/N) " yn
+      if [ "${yn,}" = "y" ];then
+        message "Deleting previous build directory $(basename ${cmake_build_dir}) ..."
+        rm -rf ${cmake_build_dir}
+      else
+        message "Halting build_tsmp2.sh. Either re-run build_tsmp2.sh with \"--env ${build_env}\", or backup/delete '${cmake_build_dir}' first before re-running build_tsmp2.sh."
+        exit 1
+      fi
+    fi
+  fi
+fi
+
+# Create build folder for fresh builds
+if [[ ! -d "${cmake_build_dir}" ]]; then
+  mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+  ln -sf ${TSMP2_ENV_FILE} ${cmake_build_dir}/default.env
+fi
+build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
+
+#
+# 3. Set the rest of the CMake options
+#
 message "Setting CMAKE options..."
-
-# build_type
-if [ -z "$build_type" ];then
+if [[ -z "$build_type" ]];then
    build_type="RELEASE"
 fi
 if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" ]]; then
@@ -192,30 +266,10 @@ else
    exit 1
 fi
 
-## set the environment for known machines if no env file is provided
-if [[ -z "${tsmp2_env}" ]]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
-fi
-
-## source environment if on a known machine or env file is provided
-if [ -n "${tsmp2_env}" ]; then
-  message "Sourcing environment..."
-  tsmp2_env="$(realpath "${tsmp2_env}")"
-  if [[ "$parflowGPU" == "y" ]];then
-    source "$tsmp2_env" --parflowgpu
-    tsmp2_env="${tsmp2_env} --parflowgpu" # for logging-purposes
-  else
-    source "$tsmp2_env"
-  fi
-fi
-
-## set INSTALL and BUILD DIR (necessary for building)
-BUILD_ID="${SYSTEMNAME^^}_${model_id}"
-
-if [ -z "${build_dir}" ]; then
-  cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
+if [ -z "${verbose_makefile}" ]; then
+  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
 else
-  cmake_build_dir="${build_dir}"
+  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
 fi
 
 if [ -z "${install_dir}" ]; then
@@ -223,39 +277,15 @@ if [ -z "${install_dir}" ]; then
 else
   cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
 fi
+mkdir -p $( echo "${cmake_install_dir}" |cut -d\= -f2)
 
-if [ -z "${verbose_makefile}" ]; then
-  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
-else
-  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
-fi
-
-build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
-
-## CMAKE config
-if [[ -d "${cmake_build_dir}" ]]; then
-  if [[ "${clean_first}" == y ]]; then
-    message "Deleting previous build directory..."
-    rm -rf ${cmake_build_dir}
-  else
-    read -p "${cmake_build_dir} aleady exists. Do you want to resume existing build? (Y/n) " yn
-    if [ "${yn,}" = "n" ];then
-      message "Deleting previous build directory..."
-      rm -rf ${cmake_build_dir}
-    else
-      message "Resuming previous build $(basename ${cmake_build_dir}.)"
-    fi
-  fi
-fi
-
-mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 message ""
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
 message "MODEL_ID: $model_id"
 message "TSMP2_DIR: $cmake_tsmp2_dir"
-message "TSMP2_ENV: $tsmp2_env"
+message "TSMP2_ENV: ${TSMP2_ENV_FILE}"
 message "BUILD_DIR: $cmake_build_dir"
 message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
 message "CMAKE command:"
@@ -288,12 +318,12 @@ message "== CMAKE INSTALL finished"
 
 ## Copy log and environment
 message "Copying log and environment to install_dir..."
-if [[ -n "${tsmp2_env}" ]]; then
-  cp ${tsmp2_env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+if [[ -n "${env}" ]]; then
+  cp ${env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 fi
 cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
 
 ## message
 message "Log can be found in: ${build_log}"
-message "Model environment used: ${tsmp2_env}"
+message "Model environment used: ${TSMP2_ENV_FILE}"
 message "Model binaries can be found in: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
