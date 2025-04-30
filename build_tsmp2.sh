@@ -33,7 +33,7 @@ function help_tsmp2() {
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
-  echo "  --tsmp2_env      Set model environment."
+  echo "  --env            Set model environment."
   echo ""
   echo "Example: $0 --ICON --eCLM --ParFlow"
   exit 1
@@ -122,10 +122,9 @@ while [[ "$#" -gt 0 ]]; do
     --pdaf_src) pdaf_src="$2"; shift ;;
     --oasis_src) oasis_src="$2"; shift ;;
     --build_type) build_type="$2"; shift ;;
-    --compiler) compiler="$2"; shift ;;
     --build_dir) build_dir="$2"; shift ;;
     --install_dir) install_dir="$2"; shift ;;
-    --tsmp2_env) tsmp2_env="$2"; shift ;;
+    --env) tsmp2_env="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
@@ -196,15 +195,6 @@ fi
 ## set the environment for known machines if no env file is provided
 if [[ -z "${tsmp2_env}" ]]; then
   tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
-
-  # Override default if using JSC machines and compiler is explicitly specified
-  if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
-    if [[ "${compiler}" == "gnu" ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
-    elif [[ "${compiler}" == "intel" ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
-    fi
-  fi
 fi
 
 ## source environment if on a known machine or env file is provided
@@ -220,11 +210,6 @@ if [ -n "${tsmp2_env}" ]; then
 fi
 
 ## set INSTALL and BUILD DIR (necessary for building)
-if [[ -z "${compiler}" ]]; then
-  if [[ -n "${DEFAULT_COMPILER}" ]]; then
-    compiler=${DEFAULT_COMPILER}
-  fi
-fi
 BUILD_ID="${SYSTEMNAME^^}_${model_id}"
 
 if [ -z "${build_dir}" ]; then
