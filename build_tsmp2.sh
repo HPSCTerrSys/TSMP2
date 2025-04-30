@@ -29,7 +29,6 @@ function help_tsmp2() {
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
   echo "  --no_update      Skip component model download"
   echo "  --build_type     Set build configuration: 'DEBUG' 'RELEASE'"
-  echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
@@ -299,10 +298,9 @@ cmake_conf+=" -DCMAKE_INSTALL_PREFIX=${cmake_install_dir}"
 cmake_conf+=" -DCMAKE_VERBOSE_MAKEFILE=${cmake_verbose_makefile}"
 cmake_conf+=" ${cmake_comp_str}"
 cmake_conf+=" ${cmake_compsrc_str}"
-cmake_conf+=" |& tee ${build_log}"
-message "${cmake_conf}"
+message "${cmake_conf}" |& tee "${build_log}"
 message "== CMAKE GENERATE PROJECT start"
-eval "${cmake_conf}"
+eval "${cmake_conf}" |& tee -a "${build_log}"
 message "== CMAKE GENERATE PROJECT finished"
 
 #
@@ -329,6 +327,7 @@ if [[ -n "${env}" ]]; then
 fi
 cp -v ${build_log} ${cmake_install_dir}
 
+message ""
 message "Log can be found in: ${build_log}"
 message "Model environment used: ${TSMP2_ENV_FILE}"
 message "Model binaries can be found in: ${cmake_install_dir}"
