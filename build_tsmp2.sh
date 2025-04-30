@@ -225,7 +225,7 @@ if [[ -z "${compiler}" ]]; then
     compiler=${DEFAULT_COMPILER}
   fi
 fi
-BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
+BUILD_ID="${SYSTEMNAME^^}_${model_id}"
 
 if [ -z "${build_dir}" ]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
