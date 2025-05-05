@@ -182,18 +182,25 @@ fi
 # 2. Source environment file
 #
 
-# Use default environment file if --env is empty
-if [[ -z "${env}" ]]; then
+if [[ ! -z "${env}" ]]; then
+  # Case 1: --env is supplied
+  TSMP2_ENV_FILE=$(realpath ${env})
+elif [[ ! -z "${TSMP2_ENV_FILE}" ]]; then
+  # Case 2: Env var TSMP2_ENV_FILE is set
+  message "Detected environment variable TSMP2_ENV_FILE=${TSMP2_ENV_FILE}"
+  env=${TSMP2_ENV_FILE}
+else
+  # Case 3: Neither --env nor TSMP2_ENV_FILE were supplied; use the default env file.
   env="${cmake_tsmp2_dir}/env/default.2025.env"
+  if [[ ! -z "${TSMP2_ENV_FILE}" ]]; then
+    message "ERROR: $(basename ${env}) did not set TSMP2_ENV_FILE.".
+    exit 1
+  fi
 fi
 
 # Check if the supplied environment file actually exists.
-if [[ -f "${env}" ]]; then
-  if [[ -z "${TSMP2_ENV_FILE}" ]]; then
-    TSMP2_ENV_FILE=$(realpath ${env})
-  fi
-else
-  message "ERROR: Environment file \"${env}\" not found". 
+if [[ ! -f "${env}" ]]; then
+  message "ERROR: Environment file \"${env}\" not found".
   exit 1
 fi
 
