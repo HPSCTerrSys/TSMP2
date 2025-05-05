@@ -224,8 +224,8 @@ if [[ -d "${cmake_build_dir}" ]]; then
     # Case 1: User wants to explicitly remove existing build directory
     message "Deleting previous build directory $(basename ${cmake_build_dir}) ..."
     rm -rf ${cmake_build_dir}
-  elif [[ -f "${cmake_build_dir}/default.env" ]]; then
-    build_env=$(realpath ${cmake_build_dir}/default.env)
+  elif [[ -f "${cmake_build_dir}/build.env" ]]; then
+    build_env=$(realpath ${cmake_build_dir}/build.env)
     bd=$(basename ${cmake_build_dir})
     if [[ "${build_env}" == "${TSMP2_ENV_FILE}" ]]; then
       # Case 2: Resume an existing build using the same environment it previously used.
@@ -248,7 +248,7 @@ fi
 # Create build folder for fresh builds
 if [[ ! -d "${cmake_build_dir}" ]]; then
   mkdir -p ${cmake_build_dir}
-  ln -sf ${TSMP2_ENV_FILE} ${cmake_build_dir}/default.env
+  ln -sf ${TSMP2_ENV_FILE} ${cmake_build_dir}/build.env
 fi
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
