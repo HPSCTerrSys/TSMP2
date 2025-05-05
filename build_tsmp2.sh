@@ -247,7 +247,7 @@ fi
 
 # Create build folder for fresh builds
 if [[ ! -d "${cmake_build_dir}" ]]; then
-  mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+  mkdir -p ${cmake_build_dir}
   ln -sf ${TSMP2_ENV_FILE} ${cmake_build_dir}/default.env
 fi
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
@@ -323,9 +323,9 @@ message "== CMAKE INSTALL finished"
 #
 message "Copying build log and environment file to ${cmake_install_dir}..."
 if [[ -n "${env}" ]]; then
-  cp -v ${TSMP2_ENV_FILE} ${cmake_install_dir}
+  cp -v ${TSMP2_ENV_FILE} ${cmake_install_dir}/
 fi
-cp -v ${build_log} ${cmake_install_dir}
+cp -v ${build_log} ${cmake_install_dir}/
 
 message ""
 message "Log can be found in: ${build_log}"
