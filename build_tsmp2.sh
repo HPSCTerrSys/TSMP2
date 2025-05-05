@@ -130,7 +130,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Get tsmp2_dir (full path) from location of $0
-cmake_tsmp2_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cmake_tsmp2_dir=$(dirname $(realpath ${BASH_SOURCE:-$0}))
 
 ## Create MODEL_ID + COMPONENT STRING
 model_id=""
@@ -191,11 +191,8 @@ elif [[ ! -z "${TSMP2_ENV_FILE}" ]]; then
   env=${TSMP2_ENV_FILE}
 else
   # Case 3: Neither --env nor TSMP2_ENV_FILE were supplied; use the default env file.
+  #         The default env file is expected to set TSMP2_ENV_FILE.
   env="${cmake_tsmp2_dir}/env/default.2025.env"
-  if [[ -z "${TSMP2_ENV_FILE}" ]]; then
-    message "ERROR: $(basename ${env}) did not set TSMP2_ENV_FILE."
-    exit 1
-  fi
 fi
 
 # Check if the supplied environment file actually exists.
@@ -213,6 +210,13 @@ if [[ -n "${env}" ]]; then
   else
     source "${env}"
   fi
+fi
+
+# TSMP2_ENV_FILE should be set either (1) through --env, (2) as a shell variable,
+# or (3) via the default environent file.
+if [[ -z "${TSMP2_ENV_FILE}" ]]; then
+  message "ERROR: TSMP2_ENV_FILE is not set."
+  exit 1
 fi
 
 #
