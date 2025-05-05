@@ -192,8 +192,8 @@ elif [[ ! -z "${TSMP2_ENV_FILE}" ]]; then
 else
   # Case 3: Neither --env nor TSMP2_ENV_FILE were supplied; use the default env file.
   env="${cmake_tsmp2_dir}/env/default.2025.env"
-  if [[ ! -z "${TSMP2_ENV_FILE}" ]]; then
-    message "ERROR: $(basename ${env}) did not set TSMP2_ENV_FILE.".
+  if [[ -z "${TSMP2_ENV_FILE}" ]]; then
+    message "ERROR: $(basename ${env}) did not set TSMP2_ENV_FILE."
     exit 1
   fi
 fi
