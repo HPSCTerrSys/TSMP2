@@ -334,9 +334,9 @@ message "== CMAKE INSTALL finished"
 #
 message "Copying build log and environment file to ${cmake_install_dir}..."
 if [[ -n "${env}" ]]; then
-  cp -v ${TSMP2_ENV_FILE} ${cmake_install_dir}/
+  cp ${TSMP2_ENV_FILE} ${cmake_install_dir}
 fi
-cp -v ${build_log} ${cmake_install_dir}/
+cp ${build_log} ${cmake_install_dir}
 
 message ""
 message "Log can be found in: ${build_log}"
