@@ -278,7 +278,7 @@ else
 fi
 
 if [ -z "${verbose_makefile}" ]; then
-  cmake_verbose_makefile="OFF" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
+  cmake_verbose_makefile="OFF"
 else
   cmake_verbose_makefile="ON"
 fi
@@ -303,15 +303,15 @@ message "TSMP2_ENV: ${TSMP2_ENV_FILE}"
 message "BUILD_DIR: $cmake_build_dir"
 message "INSTALL_DIR: ${cmake_install_dir}"
 message "CMAKE command:"
-cmake_conf="cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}"
+cmake_conf="-S ${cmake_tsmp2_dir} -B ${cmake_build_dir}"
 cmake_conf+=" -DCMAKE_BUILD_TYPE=${cmake_build_type}"
 cmake_conf+=" -DCMAKE_INSTALL_PREFIX=${cmake_install_dir}"
 cmake_conf+=" -DCMAKE_VERBOSE_MAKEFILE=${cmake_verbose_makefile}"
 cmake_conf+=" ${cmake_comp_str}"
 cmake_conf+=" ${cmake_compsrc_str}"
-message "${cmake_conf}" |& tee "${build_log}"
+message "cmake ${cmake_conf}" |& tee "${build_log}"
 message "== CMAKE GENERATE PROJECT start"
-eval "${cmake_conf}" |& tee -a "${build_log}"
+cmake ${cmake_conf} |& tee -a "${build_log}"
 message "== CMAKE GENERATE PROJECT finished"
 
 #
