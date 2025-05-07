@@ -29,11 +29,10 @@ function help_tsmp2() {
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
   echo "  --no_update      Skip component model download"
   echo "  --build_type     Set build configuration: 'DEBUG' 'RELEASE'"
-  echo "  --compiler       Set compiler for building"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
-  echo "  --tsmp2_env      Set model environment."
+  echo "  --env            Set model environment."
   echo ""
   echo "Example: $0 --ICON --eCLM --ParFlow"
   exit 1
@@ -122,17 +121,16 @@ while [[ "$#" -gt 0 ]]; do
     --pdaf_src) pdaf_src="$2"; shift ;;
     --oasis_src) oasis_src="$2"; shift ;;
     --build_type) build_type="$2"; shift ;;
-    --compiler) compiler="$2"; shift ;;
     --build_dir) build_dir="$2"; shift ;;
     --install_dir) install_dir="$2"; shift ;;
-    --tsmp2_env) tsmp2_env="$2"; shift ;;
+    --env) env="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
 done
 
 # Get tsmp2_dir (full path) from location of $0
-cmake_tsmp2_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cmake_tsmp2_dir=$(dirname $(realpath ${BASH_SOURCE:-$0}))
 
 ## Create MODEL_ID + COMPONENT STRING
 model_id=""
@@ -167,7 +165,9 @@ set_compsrc pdaf_src "PDAF_SRC"
 set_compsrc cosmo_src "COSMO_SRC"
 set_compsrc clm35_src "CLM35_SRC"
 
-## download model components
+#
+# 1. Download model components
+#
 if [ "${update_compsrc}" != n ]; then
   dwn_compsrc icon icon_src "icon"
   dwn_compsrc eclm eclm_src "eCLM"
@@ -178,117 +178,145 @@ if [ "${update_compsrc}" != n ]; then
   dwn_compsrc clm35 clm35_src "CLM3.5"
 fi
 
+#
+# 2. Source environment file
+#
 
-## CMAKE options
-message "Setting CMAKE options..."
-
-# build_type
-if [ -z "$build_type" ];then
-   build_type="RELEASE"
-fi
-if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" ]]; then
-   cmake_build_type=" -DCMAKE_BUILD_TYPE=${build_type^^}"
+if [[ ! -z "${env}" ]]; then
+  # Case 1: --env is supplied
+  TSMP2_ENV_FILE=$(realpath ${env})
+elif [[ ! -z "${TSMP2_ENV_FILE}" ]]; then
+  # Case 2: Env var TSMP2_ENV_FILE is set
+  message "Detected environment variable TSMP2_ENV_FILE=${TSMP2_ENV_FILE}"
+  env=${TSMP2_ENV_FILE}
 else
-   echo "ABORT: Unsupported build_type=${build_type}"
-   exit 1
+  # Case 3: Neither --env nor TSMP2_ENV_FILE were supplied; use the default env file.
+  #         The default env file is expected to set TSMP2_ENV_FILE.
+  env="${cmake_tsmp2_dir}/env/default.2025.env"
 fi
 
-## set the environment for known machines if no env file is provided
-if [[ -z "${tsmp2_env}" ]]; then
-  tsmp2_env="${cmake_tsmp2_dir}/env/default.2025.env"
-
-  # Override default if using JSC machines and compiler is explicitly specified
-  if [[ ($SYSTEMNAME = "jurecadc" || $SYSTEMNAME = "juwels" || $SYSTEMNAME = "jusuf" ) ]]; then
-    if [[ "${compiler}" == "gnu" ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.gnu.openmpi"
-    elif [[ "${compiler}" == "intel" ]]; then
-      tsmp2_env="${cmake_tsmp2_dir}/env/jsc.2025.intel.psmpi"
-    fi
-  fi
+# Check if the supplied environment file actually exists.
+if [[ ! -f "${env}" ]]; then
+  message "ERROR: Environment file \"${env}\" not found".
+  exit 1
 fi
 
-## source environment if on a known machine or env file is provided
-if [ -n "${tsmp2_env}" ]; then
+if [[ -n "${env}" ]]; then
   message "Sourcing environment..."
-  tsmp2_env="$(realpath "${tsmp2_env}")"
+
+  # TODO: Fix this GPU thing on another PR
   if [[ "$parflowGPU" == "y" ]];then
-    source "$tsmp2_env" --parflowgpu
-    tsmp2_env="${tsmp2_env} --parflowgpu" # for logging-purposes
+    source "${env}" --parflowgpu
   else
-    source "$tsmp2_env"
+    source "${env}"
   fi
 fi
 
-## set INSTALL and BUILD DIR (necessary for building)
-if [[ -z "${compiler}" ]]; then
-  if [[ -n "${DEFAULT_COMPILER}" ]]; then
-    compiler=${DEFAULT_COMPILER}
-  fi
+# TSMP2_ENV_FILE should be set either (1) through --env, (2) as a shell variable,
+# or (3) via the default environent file.
+if [[ -z "${TSMP2_ENV_FILE}" ]]; then
+  message "ERROR: TSMP2_ENV_FILE is not set."
+  exit 1
 fi
-BUILD_ID="${SYSTEMNAME^^}_${STAGE}_${compiler^^}_${model_id}"
 
-if [ -z "${build_dir}" ]; then
+#
+# 3. Set CMake build directory
+#
+BUILD_ID="${SYSTEMNAME^^}_${model_id}"
+if [[ -z "${build_dir}" ]]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
 else
   cmake_build_dir="${build_dir}"
 fi
 
-if [ -z "${install_dir}" ]; then
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${cmake_tsmp2_dir}/bin/${BUILD_ID}"
-else
-  cmake_install_dir="-DCMAKE_INSTALL_PREFIX=${install_dir}"
-fi
-
-if [ -z "${verbose_makefile}" ]; then
-  cmake_verbose_makefile="" # equivalent to "-DCMAKE_VERBOSE_MAKEFILE=OFF"
-else
-  cmake_verbose_makefile="-DCMAKE_VERBOSE_MAKEFILE=ON"
-fi
-
-build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
-
-## CMAKE config
+# Decide how to deal with an existing build directory
 if [[ -d "${cmake_build_dir}" ]]; then
   if [[ "${clean_first}" == y ]]; then
-    message "Deleting previous build directory..."
+    # Case 1: User wants to explicitly remove existing build directory
+    message "Deleting previous build directory $(basename ${cmake_build_dir}) ..."
     rm -rf ${cmake_build_dir}
-  else
-    read -p "${cmake_build_dir} aleady exists. Do you want to resume existing build? (Y/n) " yn
-    if [ "${yn,}" = "n" ];then
-      message "Deleting previous build directory..."
-      rm -rf ${cmake_build_dir}
+  elif [[ -f "${cmake_build_dir}/build.env" ]]; then
+    build_env=$(realpath ${cmake_build_dir}/build.env)
+    bd=$(basename ${cmake_build_dir})
+    if [[ "${build_env}" == "${TSMP2_ENV_FILE}" ]]; then
+      # Case 2: Resume an existing build using the same environment it previously used.
+      message "Resuming build at ${bd} ... "
     else
-      message "Resuming previous build $(basename ${cmake_build_dir}.)"
+      # Case 3: Existing build was configured with a different environment.
+      message "WARNING: Existing build directory ${bd} uses '$(basename ${build_env})' which is different from the current environment '$(basename ${TSMP2_ENV_FILE})'."
+      read -p "Do you want to overwrite ${bd}? (y/N) " yn
+      if [ "${yn,}" = "y" ];then
+        message "Deleting previous build directory ${bd} ..."
+        rm -rf ${cmake_build_dir}
+      else
+        message "Halting build_tsmp2.sh. Either re-run build_tsmp2.sh with \"--env ${build_env}\", or backup/delete '${cmake_build_dir}' first before re-running build_tsmp2.sh."
+        exit 1
+      fi
     fi
   fi
 fi
 
-mkdir -p ${cmake_build_dir} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+# Create build folder for fresh builds
+if [[ ! -d "${cmake_build_dir}" ]]; then
+  mkdir -p ${cmake_build_dir}
+  ln -sf ${TSMP2_ENV_FILE} ${cmake_build_dir}/build.env
+fi
+build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
+
+#
+# 4. Set the rest of the CMake options
+#
+message "Setting CMAKE options..."
+if [[ -z "$build_type" ]];then
+   build_type="RELEASE"
+fi
+if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" ]]; then
+   cmake_build_type="${build_type^^}"
+else
+   echo "ABORT: Unsupported build_type=${build_type}"
+   exit 1
+fi
+
+if [ -z "${verbose_makefile}" ]; then
+  cmake_verbose_makefile="OFF"
+else
+  cmake_verbose_makefile="ON"
+fi
+
+if [ -z "${install_dir}" ]; then
+  cmake_install_dir="${cmake_tsmp2_dir}/bin/${BUILD_ID}"
+else
+  cmake_install_dir="${install_dir}"
+fi
+mkdir -p "${cmake_install_dir}"
+
+#
+# 5. CMake configure
+#
 message ""
 message "===================="
 message "== TSMP2 settings =="
 message "===================="
 message "MODEL_ID: $model_id"
 message "TSMP2_DIR: $cmake_tsmp2_dir"
-message "TSMP2_ENV: $tsmp2_env"
+message "TSMP2_ENV: ${TSMP2_ENV_FILE}"
 message "BUILD_DIR: $cmake_build_dir"
-message "INSTALL_DIR: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
+message "INSTALL_DIR: ${cmake_install_dir}"
 message "CMAKE command:"
-message "cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir}  ${cmake_build_type} ${cmake_comp_str}  ${cmake_compsrc_str} ${cmake_install_dir} ${cmake_verbose_makefile} |& tee ${build_log} "
+cmake_conf="-S ${cmake_tsmp2_dir} -B ${cmake_build_dir}"
+cmake_conf+=" -DCMAKE_BUILD_TYPE=${cmake_build_type}"
+cmake_conf+=" -DCMAKE_INSTALL_PREFIX=${cmake_install_dir}"
+cmake_conf+=" -DCMAKE_VERBOSE_MAKEFILE=${cmake_verbose_makefile}"
+cmake_conf+=" ${cmake_comp_str}"
+cmake_conf+=" ${cmake_compsrc_str}"
+message "cmake ${cmake_conf}" |& tee "${build_log}"
 message "== CMAKE GENERATE PROJECT start"
-
-cmake -S ${cmake_tsmp2_dir} -B ${cmake_build_dir} \
-      ${cmake_build_type} \
-      ${cmake_comp_str} \
-      ${cmake_compsrc_str} \
-      ${cmake_install_dir} \
-      ${cmake_verbose_makefile} \
-      |& tee ${build_log}
-
+cmake ${cmake_conf} |& tee -a "${build_log}"
 message "== CMAKE GENERATE PROJECT finished"
 
-## Build and install
-
+#
+# 6. CMake build and install
+#
 message "CMAKE build:"
 message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
 message "== CMAKE BUILD start"
@@ -301,14 +329,16 @@ message "== CMAKE INSTALL start"
 cmake --install ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE INSTALL finished"
 
-## Copy log and environment
-message "Copying log and environment to install_dir..."
-if [[ -n "${tsmp2_env}" ]]; then
-  cp ${tsmp2_env} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+#
+# 7. Post-installation steps
+#
+message "Copying build log and environment file to ${cmake_install_dir}..."
+if [[ -n "${env}" ]]; then
+  cp ${TSMP2_ENV_FILE} ${cmake_install_dir}
 fi
-cp ${build_log} $( echo "${cmake_install_dir}" |cut -d\= -f2)
+cp ${build_log} ${cmake_install_dir}
 
-## message
+message ""
 message "Log can be found in: ${build_log}"
-message "Model environment used: ${tsmp2_env}"
-message "Model binaries can be found in: $( echo "${cmake_install_dir}" |cut -d\= -f2)"
+message "Model environment used: ${TSMP2_ENV_FILE}"
+message "Model binaries can be found in: ${cmake_install_dir}"
