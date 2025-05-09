@@ -369,7 +369,7 @@ jobs:
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
             MODEL_OPTS="${MODEL_OPTS} --OASIS_SRC ${TSMP2_ROOT}/oasis3-mct"
           fi
-          BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update --compiler gnu"
+          BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update"
           echo $BUILD_TSMP2_CMD && echo ""
           eval $BUILD_TSMP2_CMD
 
