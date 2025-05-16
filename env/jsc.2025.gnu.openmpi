@@ -1,0 +1,83 @@
+# --------------------------------------------------------------------------
+# Loads GNU+OpenMPI build environment for TSMP2.
+# This environment is tailored for JURECA [1] and JUWELS [2] supercomputers.
+#
+# [1] https://apps.fz-juelich.de/jsc/software/jureca/index.xhtml
+# [2] https://apps.fz-juelich.de/jsc/software/juwels/index.xhtml
+# 
+# Usage: source jsc.2025.gnu.openmpi
+# --------------------------------------------------------------------------
+
+# Load Stages/2025
+module --force purge
+module use $OTHERSTAGES
+module load Stages/2025
+
+# Primary compiler toolchain
+module load GCC
+module load OpenMPI
+
+# Basic scripting and build tools
+module load Python
+module load CMake
+module load git
+
+# Storage libraries
+module load HDF5
+module load netCDF
+module load netCDF-Fortran
+module load PnetCDF
+
+# ParFlow additional libraries
+if [[ "$1" == "--parflowgpu" ]]; then
+  module load CUDA
+  module load UCX-settings/RC-CUDA
+  module load Hypre/2.31.0
+
+  #
+  # Workaround to make ParFlowGPU work. RMM is installed separately, and here we simply expose the path to the RMM binaries.
+  #
+  # RMM install script is at /p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/install_rmm.sh
+  #
+  export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/${SYSTEMNAME^^}_$STAGE"
+
+  # TODO: Verify these values
+  if [[ $SYSTEMNAME == "jedi" ]]; then
+    export CUDAARCHS="90"
+  else
+    export CUDAARCHS="80"
+  fi
+  export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
+else
+  module load Hypre/2.31.0-cpu
+fi
+module load Tcl
+
+# ICON additional libraries
+module load ecCodes
+
+# Set default MPI compilers
+export OMPI_CC=gcc
+export OMPI_CXX=g++
+export OMPI_FC=gfortran
+export CC=mpicc
+export FC=mpif90
+export CXX=mpicxx
+export MPI_HOME=$EBROOTOPENMPI
+
+# Display compiler settings
+module list
+echo "=============== COMPILER SETTINGS  ===============" 
+echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "   MPI lib: $(mpirun --version | head -n 1)"
+echo "         C: $($CC --version | head -n 1)"
+echo "       C++: $($CXX --version | head -n 1)"
+echo "   Fortran: $($FC --version | head -n 1)"
+if [[ "$1" == "--parflowgpu" ]]; then
+  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo " CUDAARCHS: $CUDAARCHS"
+  echo "  RMM_ROOT: ${RMM_ROOT}"
+fi
+echo "=================================================="
+echo ""
+

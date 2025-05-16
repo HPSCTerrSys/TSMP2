@@ -1,0 +1,27 @@
+# --------------------------------------------------------------------------
+# Loads GNU+OpenMPI build environment for TSMP2.
+# This environment is tailored for UBUNTU machines.
+#
+# Usage: source ubuntu.gnu.openmpi
+# --------------------------------------------------------------------------
+
+# Set default MPI compilers
+export CC=mpicc
+export FC=mpif90
+export CXX=mpicxx
+export MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
+export SYSTEMNAME="UBUNTU"
+export STAGE=$(lsb_release -sr)
+
+# TODO: Find a way to pack all TSMP2 dependency info to CMAKE_PREFIX_PATH.
+#  export CMAKE_PREFIX_PATH=$(cd ${DEPENDENCIES_ROOT} | ls -1 | xargs realpath | paste -sd ":" -)
+
+# Display compiler settings
+echo "==================== COMPILER SETTINGS  ====================="
+echo " Machine: ${SYSTEMNAME} $STAGE"
+echo " MPI lib: $(mpirun --version | head -n 1)"
+echo "       C: $($CC --version | head -n 1)"
+echo "     C++: $($CXX --version | head -n 1)"
+echo " Fortran: $($FC --version | head -n 1)"
+echo "============================================================="
+echo ""
