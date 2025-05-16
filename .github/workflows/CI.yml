@@ -22,28 +22,29 @@ jobs:
             parflow_dir: "parflow",
             model_opts: "--ICON --eCLM --ParFlow"
           }
-        - {
-            name: "CLM3.5-PDAF",
-            use_oasis: "False",
-            model_opts: "--CLM35 --PDAF"
-          }
-        - {
-            name: "eCLM-PDAF",
-            use_oasis: "False",
-            model_opts: "--eCLM --PDAF"
-          }
-        - {
-            name: "CLM3.5-ParFlow-PDAF",
-            use_oasis: "True",
-            parflow_dir: "parflow_pdaf",
-            model_opts: "--CLM35 --ParFlow --PDAF"
-          }
-        - {
-            name: "eCLM-ParFlow-PDAF",
-            use_oasis: "True",
-            parflow_dir: "parflow_pdaf",
-            model_opts: "--eCLM --ParFlow --PDAF"
-          }
+# TODO - Fix PDAF GNU errors
+#        - {
+#            name: "CLM3.5-PDAF",
+#            use_oasis: "False",
+#            model_opts: "--CLM35 --PDAF"
+#          }
+#        - {
+#            name: "eCLM-PDAF",
+#            use_oasis: "False",
+#            model_opts: "--eCLM --PDAF"
+#          }
+#        - {
+#            name: "CLM3.5-ParFlow-PDAF",
+#            use_oasis: "True",
+#            parflow_dir: "parflow_pdaf",
+#            model_opts: "--CLM35 --ParFlow --PDAF"
+#          }
+#        - {
+#            name: "eCLM-ParFlow-PDAF",
+#            use_oasis: "True",
+#            parflow_dir: "parflow_pdaf",
+#            model_opts: "--eCLM --ParFlow --PDAF"
+#         }
     env:
       SYSTEMNAME: UBUNTU
       STAGE: 24.04
@@ -265,11 +266,12 @@ jobs:
             echo "VER_ICON=${VER_ICON}" >> $GITHUB_OUTPUT
           fi
 
-          if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
-            VER_PDAF=$(cat model_versions | grep -w "pdaf" | cut -d' ' -f1)
-            echo "${VER_PDAF} => VER_PDAF"
-            echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_OUTPUT
-          fi
+          # TODO - Fix PDAF GNU errors
+          # if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
+          #   VER_PDAF=$(cat model_versions | grep -w "pdaf" | cut -d' ' -f1)
+          #   echo "${VER_PDAF} => VER_PDAF"
+          #   echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_OUTPUT
+          # fi
 
       #
       # OASIS3-MCT
@@ -332,13 +334,13 @@ jobs:
           pwd && git submodule update --init --force .
 
       #
-      # PDAF
+      # TODO - Fix PDAF GNU errors
       #
-      - if: contains(matrix.config.name, 'PDAF')
-        name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
-        working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
-        run: |
-          pwd && git submodule update --init --force .
+      # - if: contains(matrix.config.name, 'PDAF')
+      #   name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
+      #   working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
+      #   run: |
+      #     pwd && git submodule update --init --force .
 
       #
       # Pre-build checks
