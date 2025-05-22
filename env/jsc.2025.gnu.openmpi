@@ -39,7 +39,7 @@ if [[ "$1" == "--parflowgpu" ]]; then
   #
   # RMM install script is at /p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/install_rmm.sh
   #
-  export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/${SYSTEMNAME^^}_$STAGE"
+  export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/rmm-0.10/${SYSTEMNAME^^}_$STAGE"
 
   # TODO: Verify these values
   if [[ $SYSTEMNAME == "jedi" ]]; then
