@@ -25,10 +25,20 @@ module load NCO/5.1.8
 module load CMake/3.26.3
 module load git/2.41.0-nodocs
 
-module li
-
 # Set default compilers
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=$EBROOTPSMPI
+
+# Display compiler settings
+module li
+echo "====================================== COMPILER SETTINGS ======================================"
+echo " Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo " MPI lib: $(mpichversion | head -n 1 | tr -d =)"
+echo "       C: $($CC --version | head -n 1)"
+echo "     C++: $($CXX --version | head -n 1)"
+echo " Fortran: $($FC --version | head -n 1)"
+echo "==============================================================================================="
+echo ""
+
