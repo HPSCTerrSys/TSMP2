@@ -1,3 +1,8 @@
+`dev-debug`: Branch for more debug output
+
+- uses PDAF-branch `tsmp-pdaf-patched-debug`
+
+
 ## Quickstart
 
 > [!TIP]
