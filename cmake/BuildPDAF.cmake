@@ -111,7 +111,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
     list(APPEND PDAF_FOPT "-g")
     list(APPEND PDAF_FOPT "-traceback")
     list(APPEND PDAF_FOPT "-fpe0") # compare eCLM debug flags
-    list(APPEND PDAF_FOPT "-check all") # compare eCLM debug flags
+    # list(APPEND PDAF_FOPT "-check all") # compare eCLM debug flags
   else()
     message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
   endif()
