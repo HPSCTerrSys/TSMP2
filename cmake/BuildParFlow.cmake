@@ -30,7 +30,7 @@ if (${ParFlowGPU})
   endif()
 
   # TODO: Don't rely on env variables!
-  list(APPEND PF_GPU_FLAGS -DRMM_ROOT=$ENV{RMM_ROOT})
+  #list(APPEND PF_GPU_FLAGS -DRMM_ROOT=$ENV{RMM_ROOT})
 else()
   find_package(OpenMP)
   if (OpenMP_FOUND)

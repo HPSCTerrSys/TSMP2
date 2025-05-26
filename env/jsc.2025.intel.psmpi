@@ -36,17 +36,15 @@ module load PnetCDF
 
 # ParFlow additional libraries
 if [[ "$1" == "--parflowgpu" ]]; then
-  module load Hypre/2.31.0
-
+  # WARNING:
   #
-  # Workaround to make ParFlowGPU work. RMM is installed separately, and here we simply expose the path to the RMM binaries.
-  #
-  # RMM install script is at /p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/install_rmm.sh
-  #
-  export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/rmm-0.10/${SYSTEMNAME^^}_$STAGE"
+  # Loading Hypre/2.31.0 under Intel will stubbornly load Hypre/2.31.0-cpu
+  # since Hypre/2.31.0 is only available under the GCC toolchain. This wrong
+  # Hypre will trigger a linker failure in ParFlow. I suggest using jsc.2025.gnu.openmpi when
+  # building ParFlow.
 
   # TODO: Verify these values
-  if [[ $SYSTEMNAME == "jedi" ]]; then
+  if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
     export CUDAARCHS="90"
   else
     export CUDAARCHS="80"
@@ -61,6 +59,9 @@ module load Tcl
 module load ecCodes
 
 # Set default MPI compilers
+export OMPI_CC=icx
+export OMPI_CXX=icpx
+export OMPI_FC=ifx
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
@@ -77,7 +78,11 @@ echo "   Fortran: $($FC --version | head -n 1)"
 if [[ "$1" == "--parflowgpu" ]]; then
   echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
   echo " CUDAARCHS: $CUDAARCHS"
-  echo "  RMM_ROOT: ${RMM_ROOT}"
 fi
 echo "==============================================================================================="
+echo ""
+if [[ "$1" == "--parflowgpu" ]]; then
+  echo "WARNING: ParFlowGPU doesn't work on Intel toolchain due to missing Intel-built Hypre-CUDA library."
+  echo "         Load the 'jsc.2025.gnu.openmpi' env file instead to build ParFlowGPU."
+fi
 echo ""

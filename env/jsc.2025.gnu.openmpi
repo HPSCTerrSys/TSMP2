@@ -34,15 +34,8 @@ if [[ "$1" == "--parflowgpu" ]]; then
   module load UCX-settings/RC-CUDA
   module load Hypre/2.31.0
 
-  #
-  # Workaround to make ParFlowGPU work. RMM is installed separately, and here we simply expose the path to the RMM binaries.
-  #
-  # RMM install script is at /p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/install_rmm.sh
-  #
-  export RMM_ROOT="/p/scratch/cslts/shared_data/TSMP2_S2025/RAPIDS_MemoryManager/rmm-0.10/${SYSTEMNAME^^}_$STAGE"
-
   # TODO: Verify these values
-  if [[ $SYSTEMNAME == "jedi" ]]; then
+  if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
     export CUDAARCHS="90"
   else
     export CUDAARCHS="80"
@@ -76,7 +69,6 @@ echo "   Fortran: $($FC --version | head -n 1)"
 if [[ "$1" == "--parflowgpu" ]]; then
   echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
   echo " CUDAARCHS: $CUDAARCHS"
-  echo "  RMM_ROOT: ${RMM_ROOT}"
 fi
 echo "=================================================="
 echo ""
