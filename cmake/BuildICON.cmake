@@ -75,6 +75,10 @@ string(PREPEND ICON_FCFLAGS "-I${NetCDF_F90_ROOT}/include ")
 #    list(APPEND EXTRA_CONFIG_ARGS --disable-parallel-netcdf)
 # endif()
 
+# ZLIB
+find_package(ZLIB REQUIRED)
+list(APPEND ICON_LIBS "${ZLIB_LIBRARIES}")
+
 # Enable/disable model-specific features
 list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --enable-openmp --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
 
