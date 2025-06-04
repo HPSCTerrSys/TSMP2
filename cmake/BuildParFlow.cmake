@@ -28,9 +28,6 @@ if (${ParFlowGPU})
       message(FATAL_ERROR "BuildParFlow: ParFlow GPU is enabled, but neither CUDA nor Kokkos was found.")
     endif()
   endif()
-
-  # TODO: Don't rely on env variables!
-  list(APPEND PF_GPU_FLAGS -DRMM_ROOT=$ENV{RMM_ROOT})
 else()
   find_package(OpenMP)
   if (OpenMP_FOUND)
@@ -38,7 +35,7 @@ else()
   else()
     set(PF_ACC_BACKEND "none") 
   endif()
-  #TODO: also support backends 'kokkos' and 'none'
+  #TODO: Add support for 'kokkos' backend
 endif()
 
 # Set compiler flags
@@ -84,7 +81,6 @@ ExternalProject_Add(ParFlow
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
                 ${PF_CLM_FLAGS}
-                ${PF_GPU_FLAGS}
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
 
