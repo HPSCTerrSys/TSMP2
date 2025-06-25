@@ -5,7 +5,7 @@
 [submodule "models/parflow"]
 	path = models/parflow
 	url = https://github.com/HPSCTerrSys/parflow
-	branch = openmp-flag-fix
+	branch = cuda12-fixes
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
