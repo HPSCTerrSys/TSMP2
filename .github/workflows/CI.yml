@@ -228,7 +228,6 @@ jobs:
           cd hypre-${VER_HYPRE}
 
           # Install
-          ./configure --prefix=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
           cmake -S src -B bld -DHYPRE_WITH_CUDA=ON -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
           cmake --build bld --parallel 4
           cmake --install bld
