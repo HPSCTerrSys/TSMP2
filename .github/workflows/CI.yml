@@ -22,6 +22,12 @@ jobs:
             parflow_dir: "parflow",
             model_opts: "--ICON --eCLM --ParFlow"
           }
+        - {
+            name: "eCLM-ParFlowGPU",
+            use_oasis: "True",
+            parflow_dir: "parflow",
+            model_opts: "--eCLM --ParFlowGPU"
+          }
 # TODO - Fix PDAF GNU errors
 #        - {
 #            name: "CLM3.5-PDAF",
@@ -62,17 +68,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # These apt packages have post-install step which can't be triggered by GitHub cache.
+      #
+      # Install required TSMP2 dependencies
+      #
       - name: Install TSMP2 dependencies on Ubuntu
         run: |
           sudo apt-get update
           sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-hl-fortran-100t64 hdf5-helpers liblapack-dev libblas-dev
 
-      # These apt packages can be safely cached.
       - name: Install extra TSMP2 dependencies on Ubuntu
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblzma-dev
+          version: 1.0
+          execute_install_scripts: true
+
+      #
+      # Install CUDA dependencies on Ubuntu
+      #
+      - if: contains(matrix.config.name, 'ParFlowGPU')
+        name: Install CUDA compiler and libraries
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: nvidia-cuda-toolkit nvidia-cuda-dev
           version: 1.0
           execute_install_scripts: true
 
@@ -156,10 +174,10 @@ jobs:
           key: ${{ matrix.config.name }}_netcdf-f90-${{ env.VER_NETCDF_F90 }}
 
       #
-      # Hypre
+      # Hypre (OpenMP backend)
       #
       - if: contains(matrix.config.name, 'ParFlow')
-        name: Restore cached hypre-${{ env.VER_HYPRE }}
+        name: Restore cached hypre-${{ env.VER_HYPRE }}  (OpenMP backend)
         uses: actions/cache/restore@v4
         id: cache-hypre-restore
         with:
@@ -167,7 +185,7 @@ jobs:
           key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Install hypre-${{ env.VER_HYPRE }}
+        name: Install hypre-${{ env.VER_HYPRE }} (OpenMP backend)
         working-directory: /tmp
         run: |
           # Download
@@ -183,11 +201,47 @@ jobs:
           tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
 
       - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Cache hypre-${{ env.VER_HYPRE }}
+        name: Cache hypre-${{ env.VER_HYPRE }} (OpenMP backend)
         uses: actions/cache/save@v4
         with:
           path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}
           key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}
+
+      #
+      # Hypre (CUDA backend)
+      #
+      - if: contains(matrix.config.name, 'ParFlowGPU')
+        name: Restore cached hypre-${{ env.VER_HYPRE }} (CUDA backend)
+        uses: actions/cache/restore@v4
+        id: cache-hypre-cuda-restore
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}-cuda
+          key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}-cuda
+
+      - if: contains(matrix.config.name, 'ParFlowGPU') && steps.cache-hypre-cuda-restore.outputs.cache-hit != 'true'
+        name: Install hypre-${{ env.VER_HYPRE }} (CUDA backend)
+        working-directory: /tmp
+        run: |
+          # Download
+          wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
+          tar xf v${VER_HYPRE}.tar.gz
+          cd hypre-${VER_HYPRE}
+
+          # Install
+          ./configure --prefix=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
+          cmake -S src -B bld -DHYPRE_WITH_CUDA=ON -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
+          cmake --build bld --parallel 4
+          cmake --install bld
+
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
+
+      - if: contains(matrix.config.name, 'ParFlowGPU') && steps.cache-hypre-cuda-restore.outputs.cache-hit != 'true'
+        name: Cache hypre-${{ env.VER_HYPRE }}  (CUDA backend)
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}-cuda
+          key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}-cuda
 
       #
       # ecCodes
