@@ -176,7 +176,7 @@ jobs:
       #
       # Hypre (OpenMP backend)
       #
-      - if: contains(matrix.config.name, 'ParFlow')
+      - if: contains(matrix.config.name, 'ParFlow') && !contains(matrix.config.name, 'GPU')
         name: Restore cached hypre-${{ env.VER_HYPRE }}  (OpenMP backend)
         uses: actions/cache/restore@v4
         id: cache-hypre-restore
@@ -184,7 +184,7 @@ jobs:
           path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}
           key: ${{ matrix.config.name }}_hypre-${{ env.VER_HYPRE }}
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ParFlow') && !contains(matrix.config.name, 'GPU') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Install hypre-${{ env.VER_HYPRE }} (OpenMP backend)
         working-directory: /tmp
         run: |
@@ -194,6 +194,8 @@ jobs:
           cd hypre-${VER_HYPRE}
 
           # Install
+          echo "MPI_HOME=${MPI_HOME}"
+          ls ${MPI_HOME}/include
           cmake -S src -B bld                                                   \
                 -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}  \
                 -DMPI_INCLUDE_DIR=${MPI_HOME}/include                           \
@@ -202,7 +204,7 @@ jobs:
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
 
-      - if: contains(matrix.config.name, 'ParFlow') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
+      - if: contains(matrix.config.name, 'ParFlow') && !contains(matrix.config.name, 'GPU') && steps.cache-hypre-restore.outputs.cache-hit != 'true'
         name: Cache hypre-${{ env.VER_HYPRE }} (OpenMP backend)
         uses: actions/cache/save@v4
         with:
@@ -230,6 +232,8 @@ jobs:
           cd hypre-${VER_HYPRE}
 
           # Install
+          echo "MPI_HOME=${MPI_HOME}"
+          ls ${MPI_HOME}/include
           cmake -S src -B bld                                                   \
                 -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}  \
                 -DMPI_INCLUDE_DIR=${MPI_HOME}/include                           \
