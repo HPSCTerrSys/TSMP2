@@ -194,12 +194,12 @@ jobs:
           cd hypre-${VER_HYPRE}
 
           # Install
-          echo "MPI_HOME=${MPI_HOME}"
-          ls ${MPI_HOME}/include
-          cmake -S src -B bld                                                   \
-                -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}  \
-                -DMPI_INCLUDE_DIR=${MPI_HOME}/include                           \
+          cmake -S src -B bld                                                     \
+                -DCMAKE_INSTALL_PREFIX="${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}"  \
+                -DMPI_INCLUDE_DIR="${MPI_HOME}/include"                           \
                 -DHYPRE_ENABLE_OPENMP="ON"
+          cmake --build bld --parallel 4
+          cmake --install bld
 
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
@@ -232,11 +232,9 @@ jobs:
           cd hypre-${VER_HYPRE}
 
           # Install
-          echo "MPI_HOME=${MPI_HOME}"
-          ls ${MPI_HOME}/include
-          cmake -S src -B bld                                                   \
-                -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}  \
-                -DMPI_INCLUDE_DIR=${MPI_HOME}/include                           \
+          cmake -S src -B bld                                                     \
+                -DCMAKE_INSTALL_PREFIX="${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}"  \
+                -DMPI_INCLUDE_DIR="${MPI_HOME}/include"                           \
                 -DHYPRE_ENABLE_CUDA="ON"
           cmake --build bld --parallel 4
           cmake --install bld
