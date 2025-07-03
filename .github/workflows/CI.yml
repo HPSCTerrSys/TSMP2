@@ -191,7 +191,7 @@ jobs:
           # Download
           wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
           tar xf v${VER_HYPRE}.tar.gz
-          cd hypre-${VER_HYPRE}/src
+          cd hypre-${VER_HYPRE}
 
           # Install
           cmake -S src -B bld                                                   \
