@@ -61,7 +61,7 @@ jobs:
       MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
-      VER_HYPRE: 2.26.0
+      VER_HYPRE: 2.33.0
       VER_ECCODES: 2.40.0
       VER_OASIS: tsmp-patches-v0.1
 
@@ -194,8 +194,10 @@ jobs:
           cd hypre-${VER_HYPRE}/src
 
           # Install
-          ./configure --prefix=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
-          make -j4 install
+          cmake -S src -B bld                                                   \
+                -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}  \
+                -DMPI_INCLUDE_DIR=${MPI_HOME}/include                           \
+                -DHYPRE_ENABLE_OPENMP="ON"
 
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
@@ -228,7 +230,10 @@ jobs:
           cd hypre-${VER_HYPRE}
 
           # Install
-          cmake -S src -B bld -DHYPRE_WITH_CUDA=ON -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}
+          cmake -S src -B bld                                                   \
+                -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}  \
+                -DMPI_INCLUDE_DIR=${MPI_HOME}/include                           \
+                -DHYPRE_ENABLE_CUDA="ON"
           cmake --build bld --parallel 4
           cmake --install bld
 
