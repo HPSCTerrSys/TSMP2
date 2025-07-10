@@ -28,7 +28,6 @@ if (${ParFlowGPU})
       message(FATAL_ERROR "BuildParFlow: ParFlow GPU is enabled, but neither CUDA nor Kokkos was found.")
     endif()
   endif()
-  list(APPEND PF_CUDA_FLAGS -DCMAKE_CUDA_FLAGS=${MPI_HOME}/include)
 else()
   find_package(OpenMP)
   if (OpenMP_FOUND)
@@ -82,7 +81,6 @@ ExternalProject_Add(ParFlow
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
                 ${PF_CLM_FLAGS}
-                ${PF_CUDA_FLAGS}
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
 
