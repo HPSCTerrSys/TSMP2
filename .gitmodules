@@ -4,8 +4,8 @@
 	branch = icon-2024.07-public_coup-oas
 [submodule "models/parflow"]
 	path = models/parflow
-	url = https://github.com/parflow/parflow.git
-	branch = master 
+	url = https://github.com/HPSCTerrSys/parflow.git
+	branch = hypre-cuda-fixes
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
