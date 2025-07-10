@@ -220,7 +220,9 @@ list(JOIN PDAF_DOUBLEPRECISION " " PDAF_DOUBLEPRECISION)
 
 # Set PDAF_MPI_INC for Makefile header
 # ----------------------------------
-list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+if(DEFINED MPICH_Fortran_INCLUDEDIR AND NOT MPICH_Fortran_INCLUDEDIR STREQUAL "")
+  list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+endif()
 
 # Join list
 list(JOIN PDAF_MPI_INC " " PDAF_MPI_INC)
