@@ -421,6 +421,7 @@ jobs:
         run: |
           tree -FUCh --du -L 2 $(pwd)
           CMAKE_PREFIX_PATH=$(ls -1 | xargs realpath | paste -sd ":" -)
+          CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${MPI_HOME}"
           echo "" && echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> $GITHUB_ENV
 
