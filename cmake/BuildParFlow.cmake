@@ -6,6 +6,7 @@ if(DEFINED eCLM_SRC)
 elseif(DEFINED CLM35_SRC)
     list(APPEND PF_CLM_FLAGS -DPARFLOW_AMPS_LAYER=oas3
                              -DOAS3_ROOT=${OASIS_ROOT}
+			     -DPARFLOW_HAVE_ECLM=ON # Experimental: CLM35 should have own flag
                              -DPARFLOW_HAVE_CLM=OFF)
 else()
     # use ParFlow's internal CLM
