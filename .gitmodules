@@ -9,7 +9,7 @@
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
-	branch = tsmp-pdaf-patched
+	branch = tsmp-pdaf-patched-hypre-cuda-fixes
 [submodule "models/pdaf"]
 	path = models/pdaf
 	url = https://github.com/HPSCTerrSys/pdaf.git
