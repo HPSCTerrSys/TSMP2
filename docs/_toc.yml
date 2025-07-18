@@ -1,0 +1,23 @@
+# https://hpscterrsys.github.io/TSMP2
+
+format: jb-book
+root: INDEX
+parts:
+  - caption: User's Guide
+    chapters:
+
+    - file: users_guide/introduction_to_TSMP2/README
+      title: Introduction to TSMP2
+      sections:
+      - file: users_guide/introduction_to_TSMP2/introduction
+
+    - file: users_guide/building_TSMP2/README
+      title: Building TSMP2
+      sections:
+      - file: users_guide/building_TSMP2/Quickstart
+      - file: users_guide/building_TSMP2/BuildingTSMP2wCMake
+
+  - caption: Reference
+    chapters:
+    - url: https://terrsysmp.org/
+      title: TSMP webpage
