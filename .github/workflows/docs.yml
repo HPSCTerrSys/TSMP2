@@ -29,6 +29,11 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: false
+          sparse-checkout: |
+            .github
+            docs
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
