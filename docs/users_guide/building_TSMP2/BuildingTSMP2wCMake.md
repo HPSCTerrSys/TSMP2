@@ -1,9 +1,10 @@
 # Building TSMP2 with CMake
 
-> [!NOTE]
-> For experienced users.
-> The result of the following commands may be different from the Quickstart above, most notably because the branches/commits in the `git clone` commands are not kept in sync with those in the `build_tsmp2.sh` script.
-[//]: > The [Quickstart](#Quickstart) is the tested and supported method.
+```{note}
+For experienced users.
+The result of the following commands may be different from the Quickstart above, most notably because the branches/commits in the `git clone` commands are not kept in sync with those in the `build_tsmp2.sh` script.
+The [Quickstart](#Quickstart) is the tested and supported method.
+```
 
 1. Clone this repository.
 

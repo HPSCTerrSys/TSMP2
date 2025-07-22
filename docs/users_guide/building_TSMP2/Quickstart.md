@@ -1,7 +1,8 @@
 # Quickstart
 
-> [!TIP]
-> `build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputted CMake command or directly head over to {doc}`BuildingTSMP2wCMake`.
+```{tip}
+`build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputted CMake command or directly head over to {doc}`BuildingTSMP2wCMake`.
+```
 
 1. Clone this repository.
 
@@ -15,9 +16,9 @@ cd $TSMP2_DIR
 
 To build a model component one need to activate the component model `--<COMP>`. The options are not case-sensitive and do not need to be in an specific order.
 
-> [!NOTE]
-> The component models (git submodules) are cloned during the execution of `build_tsmp2.sh`. If the component model (`models/<COMP>`) are already exists, the user is asked if the folder should be overwritten or not. If you do want to use the default model component source codes, one can use the option `--<COMP_SRC>`.
-
+```{note}
+The component models (git submodules) are cloned during the execution of `build_tsmp2.sh`. If the component model (`models/<COMP>`) are already exists, the user is asked if the folder should be overwritten or not. If you do want to use the default model component source codes, one can use the option `--<COMP_SRC>`.
+```
 
 ```bash
 # to see options
