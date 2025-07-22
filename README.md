@@ -20,5 +20,5 @@ Please see [quickstart section](https://hpscterrsys.github.io/TSMP2/users_guide/
 Please check the documentation at https://hpscterrsys.github.io/TSMP2
 
 ## License
-TSMP is open source software and is licensed under the [MIT-License](https://github.com/HPSCTerrSys/TSMP2/blob/master/LICENSE).
+TSMP is open source software and is licensed under the [MIT-License](https://github.com/HPSCTerrSys/TSMP2/blob/master/LICENSE.txt).
 

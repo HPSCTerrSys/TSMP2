@@ -1,7 +1,7 @@
 # Quickstart
 
 > [!TIP]
-> `build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputted CMake command or directly head over to [Building TSMP2 with CMake](#Building-TSMP2-with-CMake).
+> `build_tsmp2.sh` is a lightweight shell-script calling the CMake-based build-system. During execution of `build_tsmp2.sh`, the executed CMake-command is printed out. For advanced build use-cases, users can modify the outputted CMake command or directly head over to [Building TSMP2 with CMake](building_TSMP2/BuildingTSMP2wCMake) or {doc}`BuildingTSMP2wCMake`.
 
 1. Clone this repository.
 
