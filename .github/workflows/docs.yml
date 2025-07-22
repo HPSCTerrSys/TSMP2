@@ -21,12 +21,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,7 +38,7 @@ jobs:
       - name: Install dependencies
         run:  pip install -r ${GITHUB_WORKSPACE}/docs/requirements.txt
 
-      - name: Build eCLM doc homepage
+      - name: Build TSMP2 doc homepage
         working-directory: ./docs
         run:  |
           make clean docs
