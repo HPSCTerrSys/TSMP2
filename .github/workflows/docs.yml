@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - 'docs-**'
+#      - 'docs-**'
   pull_request:
     branches: 
       - 'master'

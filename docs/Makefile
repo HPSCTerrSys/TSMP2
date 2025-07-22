@@ -1,5 +1,4 @@
 BUILD_DIR = ./_build
-SRC_DIR = ../src
 
 all: docs
 
