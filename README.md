@@ -14,7 +14,7 @@ TSMP development has been driven by groups within the [Center for High-Performan
 
 ## Quickstart
 
-Please see [quickstart section](../building_TSMP2/Quickstart.md) for guided steps on how the model can be build.
+Please see [quickstart section](./docs/users_guide/building_TSMP2/Quickstart.md) for guided steps on how the model can be build.
 
 ## Usage / Documentation
 
