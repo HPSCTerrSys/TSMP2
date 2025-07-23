@@ -1,7 +1,8 @@
-# Terrestrial Systems Modelling Platform v2 (TSMP2)
+# Terrestrial Systems Modeling Platform v2 (TSMP2)
 
 [![docs](https://github.com/HPSCTerrSys/TSMP2/actions/workflows/docs.yml/badge.svg)](https://github.com/HPSCTerrSys/TSMP2/actions/workflows/docs.yml)
 [![build](https://github.com/HPSCTerrSys/TSMP2/actions/workflows/CI.yml/badge.svg)](https://github.com/HPSCTerrSys/TSMP2/actions/workflows/CI.yml)
+[![doi](https://img.shields.io/badge/rsd-tsmp2-00a3e3)](https://helmholtz.software/software/tsmp2)
 
 ## Introduction 
 
@@ -13,7 +14,7 @@ TSMP development has been driven by groups within the [Center for High-Performan
 
 ## Quickstart
 
-Please see [quickstart section](https://hpscterrsys.github.io/TSMP2/users_guide/building_TSMP2/Quickstart.html) for guided steps on how the model can be build.
+Please see [quickstart section](../building_TSMP2/Quickstart.md) for guided steps on how the model can be build.
 
 ## Usage / Documentation
 
