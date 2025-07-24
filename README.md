@@ -10,6 +10,12 @@ The Terrestrial System Modeling Platform v2 (TSMP2, https://www.terrsysmp.org) i
 
 TSMP allows for a physically-based representation of transport processes of mass, energy and momentum and interactions between the different compartments of the geo-ecosystem across scales, explicitly reproducing feedbacks in the hydrological cycle from the groundwater into the atmosphere.
 
+TSMP-PDAF describes the build commands of TSMP that can introduce data
+assimilation for an ensemble of TSMP simulations using the Parallel
+	Data Assimilation Framework
+([PDAF](https://pdaf.awi.de/trac/wiki)). For more information, see the
+[documentation of TSMP-PDAF](https://hpscterrsys.github.io/pdaf).
+
 TSMP development has been driven by groups within the [Center for High-Performance Scientific Computing in Terrestrial Systems](http://www.hpsc-terrsys.de) (HPSC-TerrSys).
 
 ## Quickstart

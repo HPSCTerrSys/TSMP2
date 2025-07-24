@@ -21,3 +21,5 @@ parts:
     chapters:
     - url: https://terrsysmp.org/
       title: TSMP webpage
+    - url: https://hpscterrsys.github.io/pdaf
+      title: TSMP-PDAF documentation
