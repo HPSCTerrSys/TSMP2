@@ -320,7 +320,7 @@ message "== CMAKE GENERATE PROJECT finished"
 message "CMAKE build:"
 message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
 message "== CMAKE BUILD start"
-cmake --build ${cmake_build_dir} |& tee -a $build_log
+cmake --build ${cmake_build_dir} --parallel 4 |& tee -a $build_log
 message "== CMAKE BUILD finished"
 
 message "CMAKE install:"
