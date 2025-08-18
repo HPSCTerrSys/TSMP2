@@ -33,6 +33,7 @@ function help_tsmp2() {
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --env            Set model environment."
+  echo "  --max_jobs       Set the maximum number of jobs to build the code, if not set compilation is serial."
   echo ""
   echo "Example: $0 --ICON --eCLM --ParFlow"
   exit 1
@@ -124,6 +125,7 @@ while [[ "$#" -gt 0 ]]; do
     --build_dir) build_dir="$2"; shift ;;
     --install_dir) install_dir="$2"; shift ;;
     --env) env="$2"; shift ;;
+    --max_jobs) max_jobs="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
@@ -290,6 +292,8 @@ else
 fi
 mkdir -p "${cmake_install_dir}"
 
+cmake_max_jobs="${max_jobs:-1}"
+
 #
 # 5. CMake configure
 #
@@ -318,7 +322,7 @@ message "== CMAKE GENERATE PROJECT finished"
 # 6. CMake build and install
 #
 message "CMAKE build:"
-message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
+message "cmake --build ${cmake_build_dir} --parallel ${cmake_max_jobs} |& tee -a $build_log"
 message "== CMAKE BUILD start"
 cmake --build ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE BUILD finished"
