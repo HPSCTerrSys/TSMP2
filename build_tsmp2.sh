@@ -292,7 +292,9 @@ else
 fi
 mkdir -p "${cmake_install_dir}"
 
-cmake_max_jobs="${max_jobs:-1}"
+if [ -v max_jobs ]; then
+  export CMAKE_BUILD_PARALLEL_LEVEL=${max_jobs}
+fi
 
 #
 # 5. CMake configure
@@ -322,7 +324,7 @@ message "== CMAKE GENERATE PROJECT finished"
 # 6. CMake build and install
 #
 message "CMAKE build:"
-message "cmake --build ${cmake_build_dir} --parallel ${cmake_max_jobs} |& tee -a $build_log"
+message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
 message "== CMAKE BUILD start"
 cmake --build ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE BUILD finished"
