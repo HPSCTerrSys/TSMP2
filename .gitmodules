@@ -5,7 +5,7 @@
 [submodule "models/parflow"]
 	path = models/parflow
 	url = https://github.com/parflow/parflow.git
-	branch = v3.14.1 
+	branch = v3.14.1
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
