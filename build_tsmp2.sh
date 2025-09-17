@@ -18,7 +18,7 @@ function help_tsmp2() {
   echo "  --ICON           Compile with ICON"
   echo "  --eCLM           Compile with eCLM"
   echo "  --ParFlow        Compile with ParFlow"
-  echo "  --ParFlow-GPU    Compile with ParFlow-GPU"
+  echo "  --ParFlowGPU    Compile with ParFlow-GPU"
   echo "  --PDAF           Compile with PDAF"
   echo "  --COSMO          Compile with COSMO"
   echo "  --CLM35          Compile with CLM3.5"
