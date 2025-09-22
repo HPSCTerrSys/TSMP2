@@ -106,8 +106,8 @@ while [[ "$#" -gt 0 ]]; do
     --version) echo "$0 version 0.1.0"; exit 1;;
     --icon) icon=y;;
     --eclm) eclm=y;;
-    --parflow) parflow=y;;
-    --parflowgpu) parflowGPU=y;;
+    --parflow) parflow=y parflowGPU=n;;
+    --parflowgpu) parflow=y parflowGPU=y;;
     --pdaf) pdaf=y;;
     --cosmo) cosmo=y;;
     --clm35) clm35=y;;
