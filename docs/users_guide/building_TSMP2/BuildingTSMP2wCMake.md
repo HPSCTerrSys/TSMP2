@@ -10,8 +10,7 @@ The [Quickstart](#Quickstart) is the tested and supported method.
 
 ```bash
 git clone https://github.com/HPSCTerrSys/TSMP2.git
-export TSMP2_DIR=$(realpath TSMP2)
-cd $TSMP2_DIR
+cd TSMP2
 ```
 
 2. Load the environment variables required for the build.
