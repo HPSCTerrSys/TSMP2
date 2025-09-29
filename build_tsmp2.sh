@@ -11,17 +11,25 @@ set -eo pipefail
 ## functions
 
 function help_tsmp2() {
-  echo "Usage: $0 [-v ] [--component_name] [--optionals]"
-  echo "  -q, --quiet      Write less output during shell execution"
-  echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
-  echo "  --version        Print $0 scipt version"
-  echo "  --ICON           Compile with ICON"
-  echo "  --eCLM           Compile with eCLM"
-  echo "  --ParFlow        Compile with ParFlow"
-  echo "  --ParFlowGPU    Compile with ParFlow-GPU"
-  echo "  --PDAF           Compile with PDAF"
-  echo "  --COSMO          Compile with COSMO"
-  echo "  --CLM35          Compile with CLM3.5"
+  echo "build_tsmp2.sh - Shell-based script to compile model components within the TSMP2 framework."
+  echo ""
+  echo "Usage:"
+  echo ""
+  echo "  ./build_tsmp2.sh [component models...] [options...]"
+  echo ""
+  echo "Component models:"
+  echo ""
+  echo "  icon           Compile with ICON atmosphere model."
+  echo "  iconGPU        Compile with ICON atmosphere model (GPU-enabled)."
+  echo "  eclm           Compile with eCLM land surface model."
+  echo "  parflow        Compile with ParFlow subsurface model."
+  echo "  parflowGPU     Compile with ParFlow subsurface model (GPU-enabled)"
+  echo "  pdaf           Compile with PDAF data assimilation framework."
+  echo "  cosmo          Compile with COSMO atmosphere model (legacy)"
+  echo "  clm35          Compile with CLM3.5 land surface model (legacy)"
+  echo ""
+  echo "Options:"
+  echo ""
   echo "  --ICON_SRC       Set ICON_SRC directory"
   echo "  --eCLM_SRC       Set eCLM_SRC directory"
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
@@ -33,8 +41,16 @@ function help_tsmp2() {
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --env            Set model environment."
+  echo "  --version        Print $0 scipt version"
+  echo "  -q, --quiet      Write less output during shell execution"
+  echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
   echo ""
-  echo "Example: $0 --ICON --eCLM --ParFlow"
+  echo "Examples:"
+  echo ""
+  echo "  ./build_tsmp2.sh icon eclm parflow"
+  echo "  ./build_tsmp2.sh eclm parflowGPU"
+  echo "  ./build_tsmp2.sh iconGPU eclm"
+  echo ""
   exit 1
 }
 
@@ -98,19 +114,21 @@ fi # quiet
 ###
 
 ## get params
+# TODO: --<model> switches should be deprecated in favor of <model>
 while [[ "$#" -gt 0 ]]; do
   case "${1,,}" in
     -h|--help) help_tsmp2;;
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
     --version) echo "$0 version 0.1.0"; exit 1;;
-    --icon) icon=y;;
-    --eclm) eclm=y;;
-    --parflow) parflow=y parflowGPU=n;;
-    --parflowgpu) parflow=y parflowGPU=y;;
-    --pdaf) pdaf=y;;
-    --cosmo) cosmo=y;;
-    --clm35) clm35=y;;
+    --icon|icon) icon=y iconGPU=n;;
+    --icongpu|icongpu) icon=y iconGPU=y;;
+    --eclm|eclm) eclm=y;;
+    --parflow|parflow) parflow=y parflowGPU=n;;
+    --parflowgpu|parflowgpu) parflow=y parflowGPU=y;;
+    --pdaf|pdaf) pdaf=y;;
+    --cosmo|cosmo) cosmo=y;;
+    --clm35|clm35) clm35=y;;
     --no_update) update_compsrc=n;;
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
