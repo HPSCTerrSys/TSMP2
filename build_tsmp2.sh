@@ -74,7 +74,7 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     read -p "submodule ${submodule_name} aleady exists. Do you want to overwrite it? (y/N) " yn
+     read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
@@ -197,7 +197,7 @@ fi
 
 # Check if the supplied environment file actually exists.
 if [[ ! -f "${env}" ]]; then
-  message "ERROR: Environment file \"${env}\" not found".
+  message "ERROR: Environment file \"${env}\" not found."
   exit 1
 fi
 
