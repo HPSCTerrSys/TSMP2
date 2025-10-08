@@ -142,27 +142,10 @@ message "Setting model-id and component string..."
 set_component icon "ICON"
 set_component eclm "eCLM"
 set_component parflow "ParFlow"
-set_component parflowGPU "ParFlowGPU"
+set_component parflowGPU "ParFlowGPU" #TODO: check if only one ParFlow option is enabled (either --parflow or --parflowgpu)
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
-
-echo ""
-echo "Configuration:"
-echo "  icon        : $icon"
-echo "  eCLM        : $eclm"
-echo "  ParFlow     : $parflow"
-echo "  ParFlow GPU : $parflowGPU"
-echo "  COSMO       : $cosmo"
-echo "  CLM3.5      : $clm35"
-echo "  PDAF        : $pdaf"
-echo ""
-
-# Validate mutually exclusive ParFlow options
-if [ "${parflow}" = "y" ] && [ "${parflowGPU}" = "y" ];then
-  echo "ABORT: Cannot enable both --parflow and --parflowgpu simultaneously"
-  exit 1
-fi
 
 if [ $model_count = 0 ];then
   echo "ABORT: No model component is chosen"
