@@ -103,7 +103,7 @@ while [[ "$#" -gt 0 ]]; do
     -h|--help) help_tsmp2;;
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
-    --version) echo "$0 version 0.1.0"; exit 1;;
+    --version) echo "$0 version 0.1.0"; exit 0;;
     --icon) icon=y;;
     --eclm) eclm=y;;
     --parflow) parflow=y;;
