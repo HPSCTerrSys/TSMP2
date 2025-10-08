@@ -147,6 +147,17 @@ set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
 
+echo ""
+echo "Configuration:"
+echo "  icon        : $icon"
+echo "  eCLM        : $eclm"
+echo "  ParFlow     : $parflow"
+echo "  ParFlow GPU : $parflowGPU"
+echo "  COSMO       : $cosmo"
+echo "  CLM3.5      : $clm35"
+echo "  PDAF        : $pdaf"
+echo ""
+
 # Validate mutually exclusive ParFlow options
 if [ "${parflow}" = "y" ] && [ "${parflowGPU}" = "y" ];then
   echo "ABORT: Cannot enable both --parflow and --parflowgpu simultaneously"
