@@ -17,7 +17,7 @@
 [submodule "models/eCLM"]
 	path = models/eCLM
 	url = https://github.com/HPSCTerrSys/eCLM.git
-	branch = beta-0.4
+	branch = dev-visakh
 [submodule "models/oasis3-mct"]
         path = models/oasis3-mct
         url = https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
