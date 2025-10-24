@@ -1,3 +1,8 @@
+# OMI version
+
+Observation script: https://icg4geo.icg.kfa-juelich.de/ExternalRepos/tsmp-pdaf/tsmp-pdaf-observation-scripts/-/tree/main/omi_obs_data?ref_type=heads
+
+
 # Terrestrial Systems Modeling Platform v2 (TSMP2)
 
 [![docs](https://github.com/HPSCTerrSys/TSMP2/actions/workflows/docs.yml/badge.svg)](https://github.com/HPSCTerrSys/TSMP2/actions/workflows/docs.yml)
