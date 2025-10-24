@@ -185,6 +185,17 @@ cmake -S . -B ${BUILD_DIR}                    \
       -DCLM35_SRC=${CLM35_SRC}                \
       -DCOSMO_SRC=${COSMO_SRC}
 
+
+# ICON-eCLM with Scalsca
+ml Scalasca
+cmake -S . -B ${BUILD_DIR}                    \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DCMAKE_C_COMPILER=scorep-mpicc         \
+      -DCMAKE_Fortran_COMPILER=scorep-mpif90  \
+      -DOASIS_SRC=${OASIS_SRC}                \
+      -DeCLM_SRC=${eCLM_SRC}                  \
+      -DICON_SRC=${ICON_SRC}
+
 #
 # For standalone models, remove -DOASIS_SRC=${OASIS_SRC}
 # and pass the path to the component model (i.e. -D<model-name>_SRC=${<model-name>_SRC}).
