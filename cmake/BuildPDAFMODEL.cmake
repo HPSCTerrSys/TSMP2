@@ -39,6 +39,8 @@ if(DEFINED eCLM_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM")
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM/externals/mct/include")
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM/externals/gptl/include")
+  # include PDAF .mod files to be able to call pdaf routines in framework omi routines
+  list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/src")
 endif()
 
 # ParFlow include dirs
