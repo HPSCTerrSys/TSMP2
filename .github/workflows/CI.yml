@@ -3,7 +3,7 @@ name: TSMP2 Build
 # Controls when the action will run.
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev-pdaf-* ]
   pull_request:
     branches: [ master, stages-2025-pdaf ]
 
