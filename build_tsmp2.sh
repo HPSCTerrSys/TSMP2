@@ -18,7 +18,7 @@ function help_tsmp2() {
   echo "  --ICON           Compile with ICON"
   echo "  --eCLM           Compile with eCLM"
   echo "  --ParFlow        Compile with ParFlow"
-  echo "  --ParFlow-GPU    Compile with ParFlow-GPU"
+  echo "  --ParFlowGPU    Compile with ParFlow-GPU"
   echo "  --PDAF           Compile with PDAF"
   echo "  --COSMO          Compile with COSMO"
   echo "  --CLM35          Compile with CLM3.5"
@@ -74,7 +74,7 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     read -p "submodule ${submodule_name} aleady exists. Do you want to overwrite it? (y/N) " yn
+     read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
@@ -103,11 +103,11 @@ while [[ "$#" -gt 0 ]]; do
     -h|--help) help_tsmp2;;
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
-    --version) echo "$0 version 0.1.0"; exit 1;;
+    --version) echo "$0 version 0.1.0"; exit 0;;
     --icon) icon=y;;
     --eclm) eclm=y;;
-    --parflow) parflow=y;;
-    --parflowgpu) parflowGPU=y;;
+    --parflow) parflow=y parflowGPU=n;;
+    --parflowgpu) parflow=y parflowGPU=y;;
     --pdaf) pdaf=y;;
     --cosmo) cosmo=y;;
     --clm35) clm35=y;;
@@ -197,7 +197,7 @@ fi
 
 # Check if the supplied environment file actually exists.
 if [[ ! -f "${env}" ]]; then
-  message "ERROR: Environment file \"${env}\" not found".
+  message "ERROR: Environment file \"${env}\" not found."
   exit 1
 fi
 
