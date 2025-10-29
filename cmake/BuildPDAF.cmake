@@ -241,6 +241,25 @@ endif()
 # Join list
 list(JOIN PDAF_CPP_DEFS " " PDAF_CPP_DEFS)
 
+# Set PDAF_MODULEOPT for Makefile header
+# ----------------------------------
+# Modules flag dependent on compiler
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+
+  list(APPEND PDAF_MODULEOPT "-module")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+  list(APPEND PDAF_MODULEOPT "-J")
+
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+# Join list
+list(JOIN PDAF_MODULEOPT " " PDAF_MODULEOPT)
+
 # Set env vars required by PDAF Makefiles
 # ---------------------------------------
 list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
@@ -252,6 +271,7 @@ list(APPEND PDAF_ENV_VARS TSMPPDAFCOPT=${PDAF_COPT})
 list(APPEND PDAF_ENV_VARS TSMPPDAFDOUBLEPRECISION=${PDAF_DOUBLEPRECISION})
 list(APPEND PDAF_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
 list(APPEND PDAF_ENV_VARS TSMPPDAFCPP_DEFS=${PDAF_CPP_DEFS})
+list(APPEND PDAF_ENV_VARS TSMPPDAFMODULEOPT=${PDAF_MODULEOPT})
 
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # message(STATUS "${PDAF_ENV_VARS_STR}")
