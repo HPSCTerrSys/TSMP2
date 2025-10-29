@@ -38,18 +38,18 @@ jobs:
             use_oasis: "False",
             model_opts: "--eCLM --PDAF"
           }
-#        - {
-#            name: "CLM3.5-ParFlow-PDAF",
-#            use_oasis: "True",
-#            parflow_dir: "parflow_pdaf",
-#            model_opts: "--CLM35 --ParFlow --PDAF"
-#          }
-#        - {
-#            name: "eCLM-ParFlow-PDAF",
-#            use_oasis: "True",
-#            parflow_dir: "parflow_pdaf",
-#            model_opts: "--eCLM --ParFlow --PDAF"
-#         }
+        - {
+            name: "CLM3.5-ParFlow-PDAF",
+            use_oasis: "True",
+            parflow_dir: "parflow_pdaf",
+            model_opts: "--CLM35 --ParFlow --PDAF"
+          }
+        - {
+            name: "eCLM-ParFlow-PDAF",
+            use_oasis: "True",
+            parflow_dir: "parflow_pdaf",
+            model_opts: "--eCLM --ParFlow --PDAF"
+          }
     env:
       SYSTEMNAME: UBUNTU
       STAGE: 24.04
