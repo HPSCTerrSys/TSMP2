@@ -17,8 +17,8 @@ function help_tsmp2() {
   echo "  --version        Print $0 scipt version"
   echo "  --ICON           Compile with ICON"
   echo "  --eCLM           Compile with eCLM"
-  echo "  --ParFlow        Compile with ParFlow"
-  echo "  --ParFlowGPU    Compile with ParFlow-GPU"
+  echo "  --ParFlow        Compile with ParFlow (CPU mode)"
+  echo "  --ParFlowGPU     Compile with ParFlow (GPU mode)"
   echo "  --PDAF           Compile with PDAF"
   echo "  --COSMO          Compile with COSMO"
   echo "  --CLM35          Compile with CLM3.5"
@@ -106,8 +106,8 @@ while [[ "$#" -gt 0 ]]; do
     --version) echo "$0 version 0.1.0"; exit 0;;
     --icon) icon=y;;
     --eclm) eclm=y;;
-    --parflow) parflow=y parflowGPU=n;;
-    --parflowgpu) parflow=y parflowGPU=y;;
+    --parflow) parflow=y; parflowCPU=y; parflowCMakeModelID="ParFlow" ;;
+    --parflowgpu) parflow=y; parflowGPU=y; parflowCMakeModelID="ParFlowGPU" ;;
     --pdaf) pdaf=y;;
     --cosmo) cosmo=y;;
     --clm35) clm35=y;;
@@ -141,8 +141,7 @@ message "Setting model-id and component string..."
 # fun set_component shell_name cmake_name
 set_component icon "ICON"
 set_component eclm "eCLM"
-set_component parflow "ParFlow"
-set_component parflowGPU "ParFlowGPU" #TODO: check if only one ParFlow option is enabled (either --parflow or --parflowgpu)
+set_component parflow $parflowCMakeModelID
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
@@ -152,6 +151,11 @@ if [ $model_count = 0 ];then
   exit 1
 elif [ $model_count -ge 2 ];then
   oasis=y
+fi
+
+if [[ "${parflowCPU}" == "y" &&  "${parflowGPU}" == "y" ]];then
+  echo "ABORT: Building --parflow and --parflowgpu at the same time is not supported."
+  exit 1
 fi
 
 ## CONCATENATE SOURCE CODE STRING
