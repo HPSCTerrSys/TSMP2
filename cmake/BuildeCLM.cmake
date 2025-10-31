@@ -1,6 +1,6 @@
-if(${ICON} OR ${ParFlow})
+if(${ICON} OR ${ParFlow} OR ${ParFlowGPU})
     list(APPEND COUP_OAS_FLAGS -DUSE_OASIS=True)
-    if(${ParFlow})
+    if(${ParFlow} OR ${ParFlowGPU})
         list(APPEND COUP_OAS_FLAGS  -DCOUP_OAS_PFL=True)
     endif()
     if(${ICON})
@@ -26,18 +26,10 @@ ExternalProject_Add(eCLM
                       ${COUP_OAS_FLAGS}
 		              ${PDAF_FLAGS}
     BUILD_ALWAYS      YES
-    BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice. 
+    BUILD_COMMAND     ""   # This needs to be empty to avoid building eCLM twice.
                            # This happens because INSTALL_COMMAND triggers rebuild
                            # which is abnormal. This is a problem in eCLM and should be fixed.
     DEPENDS           ${MODEL_DEPENDENCIES}
-)
-
-ExternalProject_Add_Step(eCLM install-scripts
-    COMMAND       pip3 install --user ${eCLM_SRC}/namelist_generator
-    COMMENT       "Installing clm5nl-gen ..."
-    DEPENDEES     install
-    ALWAYS        TRUE
-    USES_TERMINAL TRUE
 )
 
 if(${PDAF})
