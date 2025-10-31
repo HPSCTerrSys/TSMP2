@@ -3,233 +3,440 @@ name: TSMP2 Build
 # Controls when the action will run.
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev-pdaf-* ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, stages-2025-pdaf ]
 
 jobs:
   eclm_build_job:
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ ubuntu-24.04 ]
         config:
         - {
-            name: "eCLM-ParFlow",
+            name: "ICON-eCLM-ParFlow",
+            use_oasis: "True",
+            parflow_dir: "parflow",
+            model_opts: "--ICON --eCLM --ParFlow"
           }
-
+        - {
+            name: "eCLM-ParFlowGPU",
+            use_oasis: "True",
+            parflow_dir: "parflow",
+            model_opts: "--eCLM --ParFlowGPU"
+          }
+#        - {
+#            name: "CLM3.5-PDAF",
+#            use_oasis: "False",
+#            model_opts: "--CLM35 --PDAF"
+#          }
+        - {
+            name: "eCLM-PDAF",
+            use_oasis: "False",
+            model_opts: "--eCLM --PDAF"
+          }
+#        - {
+#            name: "CLM3.5-ParFlow-PDAF",
+#            use_oasis: "True",
+#            parflow_dir: "parflow_pdaf",
+#            model_opts: "--CLM35 --ParFlow --PDAF"
+#          }
+#        - {
+#            name: "eCLM-ParFlow-PDAF",
+#            use_oasis: "True",
+#            parflow_dir: "parflow_pdaf",
+#            model_opts: "--eCLM --ParFlow --PDAF"
+#         }
     env:
+      SYSTEMNAME: UBUNTU
+      STAGE: 24.04
       CC: mpicc
-      CXX: mpicxx
+      CXX: mpic++
       FC: mpifort
       F77: mpif77
-      BUILD_DIR: bld
-      INSTALL_DIR: install
-      MODEL_DIR: ${{ github.workspace }}/component-models
-      VER_OASIS: tsmp-patches-v0.1
-      VER_eCLM: beta-0.1
-      VER_PARFLOW: ed3974987902ef24c1f7519eb0ba5f8f66380c8c # points to commit "Supported Ubuntu 24.04 and added LLVM to CI"
-      VER_HYPRE: 2.26.0
+      MPI_HOME: /usr/lib/x86_64-linux-gnu/openmpi
       VER_NETCDF_C: 4.9.2
       VER_NETCDF_F90: 4.6.1
-      CMAKE_PREFIX_PATH: ${{ github.workspace }}/dependencies
-      SYSTEMNAME: ${{ matrix.os }}
+      VER_HYPRE: 2.33.0
+      VER_ECCODES: 2.40.0
+      VER_OASIS: tsmp-patches-v0.1
 
     steps:
       - uses: actions/checkout@v4
 
+      #
+      # Install required TSMP2 dependencies
+      #
       - name: Install TSMP2 dependencies on Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-hl-fortran-100t64 hdf5-helpers liblapack-dev libblas-dev
+
+      - name: Install extra TSMP2 dependencies on Ubuntu
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev
+          packages: libxml++2.6-dev pylint wget cmake libpnetcdf-dev tcl-dev tk-dev liblzma-dev
           version: 1.0
           execute_install_scripts: true
 
-      - name: Download HDF5 headers and MPI Fortran compiler
-        run: |
-          sudo apt-get update
-          sudo apt-get install gfortran openmpi-bin libopenmpi-dev libhdf5-openmpi-dev libhdf5-openmpi-103 hdf5-helpers
+      #
+      # Install CUDA dependencies on Ubuntu
+      #
+      - if: contains(matrix.config.name, 'ParFlowGPU')
+        name: Install CUDA compiler and libraries
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: nvidia-cuda-toolkit nvidia-cuda-dev
+          version: 1.0
+          execute_install_scripts: true
 
-      - name: Create directories for component model and dependencies
+      - name: Initialize dependency directory and variables
         run: |
-          mkdir -p ${CMAKE_PREFIX_PATH} ${MODEL_DIR}
+          TSMP2_ROOT=$(git rev-parse --show-toplevel)
+          DEPENDENCIES_ROOT=${TSMP2_ROOT}/dependencies
+          mkdir -v ${DEPENDENCIES_ROOT}
+          tree -L 1 ${TSMP2_ROOT}
+          echo "TSMP2_ROOT=${TSMP2_ROOT}" >> $GITHUB_ENV
+          echo "DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT}" >> $GITHUB_ENV
 
       #
       # NetCDF C
       #
-      - name: Restore cached NetCDF C ${{ env.VER_NETCDF_C }}
+      - name: Restore cached netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/restore@v4
-        id: cache-netcdf-restore
+        id: cache-netcdf-c-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-c-${{ env.VER_NETCDF_C }}
+          key: ${{ matrix.config.name }}_netcdf-c-${{ env.VER_NETCDF_C }}
 
-      - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
-        name: Install NetCDF C ${{ env.VER_NETCDF_C }}
+      - if: steps.cache-netcdf-c-restore.outputs.cache-hit != 'true'
+        name: Install netcdf-c-${{ env.VER_NETCDF_C }}
+        working-directory: /tmp
         run: |
+          # Download
           wget https://github.com/Unidata/netcdf-c/archive/v${VER_NETCDF_C}.tar.gz
           tar xf v${VER_NETCDF_C}.tar.gz
           cd netcdf-c-${VER_NETCDF_C}
+
+          # Install
           export CPPFLAGS=-I/usr/include/hdf5/openmpi
           export LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+          ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
           make -j4 install
 
-      - if: steps.cache-netcdf-restore.outputs.cache-hit != 'true'
-        name: Cache NetCDF ${{ env.VER_NETCDF_C }}
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
+
+      - if: steps.cache-netcdf-c-restore.outputs.cache-hit != 'true'
+        name: Cache netcdf-c-${{ env.VER_NETCDF_C }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_C }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-c-${{ env.VER_NETCDF_C }}
+          key: ${{ matrix.config.name }}_netcdf-c-${{ env.VER_NETCDF_C }}
 
       #
       # NetCDF Fortran
       #
-      - name: Restore cached NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+      - name: Restore cached netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/restore@v4
-        id: cache-netcdff90-restore
+        id: cache-netcdf-f90-restore
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-f90-${{ env.VER_NETCDF_F90 }}
+          key: ${{ matrix.config.name }}_netcdf-f90-${{ env.VER_NETCDF_F90 }}
 
-      - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
-        name: Install NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+      - if: steps.cache-netcdf-f90-restore.outputs.cache-hit != 'true'
+        name: Install netcdf-f90-${{ env.VER_NETCDF_F90 }}
+        working-directory: /tmp
         run: |
+          # Download
           wget https://github.com/Unidata/netcdf-fortran/archive/v${VER_NETCDF_F90}.tar.gz
           tar xf v${VER_NETCDF_F90}.tar.gz
           cd netcdf-fortran-${VER_NETCDF_F90}
-          export CPPFLAGS=-I${CMAKE_PREFIX_PATH}/include
-          export LDFLAGS=-L${CMAKE_PREFIX_PATH}/lib
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
+
+          # Install
+          export CPPFLAGS=-I${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/include
+          export LDFLAGS=-L${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/lib
+          ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
           make -j4 install
 
-      - if: steps.cache-netcdff90-restore.outputs.cache-hit != 'true'
-        name: Cache NetCDF Fortran ${{ env.VER_NETCDF_F90 }}
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
+
+      - if: steps.cache-netcdf-f90-restore.outputs.cache-hit != 'true'
+        name: Cache netcdf-f90-${{ env.VER_NETCDF_F90 }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_NETCDF_F90 }}
+          path: ${{ env.DEPENDENCIES_ROOT }}/netcdf-f90-${{ env.VER_NETCDF_F90 }}
+          key: ${{ matrix.config.name }}_netcdf-f90-${{ env.VER_NETCDF_F90 }}
+
+      #
+      # Hypre (OpenMP backend)
+      #
+      - if: contains(matrix.config.name, 'ParFlow') && !contains(matrix.config.name, 'GPU')
+        name: Restore cached hypre-${{ env.VER_HYPRE }}  (OpenMP backend)
+        uses: actions/cache/restore@v4
+        id: cache-hypre-openmp-restore
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}-openmp
+          key: hypre-${{ env.VER_HYPRE }}-openmp
+
+      - if: contains(matrix.config.name, 'ParFlow') && !contains(matrix.config.name, 'GPU') && steps.cache-hypre-openmp-restore.outputs.cache-hit != 'true'
+        name: Install hypre-${{ env.VER_HYPRE }} (OpenMP backend)
+        working-directory: /tmp
+        run: |
+          # Download
+          wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
+          tar xf v${VER_HYPRE}.tar.gz
+          cd hypre-${VER_HYPRE}
+
+          # Install
+          INSTALL_DIR="${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}-openmp"
+          cmake -S src -B bld                            \
+                -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"  \
+                -DMPI_INCLUDE_DIR="${MPI_HOME}/include"  \
+                -DHYPRE_ENABLE_OPENMP="ON"
+          cmake --build bld --parallel 4
+          cmake --install bld
+
+          # Verify
+          tree -L 2 ${INSTALL_DIR}
+
+      - if: contains(matrix.config.name, 'ParFlow') && !contains(matrix.config.name, 'GPU') && steps.cache-hypre-openmp-restore.outputs.cache-hit != 'true'
+        name: Cache hypre-${{ env.VER_HYPRE }} (OpenMP backend)
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}-openmp
+          key: hypre-${{ env.VER_HYPRE }}-openmp
+
+      #
+      # Hypre (CUDA backend)
+      #
+      - if: contains(matrix.config.name, 'ParFlowGPU')
+        name: Restore cached hypre-${{ env.VER_HYPRE }} (CUDA backend)
+        uses: actions/cache/restore@v4
+        id: cache-hypre-cuda-restore
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}-cuda
+          key: hypre-${{ env.VER_HYPRE }}-cuda
+
+      - if: contains(matrix.config.name, 'ParFlowGPU') && steps.cache-hypre-cuda-restore.outputs.cache-hit != 'true'
+        name: Install hypre-${{ env.VER_HYPRE }} (CUDA backend)
+        working-directory: /tmp
+        run: |
+          # Download
+          wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
+          tar xf v${VER_HYPRE}.tar.gz
+          cd hypre-${VER_HYPRE}
+
+          # Install
+          INSTALL_DIR="${DEPENDENCIES_ROOT}/hypre-${VER_HYPRE}-cuda"
+          cmake -S src -B bld                            \
+                -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"  \
+                -DMPI_INCLUDE_DIR="${MPI_HOME}/include"  \
+                -DHYPRE_ENABLE_CUDA="ON"
+          cmake --build bld --parallel 4
+          cmake --install bld
+
+          # Verify
+          tree -L 2 ${INSTALL_DIR}
+
+      - if: contains(matrix.config.name, 'ParFlowGPU') && steps.cache-hypre-cuda-restore.outputs.cache-hit != 'true'
+        name: Cache hypre-${{ env.VER_HYPRE }}  (CUDA backend)
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/hypre-${{ env.VER_HYPRE }}-cuda
+          key: hypre-${{ env.VER_HYPRE }}-cuda
+
+      #
+      # ecCodes
+      #
+      - if: contains(matrix.config.name, 'ICON')
+        name: Restore cached eccodes-${{ env.VER_ECCODES }}
+        uses: actions/cache/restore@v4
+        id: cache-eccodes-restore
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/eccodes-${{ env.VER_ECCODES }}
+          key: ${{ matrix.config.name }}_eccodes-${{ env.VER_ECCODES }}
+
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
+        name: Install eccodes-${{ env.VER_ECCODES }}
+        working-directory: /tmp
+        run: |
+          # Download
+          wget https://github.com/ecmwf/eccodes/archive/refs/tags/${VER_ECCODES}.tar.gz
+          tar xf ${VER_ECCODES}.tar.gz
+          cd eccodes-${VER_ECCODES}
+
+          # Install
+          cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES}
+          cmake --build bld --parallel 4
+          cmake --install bld
+
+          # Verify
+          tree -L 2 ${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES}
+
+      - if: contains(matrix.config.name, 'ICON') && steps.cache-eccodes-restore.outputs.cache-hit != 'true'
+        name: Cache eccodes-${{ env.VER_ECCODES }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.DEPENDENCIES_ROOT }}/eccodes-${{ env.VER_ECCODES }}
+          key: ${{ matrix.config.name }}_eccodes-${{ env.VER_ECCODES }}
+
+      #
+      # Check component model versions
+      #
+      - name: Extract required component model versions
+        id: model-versions
+        working-directory: ${{ env.TSMP2_ROOT }}/models
+        run: |
+          pwd
+          echo ""
+          git submodule status | cut -c2- | cut -d' ' -f1-2 | tee model_versions
+          echo ""
+
+          if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
+            VER_OASIS=$(cat model_versions | grep -w "oasis3-mct" | cut -d' ' -f1)
+            echo "${VER_OASIS} => VER_OASIS"
+            echo "VER_OASIS=${VER_OASIS}" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"eCLM"* ]]; then
+            VER_eCLM=$(cat model_versions | grep -w "eCLM" | cut -d' ' -f1)
+            echo "${VER_eCLM} => VER_eCLM"
+            echo "VER_eCLM=${VER_eCLM}" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"CLM3.5"* ]]; then
+            VER_CLM35=$(cat model_versions | grep -w "CLM3.5" | cut -d' ' -f1)
+            echo "${VER_CLM35} => VER_CLM35"
+            echo "VER_CLM35=${VER_CLM35}" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"ParFlow"* ]]; then
+            VER_ParFlow=$(cat model_versions | grep -w "${{ matrix.config.parflow_dir }}"  | cut -d' ' -f1)
+            echo "${VER_ParFlow} => VER_ParFlow"
+            echo "VER_ParFlow=${VER_ParFlow}" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"ICON"* ]]; then
+            VER_ICON=$(cat model_versions | grep -w "icon" | cut -d' ' -f1)
+            echo "${VER_ICON} => VER_ICON"
+            echo "VER_ICON=${VER_ICON}" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${{ matrix.config.name }}" == *"PDAF"* ]]; then
+            VER_PDAF=$(cat model_versions | grep -w "pdaf" | cut -d' ' -f1)
+            echo "${VER_PDAF} => VER_PDAF"
+            echo "VER_PDAF=${VER_PDAF}" >> $GITHUB_OUTPUT
+          fi
 
       #
       # OASIS3-MCT
       #
-      - name: Restore cached OASIS3-MCT ${{ env.VER_OASIS }}
+      - if: matrix.config.use_oasis == 'True'
+        name: Restore cached OASIS3-MCT ${{ env.VER_OASIS }}
         uses: actions/cache/restore@v4
         id: cache-oasis-restore
         with:
-          path: ${{ env.MODEL_DIR }}/oasis3-mct
-          key: cache-${{ matrix.config.name }}-${{ env.VER_OASIS }}
+          path: ${{ env.TSMP2_ROOT }}/oasis3-mct
+          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}
 
-      - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
-        name: Download OASIS3-MCT ${{ env.VER_OASIS }}
-        working-directory: ${{ env.MODEL_DIR }}
+      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
+        name: Update OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
+        working-directory: ${{ env.TSMP2_ROOT }}
         run: |
-          git clone -b $VER_OASIS https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
-          echo "OASIS3-MCT version: $(cd oasis3-mct && git describe --tags --always)"
+          pwd && git clone -b $VER_OASIS https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct.git
 
-      - if: steps.cache-oasis-restore.outputs.cache-hit != 'true'
+      - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Cache OASIS3-MCT ${{ env.VER_OASIS }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.MODEL_DIR }}/oasis3-mct
-          key: cache-${{ matrix.config.name }}-${{ env.VER_OASIS }}
+          path: ${{ env.TSMP2_ROOT }}/oasis3-mct
+          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}
 
       #
       # eCLM
       #
-      - name: Restore cached eCLM ${{ env.VER_eCLM }}
-        uses: actions/cache/restore@v4
-        id: cache-eclm-restore
-        with:
-          path: ${{ env.MODEL_DIR }}/eCLM
-          key: cache-${{ matrix.config.name }}-${{ env.VER_eCLM }}
-
-      - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
-        name: Download eCLM ${{ env.VER_eCLM }}
-        working-directory: ${{ env.MODEL_DIR }}
+      - if: contains(matrix.config.name, 'eCLM')
+        name: Update eCLM submodule ${{ steps.model-versions.outputs.VER_eCLM }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/eCLM
         run: |
-          git clone -b $VER_eCLM https://github.com/HPSCTerrSys/eCLM.git
-          echo "eCLM version: $(cd eCLM && git describe --tags --always)"
+          pwd && git submodule update --init --force .
 
-      - if: steps.cache-eclm-restore.outputs.cache-hit != 'true'
-        name: Cache eCLM ${{ env.VER_eCLM }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.MODEL_DIR }}/eCLM
-          key: cache-${{ matrix.config.name }}-${{ env.VER_eCLM }}
+      #
+      # CLM3.5
+      #
+      - if: contains(matrix.config.name, 'CLM3.5')
+        name: Update CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/CLM3.5
+        run: |
+          pwd && git submodule update --init --force .
 
       #
       # ParFlow
       #
-      - name: Restore cached ParFlow ${{ env.VER_PARFLOW }}
-        uses: actions/cache/restore@v4
-        id: cache-parflow-restore
-        with:
-          path: ${{ env.MODEL_DIR }}/parflow
-          key: cache-${{ matrix.config.name }}-${{ env.VER_PARFLOW }}
-
-      # TODO: Must use upstream repo https://github.com/parflow/parflow.git
-      - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Download ParFlow ${{ env.VER_PARFLOW }}
-        working-directory: ${{ env.MODEL_DIR }}
+      - if: contains(matrix.config.name, 'ParFlow')
+        name: Update ${{ matrix.config.parflow_dir }} submodule ${{ steps.model-versions.outputs.VER_ParFlow }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/${{ matrix.config.parflow_dir }}
         run: |
-          git clone https://github.com/parflow/parflow.git
-          cd parflow
-          git checkout $VER_PARFLOW
-          echo "ParFlow version: $(git describe --tags --always)"
-
-      - if: steps.cache-parflow-restore.outputs.cache-hit != 'true'
-        name: Cache ParFlow ${{ env.VER_PARFLOW }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.MODEL_DIR }}/parflow
-          key: cache-${{ matrix.config.name }}-${{ env.VER_PARFLOW }}
+          pwd && git submodule update --init --force .
 
       #
-      # Hypre
+      # ICON
       #
-      - name: Restore cached Hypre ${{ env.VER_HYPRE }}
-        uses: actions/cache/restore@v4
-        id: cache-hypre-restore
-        with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
-
-      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Install Hypre ${{ env.VER_HYPRE }}
+      - if: contains(matrix.config.name, 'ICON')
+        name: Update ICON submodule ${{ steps.model-versions.outputs.VER_ICON }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/icon
         run: |
-          wget https://github.com/hypre-space/hypre/archive/v${VER_HYPRE}.tar.gz
-          tar xf v${VER_HYPRE}.tar.gz
-          cd hypre-${VER_HYPRE}/src
-          ./configure --prefix=$(realpath $CMAKE_PREFIX_PATH)
-          make -j4 install
-
-      - if: steps.cache-hypre-restore.outputs.cache-hit != 'true'
-        name: Cache Hypre ${{ env.VER_HYPRE }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.CMAKE_PREFIX_PATH }}
-          key: cache-${{ matrix.config.name }}-${{ env.VER_HYPRE }}
+          pwd && git submodule update --init --force .
 
       #
-      # TSMP2
+      # PDAF
       #
-      - name: Configure TSMP2
-        run: >-
-          cmake -S . -B ${BUILD_DIR}
-          -DCMAKE_BUILD_TYPE="RELEASE"
-          -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-          -DOASIS_SRC=${MODEL_DIR}/oasis3-mct
-          -DeCLM="ON"
-          -DeCLM_SRC=${MODEL_DIR}/eCLM
-          -DParFlow="ON"
-          -DPARFLOW_SRC=${MODEL_DIR}/parflow
-
-      - name: Build TSMP2
+      - if: contains(matrix.config.name, 'PDAF')
+        name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
         run: |
-          cmake --build ${BUILD_DIR}
+          pwd && git submodule update --init --force .
 
-      - name: Install TSMP2
+      #
+      # Pre-build checks
+      #
+      - name: Check component model versions
+        working-directory: ${{ env.TSMP2_ROOT }}
         run: |
-          cmake --install ${BUILD_DIR}
+          git submodule foreach 'git describe --tags --always && echo ""'
+          if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
+            echo "Entering 'oasis3-mct'"
+            echo "$(git -C oasis3-mct describe --tags --always)"
+          fi
+
+      - name: Check TSMP2 dependencies
+        working-directory: ${{ env.DEPENDENCIES_ROOT }}
+        run: |
+          tree -FUCh --du -L 2 $(pwd)
+          CMAKE_PREFIX_PATH=$(ls -1 | xargs realpath | paste -sd ":" -)
+          CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${MPI_HOME}"
+          echo "" && echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> $GITHUB_ENV
+
+      #
+      # Build TSMP2
+      #
+      - name: Build ${{ matrix.config.name }}
+        run: |
+          MODEL_OPTS="${{ matrix.config.model_opts }}"
+          if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
+            MODEL_OPTS="${MODEL_OPTS} --OASIS_SRC ${TSMP2_ROOT}/oasis3-mct"
+          fi
+          BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update"
+          echo $BUILD_TSMP2_CMD && echo ""
+          eval $BUILD_TSMP2_CMD
+
+      - name: Check installed binaries
+        working-directory: ${{ env.TSMP2_ROOT }}/bin
+        run: |
+          tree -FUCh --du -L 3 $(pwd)

@@ -66,13 +66,25 @@ list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
 list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
 list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
 list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
-list(APPEND PDAF_LINK_LIBS "-qmkl")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+  list(APPEND PDAF_LINK_LIBS "-qmkl")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  list(APPEND PDAF_LINK_LIBS "-mkl")
+  list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
+  message(WARNING "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
 list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 
 # Explicit libraries named in comments should be handed over by the
 # variables. For checking this, search `$BUILD_DIR/CMakeCache.txt`.
 list(APPEND PDAF_LINK_LIBS "${MPICH_Fortran_LDFLAGS}") # "-lpthread"
-list(APPEND PDAF_LINK_LIBS "-lmpich")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+  list(APPEND PDAF_LINK_LIBS "-lmpich")
+endif()
 list(APPEND PDAF_LINK_LIBS "${OpenMP_Fortran_FLAGS}") # "-qopenmp"
 # Use locally set NetCDF libraries variable
 list(APPEND PDAF_LINK_LIBS "${NetCDF_LIBRARIES}") # "-lnetcdf", "-lnetcdff"
@@ -126,6 +138,15 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_FOPT "-finit-local-zero")
   list(APPEND PDAF_FOPT "-mcmodel=large")
 
+  # Flags from eCLM, `Setbuildoptions.cmake:29`
+  list(APPEND PDAF_FOPT "-fconvert=big-endian")
+  list(APPEND PDAF_FOPT "-ffree-line-length-none")
+  list(APPEND PDAF_FOPT "-ffixed-line-length-none")
+  list(APPEND PDAF_FOPT "-ffree-form")
+  # list(APPEND PDAF_FOPT "-fopenmp")
+  list(APPEND PDAF_FOPT "-fallow-argument-mismatch")
+  list(APPEND PDAF_FOPT "-fcommon")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -172,6 +193,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_COPT "-fno-automatic")
   list(APPEND PDAF_COPT "-finit-local-zero")
   list(APPEND PDAF_COPT "-mcmodel=large")
+  list(APPEND PDAF_COPT "-fcommon")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -200,7 +222,9 @@ list(JOIN PDAF_DOUBLEPRECISION " " PDAF_DOUBLEPRECISION)
 
 # Set PDAF_MPI_INC for Makefile header
 # ----------------------------------
-list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+if(DEFINED MPICH_Fortran_INCLUDEDIR AND NOT MPICH_Fortran_INCLUDEDIR STREQUAL "")
+  list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+endif()
 
 # Join list
 list(JOIN PDAF_MPI_INC " " PDAF_MPI_INC)
