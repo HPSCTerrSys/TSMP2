@@ -31,7 +31,7 @@ ExternalProject_Add(COSMO5_1
   DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
-install (FILES ${COSMO_BLD_DIR}/lmparbin_pur 
+install (FILES ${COSMO_BLD_DIR}/lmparbin_pur
          TYPE BIN
          PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
                      GROUP_EXECUTE GROUP_READ)
