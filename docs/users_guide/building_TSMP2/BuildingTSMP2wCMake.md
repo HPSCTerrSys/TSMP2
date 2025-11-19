@@ -131,20 +131,20 @@ cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DeCLM=ON                               \
       -DICON=ON                               \
-      -DPARFLOW=ON
+      -DParFlow=ON
 
 # CLM3.5-COSMO5.01-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DCLM35=ON                              \
       -DCOSMO=ON                              \
-      -DPARFLOW=ON
+      -DParFlow=ON
 
 # CLM3.5-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DCLM35=ON                          \
-      -DPARFLOW=ON
+      -DParFlow=ON
 
 # CLM3.5-COSMO5.01
 cmake -S . -B ${BUILD_DIR}                    \
@@ -170,7 +170,7 @@ cmake -S . -B ${BUILD_DIR}                    \
 # ParFlow standalone
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-      -DPARFLOW=ON
+      -DParFlow=ON
 
 #
 # For TSMP-PDAF builds, add -PDAF=ON
@@ -186,7 +186,7 @@ cmake -S . -B ${BUILD_DIR}                    \
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DCLM35=ON                              \
-      -DPARFLOW=ON                            \
+      -DParFlow=ON                            \
       -DPDAF=ON
 
 # eCLM-PDAF
@@ -199,7 +199,7 @@ cmake -S . -B ${BUILD_DIR}                    \
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DeCLM=ON                               \
-      -DPARFLOW=ON                            \
+      -DParFlow=ON                            \
       -DPDAF=ON
 
 ```
