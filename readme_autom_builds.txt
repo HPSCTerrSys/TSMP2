@@ -5,6 +5,8 @@ To use:
 This will create a matrix of builds with the components and environments specified in "config_autom_builds.in" file.
 For instance, if below components are: ICON, eCLM, ICON eCLM; and below environments: jsc.2025.intel.psmpi and jsc.2025.gnu.openmpi as:
 
+The optinos specified under `OPTIONS` will be used in the `./build_tsmp2.sh` command of each build in the matrix.
+
 #########################
 COMBINATIONS:
 ICON
@@ -14,6 +16,9 @@ ICON eCLM
 ENVIRONMENTS:
 jsc.2025.intel.psmpi
 jsc.2025.gnu.openmpi
+
+OPTIONS:
+--build_type RELEASE
 ################################
 
 It will build each combination twice (one for each environment).

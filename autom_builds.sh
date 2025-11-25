@@ -22,6 +22,7 @@ fi
 
 combs=()
 envs=()
+options=""
 
 section=""
 
@@ -42,9 +43,15 @@ while IFS= read -r rawline; do
         continue
     fi
 
+    if [[ "$ULINE" == "OPTIONS:" ]]; then
+        section="options"
+        continue
+    fi
+
     case "$section" in
         "combinations") combs+=("$line") ;;
         "environments") envs+=("$line") ;;
+        "options") options+=" $line" ;;
     esac
 
 done < "$input_file"
@@ -69,7 +76,7 @@ for combo in "${combs[@]}"; do
 
         log_summary "START: combination=\"$combo\" environment=\"$env\""
 
-        cmd="./build_tsmp2.sh $combo_flags --env env/$env --force_update"
+        cmd="./build_tsmp2.sh $combo_flags --env env/$env --force_update $options"
 		log_summary "$cmd"
 
 		if eval "$cmd"; then
