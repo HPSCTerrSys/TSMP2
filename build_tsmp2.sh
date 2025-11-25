@@ -22,6 +22,7 @@ function help_tsmp2() {
   echo "  --PDAF           Compile with PDAF"
   echo "  --COSMO          Compile with COSMO"
   echo "  --CLM35          Compile with CLM3.5"
+  echo "  --CLM3.5         Compile with CLM3.5"
   echo "  --ICON_SRC       Set ICON_SRC directory"
   echo "  --eCLM_SRC       Set eCLM_SRC directory"
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
@@ -110,14 +111,14 @@ while [[ "$#" -gt 0 ]]; do
     --parflowgpu) parflow=y; parflowGPU=y; parflowCMakeModelID="ParFlowGPU" ;;
     --pdaf) pdaf=y;;
     --cosmo) cosmo=y;;
-    --clm35) clm35=y;;
+    --clm35|--clm3.5) clm35=y;;
     --no_update) update_compsrc=n;;
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
     --eclm_src) eclm_src="$2"; shift ;;
     --parflow_src) parflow_src="$2"; shift ;;
     --cosmo_src) cosmo_src="$2"; shift ;;
-    --clm35_src) clm35_src="$2"; shift ;;
+    --clm35_src|--clm3.5_src) clm35_src="$2"; shift ;;
     --pdaf_src) pdaf_src="$2"; shift ;;
     --oasis_src) oasis_src="$2"; shift ;;
     --build_type) build_type="$2"; shift ;;
