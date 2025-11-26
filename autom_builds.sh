@@ -27,7 +27,10 @@ options=""
 section=""
 
 # Robust parser (handles whitespace, casing, CRLF)
-while IFS= read -r rawline; do
+#
+# The condition `[[ -n "$rawline" ]]` ensures the last line of
+# `input_file` is read even without a trailing newline
+while IFS= read -r rawline || [[ -n "$rawline" ]]; do
     line="$(echo "$rawline" | xargs)"      # trim whitespace
     [[ -z "$line" ]] && continue           # skip blank lines
 
