@@ -22,7 +22,7 @@ function help_tsmp2() {
   echo "  --PDAF           Compile with PDAF"
   echo "  --COSMO          Compile with COSMO"
   echo "  --CLM35          Compile with CLM3.5"
-  echo "  --CLM3.5         Compile with CLM3.5"
+  echo "  --CLM3.5         Compile with CLM3.5 (same as option --CLM35)"
   echo "  --ICON_SRC       Set ICON_SRC directory"
   echo "  --eCLM_SRC       Set eCLM_SRC directory"
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
