@@ -124,7 +124,7 @@ cmake -S . -B ${BUILD_DIR}                    \
 cmake -S . -B ${BUILD_DIR}                    \
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
       -DeCLM=ON                               \
-      -DPARFLOW_SRC=ON
+      -DParFlow_SRC=ON
 
 # ICON-eCLM-ParFlow
 cmake -S . -B ${BUILD_DIR}                    \
