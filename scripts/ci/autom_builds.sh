@@ -4,16 +4,15 @@
 # a.gonzalez-nicolas@fz-juelich.de
 
 # USER INFO
-input_file="config_autom_builds.in"
+input_file="./scripts/ci/config_autom_builds.conf_Ana"
 
 # ----------------------------------------------------
 # Summary log filename
-SUMMARY_LOG="autom_builds_summary_$(date +%Y%m%d_%H%M%S).log"
+SUMMARY_LOG="./scripts/ci/autom_builds_summary_${SYSTEMNAME^^}_$(date +%Y%m%d_%H%M%S).log"
 
 log_summary() {
     echo "[$(date '+%F %T')] $*" | tee -a "$SUMMARY_LOG"
 }
-
 
 if [[ -z "$input_file" ]]; then
   echo "Usage: $0 <input-file>"
@@ -111,7 +110,6 @@ for combo in "${combs[@]}"; do
 
             log_summary "FAILED: combo=\"$combo\", env=\"$env\" → $bld_failed, $bin_failed"
             log_summary ""
-            exit 1
 
         fi
 
