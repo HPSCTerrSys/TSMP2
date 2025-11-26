@@ -12,3 +12,6 @@ ENVIRONMENTS:
 jsc.2025.intel.psmpi
 jsc.2025.gnu.openmpi
 jsc.2025.gnu.psmpi
+
+OPTIONS:
+--build_type RELEASE
