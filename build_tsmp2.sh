@@ -25,7 +25,7 @@ function help_tsmp2() {
   echo "  parflowGPU     Compile with ParFlow subsurface model (GPU-enabled)"
   echo "  pdaf           Compile with PDAF data assimilation framework."
   echo "  cosmo          Compile with COSMO atmosphere model (legacy)"
-  echo "  clm35          Compile with CLM3.5 land surface model (legacy)"
+  echo "  clm3.5          Compile with CLM3.5 land surface model (legacy)"
   echo ""
   echo "Options:"
   echo ""
@@ -127,7 +127,7 @@ while [[ "$#" -gt 0 ]]; do
     --parflowgpu|parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
     --pdaf|pdaf) pdaf=y;;
     --cosmo|cosmo) cosmo=y;;
-    --clm35|clm35) clm35=y;;
+    --clm35|--clm3.5|clm3.5) clm35=y;;
     --no_update) update_compsrc=n;;
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
