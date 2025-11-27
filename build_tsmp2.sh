@@ -25,7 +25,7 @@ function help_tsmp2() {
   echo "  parflowGPU     Compile with ParFlow subsurface model (GPU-enabled)"
   echo "  pdaf           Compile with PDAF data assimilation framework."
   echo "  cosmo          Compile with COSMO atmosphere model (legacy)"
-  echo "  clm3.5          Compile with CLM3.5 land surface model (legacy)"
+  echo "  clm3.5         Compile with CLM3.5 land surface model (legacy)"
   echo ""
   echo "Options:"
   echo ""
