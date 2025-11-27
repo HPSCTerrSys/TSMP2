@@ -28,6 +28,7 @@ function help_tsmp2() {
   echo "  --OASIS_SRC      Set OASIS3-MCT directory"
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
   echo "  --no_update      Skip component model download"
+  echo "  --force_update   Force component model download"  
   echo "  --build_type     Set build configuration: 'DEBUG' 'RELEASE'"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
@@ -73,16 +74,22 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
   else
      submodule_name=$(echo "models/"${sub_srcname})
   fi
-  if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
-     if [ "${yn,}" = "y" ];then
+  
+  if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then  
+    if [ "${force_overwrite,,}" = "y" ]; then
+        message "Force-overwrite enabled. Overwriting submodule ${submodule_name}"
+        git submodule update --init --force -- "${submodule_name}"	
+    else
+      read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
+      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
-     else
+      else
         message "Do not overwrite submodule ${submodule_name}"
-     fi
+      fi
+    fi # force-overwrite  
   else
-     git submodule update --init -- ${submodule_name}
+    git submodule update --init -- ${submodule_name}
   fi
 fi # compsrc
 }
@@ -112,6 +119,7 @@ while [[ "$#" -gt 0 ]]; do
     --cosmo) cosmo=y;;
     --clm35) clm35=y;;
     --no_update) update_compsrc=n;;
+    --force_update) force_overwrite=y;;	
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
     --eclm_src) eclm_src="$2"; shift ;;
