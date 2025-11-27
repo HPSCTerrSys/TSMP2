@@ -35,7 +35,7 @@ The component models (git submodules) are cloned during the execution of `build_
 ./build_tsmp2.sh ICON --ICON_SRC ${ICON_SRC}
 
 # Build ParFlow on Marvin (Uni Bonn)
-./build_tsmp2.sh ParFlow --env env/uni-bonn.gnu.openmpi parflow
+./build_tsmp2.sh ParFlow --env env/uni-bonn.gnu.openmpi
 
 
 # Fancy way of building a fully-coupled model

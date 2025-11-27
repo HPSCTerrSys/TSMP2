@@ -123,7 +123,7 @@ while [[ "$#" -gt 0 ]]; do
     --version) echo "$0 version 0.1.0"; exit 1;;
     --icon|icon) icon=y;;
     --eclm|eclm) eclm=y;;
-    --parflow|parflow) parflow=y parflowCPU=n parflowCMakeModelID="ParFlow";;
+    --parflow|parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
     --parflowgpu|parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
     --pdaf|pdaf) pdaf=y;;
     --cosmo|cosmo) cosmo=y;;
