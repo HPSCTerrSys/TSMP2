@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ### TSMP2 frontend
-### Shell-based script to compile model components within the TSMP2 framework.
+### Bash script for compiling model components within the TSMP2 framework.
 ###
 ### For more information:
 ### ./build_tsmp2.sh --help
@@ -11,7 +11,7 @@ set -eo pipefail
 ## functions
 
 function help_tsmp2() {
-  echo "build_tsmp2.sh - Shell-based script to compile model components within the TSMP2 framework."
+  echo "build_tsmp2.sh - Bash script for compiling model components within the TSMP2 framework."
   echo ""
   echo "Usage:"
   echo ""
@@ -48,7 +48,8 @@ function help_tsmp2() {
   echo ""
   echo "  ./build_tsmp2.sh icon eclm parflow"
   echo "  ./build_tsmp2.sh eclm parflowGPU"
-  echo "  ./build_tsmp2.sh iconGPU eclm"
+  echo "  ./build_tsmp2.sh icon eclm"
+  echo "  ./build_tsmp2.sh eclm pdaf"
   echo ""
   exit 1
 }
