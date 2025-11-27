@@ -36,10 +36,17 @@ The component models (git submodules) are cloned during the execution of `build_
 
 # Build ParFlow on Marvin (Uni Bonn)
 ./build_tsmp2.sh ParFlow --env env/uni-bonn.gnu.openmpi
+```
 
+## `build_tsmp2.sh` cheatsheet
 
-# Fancy way of building a fully-coupled model
-echo "eCLM ICON ParFlow" | xargs -t ./build_tsmp2.sh --no_update --clean_first
+```bash
+# Specify model combinations thru xargs
+echo "icon eclm parflow" | xargs -t ./build_tsmp2.sh --no_update --clean_first
+
+# Build models with custom environment, build, and install directories
+echo "icon eclm parflow" | xargs -t -L 1 ./build_tsmp2.sh --no_update --env env/jsc.2025.gnu.psmpi --build_dir bld/ICON_eCLM_ParFlow_GNUPSMPI --install_dir bin/ICON_eCLM_ParFlow_GNUPSMPI
+echo "eclm parflowgpu" | xargs -t -L 1 ./build_tsmp2.sh --no_update --env env/jsc.2025.gnu.openmpi --build_dir bld/eCLM_ParFlowGPU_GNUOPENMPI --install_dir bin/eCLM_ParFlowGPU_GNUOPENMPI
 
 # Build multiple combinations (useful for CI)
 cat << EOF > model_combinations.txt
@@ -49,5 +56,8 @@ icon eclm
 eclm pdaf
 EOF
 cat model_combinations.txt | xargs -t -L 1 ./build_tsmp2.sh --no_update
+
+# Force-update all component models before building
+yes y | ./build_tsmp2.sh icon eclm parflow
 ```
 
