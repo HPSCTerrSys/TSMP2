@@ -48,6 +48,6 @@ eclm parflowgpu
 icon eclm
 eclm pdaf
 EOF
-cat model_combinations.txt | xargs -t -n 3 ./build_tsmp2.sh --no_update
+cat model_combinations.txt | xargs -t -L 1 ./build_tsmp2.sh --no_update
 ```
 
