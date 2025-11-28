@@ -27,11 +27,17 @@ module load netCDF-Fortran
 module load PnetCDF
 
 # ParFlow additional libraries (TODO)
-# module load Hypre # Non-existent under NVHPC toolchain
-# module load Tcl
-if [[ "$1" == "--parflowgpu" ]]; then
-  echo "ERROR: Hypre isn't yet available on the NVHPC toolchain."
+module load CUDA
+module load UCX-settings/RC-CUDA
+module load Hypre/2.31.0
+
+# TODO: Verify these values
+if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
+  export CUDAARCHS="90"
+else
+  export CUDAARCHS="80"
 fi
+export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
 
 # ICON additional libraries
 module load ecCodes
@@ -44,11 +50,11 @@ export MPI_HOME=$EBROOTPSMPI
 
 # Display compiler settings
 module list
-echo "====================================== COMPILER SETTINGS ======================================"
+echo "========================= COMPILER SETTINGS =========================="
 echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
 echo "   MPI lib: $(mpichversion | head -n 1 | tr -d =)"
 echo "         C: $($CC --version 2>/dev/null | head -n 2 | tail -n 1)"
 echo "       C++: $($CXX --version 2>/dev/null | head -n 2 | tail -n 1)"
 echo "   Fortran: $($FC --version 2>/dev/null | head -n 2 | tail -n 1)"
-echo "==============================================================================================="
+echo "======================================================================"
 echo ""
