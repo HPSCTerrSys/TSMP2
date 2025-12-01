@@ -22,6 +22,8 @@ else
   module load Intel
 fi
 module load ParaStationMPI
+module load ScaLAPACK/2.2.0-fb
+
 
 # Basic scripting and build tools
 module load Python

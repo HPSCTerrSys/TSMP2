@@ -44,6 +44,9 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OPTIM} -I. -ffree-line-length-none -fallow-argument-mismatch ${OpenMP_Fortran_FLAGS}\n")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
   file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OPTIM} -I. -xCORE-AVX2 -assume byterecl -mt_mpi ${OpenMP_Fortran_FLAGS}\n")
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+  # nvfortran doesn't support real(16) / quad precision; hence the __NO_16BYTE_REALS here.
+  file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = -D__NO_16BYTE_REALS ${OPTIM} -I. ${OpenMP_Fortran_FLAGS}\n")
 else()
   message(FATAL_ERROR "Fortran compiler '${CMAKE_Fortran_COMPILER_ID}' is not supported.")
 endif()
@@ -68,7 +71,7 @@ ExternalProject_Add(OASIS3_MCT
   SOURCE_DIR        ${OASIS_SRC}
   BUILD_IN_SOURCE   FALSE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
+  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 realclean static-libs -C ${OASIS_BLD_DIR}
   INSTALL_COMMAND   ""
 )
 

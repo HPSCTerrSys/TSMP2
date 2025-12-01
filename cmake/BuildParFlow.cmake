@@ -35,7 +35,6 @@ else()
   else()
     set(PF_ACC_BACKEND "none") 
   endif()
-  #TODO: Add support for 'kokkos' backend
 endif()
 
 # Set compiler flags
@@ -48,7 +47,12 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     endif()
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
-    set(PF_CFLAGS "-Wall -Werror -Wno-unused-function -Wno-unused-variable")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
+    if (NOT ${ParFlowGPU})
+      # TODO: Perhaps there's a case for using NVHPC to target CPU. This would require
+      #       fiddling with libraries+environment so we don't support it for now.
+      message(FATAL_ERROR "NVHPC is only valid for ParflowGPU builds.")
+    endif()
 else()
   message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
 endif()
