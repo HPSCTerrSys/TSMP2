@@ -14,6 +14,7 @@ module use $OTHERSTAGES
 module load Stages/2025
 module load NVHPC/25.5-CUDA-12
 module load ParaStationMPI
+module load ScaLAPACK/2.2.0-fb
 
 # Basic scripting and build tools
 module load Python
