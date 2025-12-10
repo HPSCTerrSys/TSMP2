@@ -24,6 +24,7 @@ endif()
 # LAPACK is required
 # For eCLM-PDAF, this setting has to be consistent with MKL/LAPACK
 # loading in `eCLM/src/clm5/CMakelists.txt`
+# https://cmake.org/cmake/help/latest/module/FindLAPACK.html
 find_package(LAPACK REQUIRED)
 
 # OpenMP is required
@@ -75,6 +76,10 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   message(WARNING "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
   # MKL command
+  list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
+  list(APPEND PDAF_LINK_LIBS "${LAPACK_LINKER_FLAGS}")
+  message(STATUS "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+  message(STATUS "LAPACK_LINKER_FLAGS: ${LAPACK_LINKER_FLAGS}")
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -250,6 +255,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
 
   # doubleprecision flag!?
+  list(APPEND PDAF_DOUBLEPRECISION "-r8")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
