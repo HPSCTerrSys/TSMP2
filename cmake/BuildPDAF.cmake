@@ -24,6 +24,7 @@ endif()
 # LAPACK is required
 # For eCLM-PDAF, this setting has to be consistent with MKL/LAPACK
 # loading in `eCLM/src/clm5/CMakelists.txt`
+# https://cmake.org/cmake/help/latest/module/FindLAPACK.html
 find_package(LAPACK REQUIRED)
 
 # OpenMP is required
@@ -73,6 +74,12 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_LINK_LIBS "-mkl")
   list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
   message(WARNING "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+  # MKL command
+  list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
+  list(APPEND PDAF_LINK_LIBS "${LAPACK_LINKER_FLAGS}")
+  message(STATUS "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+  message(STATUS "LAPACK_LINKER_FLAGS: ${LAPACK_LINKER_FLAGS}")
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -147,6 +154,22 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_FOPT "-fallow-argument-mismatch")
   list(APPEND PDAF_FOPT "-fcommon")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # Using NVHPC
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    # Release optimization flags
+    list(APPEND PDAF_FOPT "-Ofast")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    # Debug optimization flags
+    list(APPEND PDAF_FOPT "-O0")
+    list(APPEND PDAF_FOPT "-g")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_FOPT "-fPIC")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -195,6 +218,22 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_COPT "-mcmodel=large")
   list(APPEND PDAF_COPT "-fcommon")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # Using NVHPC
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    # Release optimization flags
+    list(APPEND PDAF_COPT "-Ofast")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    # Debug optimization flags
+    list(APPEND PDAF_COPT "-O0")
+    list(APPEND PDAF_COPT "-g")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_COPT "-fPIC")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -212,6 +251,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   list(APPEND PDAF_DOUBLEPRECISION "-fdefault-real-8")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # doubleprecision flag!?
+  list(APPEND PDAF_DOUBLEPRECISION "-r8")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
