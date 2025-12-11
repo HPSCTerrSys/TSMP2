@@ -24,7 +24,10 @@ endif()
 # LAPACK is required
 # For eCLM-PDAF, this setting has to be consistent with MKL/LAPACK
 # loading in `eCLM/src/clm5/CMakelists.txt`
+# https://cmake.org/cmake/help/latest/module/FindLAPACK.html
 find_package(LAPACK REQUIRED)
+message(STATUS "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+message(STATUS "LAPACK_LINKER_FLAGS: ${LAPACK_LINKER_FLAGS}")
 
 # OpenMP is required
 find_package(OpenMP REQUIRED)
@@ -62,21 +65,23 @@ set(PDAF_DIR "${PDAF_SRC}")
 # --------------------------------------
 # --start-group: libraries inside the group are recalled until, such
 # --that order does not matter in the linking command
-list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
-list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
-list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
-list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
-    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-  list(APPEND PDAF_LINK_LIBS "-qmkl")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  list(APPEND PDAF_LINK_LIBS "-mkl")
-  list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
-  message(WARNING "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
-else()
-  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
-endif()
-list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
+list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
+list(APPEND PDAF_LINK_LIBS "${LAPACK_LINKER_FLAGS}")
+# list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
+# list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
+# list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
+# list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
+# if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+#     OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+#   list(APPEND PDAF_LINK_LIBS "-qmkl")
+# elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+#   list(APPEND PDAF_LINK_LIBS "-mkl")
+#   list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
+#   message(WARNING "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+# else()
+#   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+# endif()
+# list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
 
 # Explicit libraries named in comments should be handed over by the
 # variables. For checking this, search `$BUILD_DIR/CMakeCache.txt`.
