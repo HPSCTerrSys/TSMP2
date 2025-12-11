@@ -1,0 +1,61 @@
+# --------------------------------------------------------------------------
+# Loads IntelLLVM+ParaStationMPI build environment for TSMP2.
+# This environment is tailored for JURECA [1] and JUWELS [2] supercomputers.
+#
+# [1] https://apps.fz-juelich.de/jsc/software/jureca/index.xhtml
+# [2] https://apps.fz-juelich.de/jsc/software/juwels/index.xhtml
+# 
+# Usage: source jsc.2025.intel.psmpi
+# --------------------------------------------------------------------------
+
+# Load Stages/2025
+module --force purge
+module use $OTHERSTAGES
+module load Stages/2025
+module load NVHPC/25.5-CUDA-12
+module load ParaStationMPI
+module load ScaLAPACK/2.2.0-fb
+
+# Basic scripting and build tools
+module load Python
+module load CMake
+module load git
+
+# Storage libraries
+module load HDF5
+module load netCDF
+module load netCDF-Fortran
+module load PnetCDF
+
+# ParFlow additional libraries (TODO)
+module load CUDA
+module load UCX-settings/RC-CUDA
+module load Hypre/2.31.0
+
+# TODO: Verify these values
+if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
+  export CUDAARCHS="90"
+else
+  export CUDAARCHS="80"
+fi
+export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
+
+# ICON additional libraries
+module load ecCodes
+
+# Set default MPI compilers
+export CC=mpicc
+export FC=mpif90
+export CXX=mpicxx
+export MPI_HOME=$EBROOTPSMPI
+
+# Display compiler settings
+module list
+echo "========================= COMPILER SETTINGS =========================="
+echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "   MPI lib: $(mpichversion | head -n 1 | tr -d =)"
+echo "         C: $($CC --version 2>/dev/null | head -n 2 | tail -n 1)"
+echo "       C++: $($CXX --version 2>/dev/null | head -n 2 | tail -n 1)"
+echo "   Fortran: $($FC --version 2>/dev/null | head -n 2 | tail -n 1)"
+echo "======================================================================"
+echo ""
