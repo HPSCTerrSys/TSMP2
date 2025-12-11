@@ -13,7 +13,7 @@
 [submodule "models/pdaf"]
 	path = models/pdaf
 	url = https://github.com/HPSCTerrSys/pdaf.git
-	branch = tsmp-pdaf-patched-lstda
+	branch = tsmp-pdaf-patched-lstda-local
 [submodule "models/eCLM"]
 	path = models/eCLM
 	url = https://github.com/HPSCTerrSys/eCLM.git
