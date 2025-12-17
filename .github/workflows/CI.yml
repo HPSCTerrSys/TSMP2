@@ -20,35 +20,35 @@ jobs:
             name: "ICON-eCLM-ParFlow",
             use_oasis: "True",
             parflow_dir: "parflow",
-            model_opts: "--ICON --eCLM --ParFlow"
+            model_opts: "ICON eCLM ParFlow"
           }
         - {
             name: "eCLM-ParFlowGPU",
             use_oasis: "True",
             parflow_dir: "parflow",
-            model_opts: "--eCLM --ParFlowGPU"
+            model_opts: "eCLM ParFlowGPU"
           }
 #        - {
 #            name: "CLM3.5-PDAF",
 #            use_oasis: "False",
-#            model_opts: "--CLM35 --PDAF"
+#            model_opts: "CLM35 PDAF"
 #          }
         - {
             name: "eCLM-PDAF",
             use_oasis: "False",
-            model_opts: "--eCLM --PDAF"
+            model_opts: "eCLM PDAF"
           }
 #        - {
 #            name: "CLM3.5-ParFlow-PDAF",
 #            use_oasis: "True",
 #            parflow_dir: "parflow_pdaf",
-#            model_opts: "--CLM35 --ParFlow --PDAF"
+#            model_opts: "CLM35 ParFlow PDAF"
 #          }
 #        - {
 #            name: "eCLM-ParFlow-PDAF",
 #            use_oasis: "True",
 #            parflow_dir: "parflow_pdaf",
-#            model_opts: "--eCLM --ParFlow --PDAF"
+#            model_opts: "eCLM ParFlow PDAF"
 #         }
     env:
       SYSTEMNAME: UBUNTU
