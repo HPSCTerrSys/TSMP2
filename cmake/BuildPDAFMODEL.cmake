@@ -20,6 +20,7 @@ set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
 list(APPEND PDAF_INCLUDES "-I${NetCDF_F90_ROOT}/include")
 
 # DA include dirs
+list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/include")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/common")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/parflow")
@@ -39,8 +40,6 @@ if(DEFINED eCLM_SRC)
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM")
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM/externals/mct/include")
   list(APPEND PDAF_INCLUDES "-I${CMAKE_INSTALL_PREFIX}/include/eCLM/externals/gptl/include")
-  # include PDAF .mod files to be able to call pdaf routines in framework omi routines
-  list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/src")
 endif()
 
 # ParFlow include dirs
