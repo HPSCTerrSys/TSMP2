@@ -145,6 +145,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_FOPT "-ffree-form")
   # list(APPEND PDAF_FOPT "-fopenmp")
   list(APPEND PDAF_FOPT "-fallow-argument-mismatch")
+  list(APPEND PDAF_FOPT "-fcommon")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -192,6 +193,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_COPT "-fno-automatic")
   list(APPEND PDAF_COPT "-finit-local-zero")
   list(APPEND PDAF_COPT "-mcmodel=large")
+  list(APPEND PDAF_COPT "-fcommon")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -220,7 +222,9 @@ list(JOIN PDAF_DOUBLEPRECISION " " PDAF_DOUBLEPRECISION)
 
 # Set PDAF_MPI_INC for Makefile header
 # ----------------------------------
-list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+if(DEFINED MPICH_Fortran_INCLUDEDIR AND NOT MPICH_Fortran_INCLUDEDIR STREQUAL "")
+  list(APPEND PDAF_MPI_INC "-I${MPICH_Fortran_INCLUDEDIR}")
+endif()
 
 # Join list
 list(JOIN PDAF_MPI_INC " " PDAF_MPI_INC)

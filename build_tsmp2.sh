@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ### TSMP2 frontend
-### Shell-based script to compile model components within the TSMP2 framework.
+### Bash script for compiling model components within the TSMP2 framework.
 ###
 ### For more information:
 ### ./build_tsmp2.sh --help
@@ -11,17 +11,24 @@ set -eo pipefail
 ## functions
 
 function help_tsmp2() {
-  echo "Usage: $0 [-v ] [--component_name] [--optionals]"
-  echo "  -q, --quiet      Write less output during shell execution"
-  echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
-  echo "  --version        Print $0 scipt version"
-  echo "  --ICON           Compile with ICON"
-  echo "  --eCLM           Compile with eCLM"
-  echo "  --ParFlow        Compile with ParFlow"
-  echo "  --ParFlow-GPU    Compile with ParFlow-GPU"
-  echo "  --PDAF           Compile with PDAF"
-  echo "  --COSMO          Compile with COSMO"
-  echo "  --CLM35          Compile with CLM3.5"
+  echo "build_tsmp2.sh - Bash script for compiling model components within the TSMP2 framework."
+  echo ""
+  echo "Usage:"
+  echo ""
+  echo "  ./build_tsmp2.sh [component models...] [options...]"
+  echo ""
+  echo "Component models:"
+  echo ""
+  echo "  icon           Compile with ICON atmosphere model."
+  echo "  eclm           Compile with eCLM land surface model."
+  echo "  parflow        Compile with ParFlow subsurface model."
+  echo "  parflowGPU     Compile with ParFlow subsurface model (GPU-enabled)"
+  echo "  pdaf           Compile with PDAF data assimilation framework."
+  echo "  cosmo          Compile with COSMO atmosphere model (legacy)"
+  echo "  clm3.5         Compile with CLM3.5 land surface model (legacy)"
+  echo ""
+  echo "Options:"
+  echo ""
   echo "  --ICON_SRC       Set ICON_SRC directory"
   echo "  --eCLM_SRC       Set eCLM_SRC directory"
   echo "  --ParFlow_SRC    Set ParFlow_SRC directory"
@@ -33,8 +40,17 @@ function help_tsmp2() {
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --env            Set model environment."
+  echo "  --version        Print $0 scipt version"
+  echo "  -q, --quiet      Write less output during shell execution"
+  echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
   echo ""
-  echo "Example: $0 --ICON --eCLM --ParFlow"
+  echo "Examples:"
+  echo ""
+  echo "  ./build_tsmp2.sh icon eclm parflow"
+  echo "  ./build_tsmp2.sh eclm parflowGPU"
+  echo "  ./build_tsmp2.sh icon eclm"
+  echo "  ./build_tsmp2.sh eclm pdaf"
+  echo ""
   exit 1
 }
 
@@ -74,7 +90,7 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
      submodule_name=$(echo "models/"${sub_srcname})
   fi
   if [ "$( ls -A ${cmake_tsmp2_dir}/${submodule_name} | wc -l)" -ne 0 ];then
-     read -p "submodule ${submodule_name} aleady exists. Do you want to overwrite it? (y/N) " yn
+     read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
         git submodule update --init --force -- ${submodule_name}
@@ -98,26 +114,27 @@ fi # quiet
 ###
 
 ## get params
+# TODO: --<model> switches should be deprecated in favor of <model>
 while [[ "$#" -gt 0 ]]; do
   case "${1,,}" in
     -h|--help) help_tsmp2;;
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
-    --version) echo "$0 version 0.1.0"; exit 1;;
-    --icon) icon=y;;
-    --eclm) eclm=y;;
-    --parflow) parflow=y;;
-    --parflowgpu) parflowGPU=y;;
-    --pdaf) pdaf=y;;
-    --cosmo) cosmo=y;;
-    --clm35) clm35=y;;
+    --version) echo "$0 version 0.2.0"; exit 0;;
+    --icon|icon) icon=y;;
+    --eclm|eclm) eclm=y;;
+    --parflow|parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
+    --parflowgpu|parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
+    --pdaf|pdaf) pdaf=y;;
+    --cosmo|cosmo) cosmo=y;;
+    --clm35|--clm3.5|clm3.5) clm35=y;;
     --no_update) update_compsrc=n;;
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
     --eclm_src) eclm_src="$2"; shift ;;
     --parflow_src) parflow_src="$2"; shift ;;
     --cosmo_src) cosmo_src="$2"; shift ;;
-    --clm35_src) clm35_src="$2"; shift ;;
+    --clm35_src|--clm3.5_src) clm35_src="$2"; shift ;;
     --pdaf_src) pdaf_src="$2"; shift ;;
     --oasis_src) oasis_src="$2"; shift ;;
     --build_type) build_type="$2"; shift ;;
@@ -141,8 +158,7 @@ message "Setting model-id and component string..."
 # fun set_component shell_name cmake_name
 set_component icon "ICON"
 set_component eclm "eCLM"
-set_component parflow "ParFlow"
-set_component parflowGPU "ParFlowGPU" #TODO: check if only one ParFlow option is enabled (either --parflow or --parflowgpu)
+set_component parflow $parflowCMakeModelID
 set_component cosmo "COSMO"
 set_component clm35 "CLM3.5"
 set_component pdaf "PDAF"
@@ -152,6 +168,11 @@ if [ $model_count = 0 ];then
   exit 1
 elif [ $model_count -ge 2 ];then
   oasis=y
+fi
+
+if [[ "${parflowCPU}" == "y" &&  "${parflowGPU}" == "y" ]];then
+  echo "ABORT: Building --parflow and --parflowgpu at the same time is not supported."
+  exit 1
 fi
 
 ## CONCATENATE SOURCE CODE STRING
@@ -197,7 +218,7 @@ fi
 
 # Check if the supplied environment file actually exists.
 if [[ ! -f "${env}" ]]; then
-  message "ERROR: Environment file \"${env}\" not found".
+  message "ERROR: Environment file \"${env}\" not found."
   exit 1
 fi
 

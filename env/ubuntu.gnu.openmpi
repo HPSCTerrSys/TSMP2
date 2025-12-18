@@ -13,15 +13,26 @@ export MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
 export SYSTEMNAME="UBUNTU"
 export STAGE=$(lsb_release -sr)
 
+# ParFlow additional libraries
+if [[ "$1" == "--parflowgpu" ]]; then
+  export CUDA_HOME=/usr
+  export CUCC=nvcc
+  export CUDAARCHS="70" #TODO: Verify if this default value makes sense
+fi
+
 # TODO: Find a way to pack all TSMP2 dependency info to CMAKE_PREFIX_PATH.
 #  export CMAKE_PREFIX_PATH=$(cd ${DEPENDENCIES_ROOT} | ls -1 | xargs realpath | paste -sd ":" -)
 
 # Display compiler settings
 echo "==================== COMPILER SETTINGS  ====================="
-echo " Machine: ${SYSTEMNAME} $STAGE"
-echo " MPI lib: $(mpirun --version | head -n 1)"
-echo "       C: $($CC --version | head -n 1)"
-echo "     C++: $($CXX --version | head -n 1)"
-echo " Fortran: $($FC --version | head -n 1)"
+echo "   Machine: ${SYSTEMNAME} $STAGE"
+echo "   MPI lib: $(mpirun --version | head -n 1)"
+echo "         C: $($CC --version | head -n 1)"
+echo "       C++: $($CXX --version | head -n 1)"
+echo "   Fortran: $($FC --version | head -n 1)"
+if [[ "$1" == "--parflowgpu" ]]; then
+  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo " CUDAARCHS: $CUDAARCHS"
+fi
 echo "============================================================="
 echo ""
