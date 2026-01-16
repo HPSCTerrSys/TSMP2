@@ -5,11 +5,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   set(OPTIM "-g")
   set(MCT_DEBUGFLAG "--enable-debugging")
 elseif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-  set(OPTIM "-O2")
+  set(OPTIM "-O0")
   set(MCT_DEBUGFLAG "")
 else()
   # Assume CMAKE_BUILD_TYPE=RELEASE if CMAKE_BUILD_TYPE is unknown
-  set(OPTIM "-O2")
+  set(OPTIM "-O0")
   message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by OASIS3-MCT")
 endif()
 
