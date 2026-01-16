@@ -1,20 +1,20 @@
 # --------------------------------------------------------------------------
-# Loads IntelLLVM+ParaStationMPI build environment for TSMP2.
+# Loads NVHPC+OpenMPI build environment for TSMP2.
 # This environment is tailored for JURECA [1] and JUWELS [2] supercomputers.
 #
 # [1] https://apps.fz-juelich.de/jsc/software/jureca/index.xhtml
 # [2] https://apps.fz-juelich.de/jsc/software/juwels/index.xhtml
 # 
-# Usage: source jsc.2025.intel.psmpi
+# Usage: source jsc.2026.nvhpc.openmpi
 # --------------------------------------------------------------------------
 
-# Load Stages/2025
+# Load compilers and MPI library
 module --force purge
 module use $OTHERSTAGES
-module load Stages/2025
-module load NVHPC/25.5-CUDA-12
-module load ParaStationMPI
-module load ScaLAPACK/2.2.0-fb
+module load Stages/2026
+module load nvidia-compilers/25.9-CUDA-13
+module load OpenMPI
+module load ScaLAPACK
 
 # Basic scripting and build tools
 module load Python
@@ -23,39 +23,43 @@ module load git
 
 # Storage libraries
 module load HDF5
-module load netCDF
-module load netCDF-Fortran
-module load PnetCDF
+module load netCDF/4.9.3
+module load netCDF-Fortran/4.6.2
+module load PnetCDF/1.14.1
 
-# ParFlow additional libraries (TODO)
+# ParFlow additional libraries
 module load CUDA
 module load UCX-settings/RC-CUDA
-module load Hypre/2.31.0
+module load Hypre
 
 # TODO: Verify these values
-if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
+if [[ $SYSTEMNAME == "jupiter" ]]; then
   export CUDAARCHS="90"
 else
   export CUDAARCHS="80"
 fi
 export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
 
+
 # ICON additional libraries
 module load ecCodes
 
 # Set default MPI compilers
+export OMPI_CC=nvc
+export OMPI_CXX=nvc++
+export OMPI_FC=nvfortran
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
-export MPI_HOME=$EBROOTPSMPI
+export MPI_HOME=$EBROOTOPENMPI
 
 # Display compiler settings
 module list
-echo "========================= COMPILER SETTINGS =========================="
+echo "=========================== COMPILER SETTINGS  =======================" 
 echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo "   MPI lib: $(mpichversion | head -n 1 | tr -d =)"
-echo "         C: $($CC --version 2>/dev/null | head -n 2 | tail -n 1)"
-echo "       C++: $($CXX --version 2>/dev/null | head -n 2 | tail -n 1)"
-echo "   Fortran: $($FC --version 2>/dev/null | head -n 2 | tail -n 1)"
+echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
+echo "         C: $($CC --version | head -n 2 | tail -n 1)"
+echo "       C++: $($CXX --version | head -n 2 | tail -n 1)"
+echo "   Fortran: $($FC --version | head -n 2 | tail -n 1)"
 echo "======================================================================"
-echo ""
+
