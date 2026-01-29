@@ -35,7 +35,7 @@ if [[ "$1" == "--parflowgpu" ]]; then
   module load Hypre/2.31.0
 
   # TODO: Verify these values
-  if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
+  if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" || $SYSTEMNAME == "jureca_gh" ]]; then
     export CUDAARCHS="90"
   else
     export CUDAARCHS="80"
