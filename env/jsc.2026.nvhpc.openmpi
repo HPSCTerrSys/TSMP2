@@ -31,6 +31,8 @@ module load PnetCDF/1.14.1
 module load CUDA
 module load UCX-settings/RC-CUDA
 module load Hypre
+module load Umpire
+module load SUNDIALS
 
 # TODO: Verify these values
 if [[ $SYSTEMNAME == "jupiter" ]]; then
@@ -45,13 +47,12 @@ export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
 module load ecCodes
 
 # Set default MPI compilers
-export OMPI_CC=nvc
-export OMPI_CXX=nvc++
-export OMPI_FC=nvfortran
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=$EBROOTOPENMPI
+export UMPIRE_ROOT=$EBROOTUMPIRE
+export SUNDIALS_ROOT=$EBROOTSUNDIALS
 
 # Display compiler settings
 module list

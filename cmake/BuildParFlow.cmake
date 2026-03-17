@@ -66,6 +66,16 @@ else()
   set(ENABLE_SLURM "OFF")
 endif()
 
+# Enable Umpire if exists
+if (DEFINED ENV{UMPIRE_ROOT})
+  set(PF_UMPIRE_FLAG "-DUMPIRE_ROOT=$ENV{UMPIRE_ROOT}")
+endif()
+
+# Enable SUNDIALS if exists
+if (DEFINED ENV{SUNDIALS_ROOT})
+    set(PF_SUNDIALS_FLAG "-DSUNDIALS_ROOT=$ENV{SUNDIALS_ROOT}")
+endif()
+
 # Pass options to ParFlow CMake
 ExternalProject_Add(ParFlow
     PREFIX      ParFlow
@@ -85,6 +95,8 @@ ExternalProject_Add(ParFlow
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
+                ${PF_UMPIRE_FLAG}
+                ${PF_SUNDIALS_FLAG}
                 ${PF_CLM_FLAGS}
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
