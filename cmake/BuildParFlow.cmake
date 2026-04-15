@@ -81,7 +81,6 @@ ExternalProject_Add(ParFlow
                 -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-		-DCMAKE_MESSAGE_LOG_LEVEL="DEBUG"
                 -DPARFLOW_ENABLE_HYPRE=ON
                 -DPARFLOW_ENABLE_NETCDF=ON
                 -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
