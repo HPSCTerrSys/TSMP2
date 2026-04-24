@@ -105,6 +105,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     # Release optimization flags
     list(APPEND PDAF_FOPT "-O2")
+    list(APPEND PDAF_FOPT "-fp-model=precise")
   elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     # Debug optimization flags
     list(APPEND PDAF_FOPT "-O0")
