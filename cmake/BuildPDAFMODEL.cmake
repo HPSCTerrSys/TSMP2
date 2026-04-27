@@ -101,7 +101,7 @@ if(DEFINED PARFLOW_SRC)
   # GPU
   # list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
   list(APPEND PDAF_LIBS "-L${HYPRE_ROOT}/lib -lHYPRE")
-  list(APPEND PDAF_LIBS "-L/lib64 -lslurm")
+  list(APPEND PDAF_LIBS "-L/lib64 -lslurm -lstdc++")
 endif()
 
 # Join list of libraries
