@@ -43,6 +43,9 @@ if [[ "$1" == "--parflowgpu" ]]; then
   export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
 else
   module load Hypre/2.31.0-cpu
+  if [[ $SYSTEMNAME == "jupiter" ]]; then
+    module load UCX-settings/DC
+  fi
 fi
 module load Tcl
 
