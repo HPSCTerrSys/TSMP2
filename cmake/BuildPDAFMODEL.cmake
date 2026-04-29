@@ -20,6 +20,7 @@ set(TSMPPDAFLIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
 list(APPEND PDAF_INCLUDES "-I${NetCDF_F90_ROOT}/include")
 
 # DA include dirs
+list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/include")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/common")
 list(APPEND PDAF_INCLUDES "-I${PDAF_SRC}/interface/model/parflow")
