@@ -1,17 +1,17 @@
-# --------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 # Loads GNU+OpenMPI build environment for TSMP2.
-# This environment is tailored for JURECA [1] and JUWELS [2] supercomputers.
+# This environment is tailored for JURECA [1], JUWELS [2], and JUPITER [3] supercomputers.
 #
 # [1] https://apps.fz-juelich.de/jsc/software/jureca/index.xhtml
 # [2] https://apps.fz-juelich.de/jsc/software/juwels/index.xhtml
-# 
-# Usage: source jsc.2025.gnu.openmpi
-# --------------------------------------------------------------------------
+# [3] https://apps.fz-juelich.de/jsc/hps/jupiter/index.html
+# Usage: source jsc.2026.gnu.openmpi
+# ---------------------------------------------------------------------------------------
 
-# Load Stages/2025
+# Load Stages/2026
 module --force purge
 module use $OTHERSTAGES
-module load Stages/2025
+module load Stages/2026
 
 # Primary compiler toolchain
 module load GCC
@@ -29,43 +29,43 @@ module load netCDF-Fortran
 module load PnetCDF
 
 # ParFlow additional libraries
+module load Umpire
+module load SUNDIALS
+module load Tcl
 if [[ "$1" == "--parflowgpu" ]]; then
   module load CUDA
   module load UCX-settings/RC-CUDA
-  module load Hypre/2.31.0
+  module load Hypre/3.0.0
 
   # TODO: Verify these values
-  if [[ $SYSTEMNAME == "jedi" || $SYSTEMNAME == "jupiter" ]]; then
+  if [[ $SYSTEMNAME == "jupiter" || $SYSTEMNAME == "jureca_gh" ]]; then
     export CUDAARCHS="90"
   else
     export CUDAARCHS="80"
   fi
   export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
 else
-  module load Hypre/2.31.0-cpu
-  if [[ $SYSTEMNAME == "jupiter" ]]; then
-    module load UCX-settings/DC
-  fi
+  module load Hypre/3.0.0-cpu
 fi
-module load Tcl
 
 # ICON additional libraries
 module load ecCodes
 
 # Set default MPI compilers
-export OMPI_CC=gcc
-export OMPI_CXX=g++
-export OMPI_FC=gfortran
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
+
+# Variables read by TSMP2 cmake scripts
 export MPI_HOME=$EBROOTOPENMPI
+export UMPIRE_ROOT=$EBROOTUMPIRE
+export SUNDIALS_ROOT=$EBROOTSUNDIALS
 
 # Display compiler settings
 module list
 echo "=============== COMPILER SETTINGS  ===============" 
 echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo "   MPI lib: $(mpirun --version | head -n 1)"
+echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
 echo "         C: $($CC --version | head -n 1)"
 echo "       C++: $($CXX --version | head -n 1)"
 echo "   Fortran: $($FC --version | head -n 1)"
