@@ -28,6 +28,11 @@ jobs:
             parflow_dir: "parflow",
             model_opts: "eCLM ParFlowGPU"
           }
+        - {
+            name: "ICON Standalone",
+            use_oasis: "False",
+            model_opts: "ICON"
+          }
 #        - {
 #            name: "CLM3.5-PDAF",
 #            use_oasis: "False",
