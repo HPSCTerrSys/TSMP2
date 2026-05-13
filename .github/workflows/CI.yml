@@ -402,6 +402,15 @@ jobs:
           pwd && git submodule update --init --force .
 
       #
+      # PDAF
+      #
+      - if: contains(matrix.config.name, 'PDAF')
+        name: Update PDAF submodule ${{ steps.model-versions.outputs.VER_PDAF }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models/pdaf
+        run: |
+          pwd && git submodule update --init --force .
+
+      #
       # ICON Standalone
       #
       - if: matrix.config.name == 'ICON standalone'
