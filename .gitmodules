@@ -1,7 +1,7 @@
 [submodule "models/icon"]
 	path = models/icon
-	url = https://gitlab.dkrz.de/icon/icon-model.git
-	branch = release-2026.04-public
+	url = https://github.com/HPSCTerrSys/icon-model_coup-oas.git
+	branch = icon-2024.07-public_coup-oas
 [submodule "models/parflow"]
 	path = models/parflow
 	url = https://github.com/parflow/parflow.git
