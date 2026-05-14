@@ -66,7 +66,7 @@ if [ "${component}" = "y" ];then
       model_id+="-${cmake_name}"
   fi # model_id
   cmake_comp_str+=" -D${cmake_name}=ON"
-  if [[ $cmake_name = @(ICON|eCLM|ParFlow|ParFlowGPU|COSMO|CLM3.5) ]]; then
+  if [[ $cmake_name = @(ICON|ICONGPU|eCLM|ParFlow|ParFlowGPU|COSMO|CLM3.5) ]]; then
      model_count=$(( $model_count + 1 ))
   fi # cmake_name
 fi # component
@@ -236,9 +236,6 @@ if [[ -n "${env}" ]]; then
   # TODO: Fix this GPU thing on another PR
   if [[ "$parflowGPU" == "y" ]];then
     source "${env}" --parflowgpu
-  elif [[ "$iconGPU" == "y" ]];then
-    # Note: we don't support ParFlowGPU + ICON GPU yet.
-    source "${env}" --icongpu
   else
     source "${env}"
   fi
