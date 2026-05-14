@@ -19,6 +19,23 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
   set(ICON_CFLAGS "-gdwarf-4 -qno-opt-dynamic-align -ftz -march=native")
   set(ICON_FCFLAGS "-gdwarf-4 -march=native -pc64 -fp-model source -traceback -qno-opt-dynamic-align -no-fma")
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+  set(ICON_FCFLAGS "-Mrecursive -Mallocatable=03 -Mstack_arrays")
+  if(${ICONGPU})
+    string(APPEND ICON_FCFLAGS " -Minfo=accel,inline -acc=gpu,verystrict -gpu=cc90")
+    include(CheckLanguage)
+    check_language(CUDA)
+    if(CMAKE_CUDA_COMPILER)
+      enable_language(CUDA)
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -arch=sm_90")
+    else()
+      message(FATAL_ERROR "BuildICON.cmake: Cannot find CUDA library in the system.")
+    endif()
+  else()
+    string(APPEND ICON_FCFLAGS " -Minfo=inline")
+    set(CMAKE_CUDA_COMPILER "")
+    set(CMAKE_CUDA_FLAGS "")
+  endif()
 endif()
 set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
@@ -81,6 +98,7 @@ string(PREPEND ICON_FCFLAGS "-I${NetCDF_F90_ROOT}/include ")
 find_package(ZLIB REQUIRED)
 list(APPEND ICON_LIBS "${ZLIB_LIBRARIES}")
 
+
 # Enable/disable model-specific features
 list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --enable-openmp --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
 
@@ -90,6 +108,18 @@ if( ${eCLM} OR ${CLM3.5} OR ${ParFlow} OR ${ParFlowGPU} )
   string(APPEND ICON_LDFLAGS " ${OASIS_LIBRARIES}")
   list(APPEND ICON_LIBS "${OASIS_LIBRARIES}")
   list(APPEND EXTRA_CONFIG_ARGS --enable-oascoupling)
+endif()
+
+# GPU-specific options
+if(${ICONGPU})
+  list(APPEND ICON_LIBS "-c++libs -nvmalloc -cuda")
+  list(APPEND EXTRA_CONFIG_ARGS --enable-gpu --enable-mpi-gpu --enable-cuda-graphs)
+endif()
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+  # Use of NVHPC toolchain implies nvc++ is being used; hence
+  # it is necessary to link to the C++ stdlib.
+  list(APPEND ICON_LIBS "-lstdc++")
+  list(APPEND EXTRA_CONFIG_ARGS --enable-realloc-buf --enable-pgi-inlib)
 endif()
 
 # Assemble linker options
@@ -102,8 +132,10 @@ ExternalProject_Add(ICON
     CONFIGURE_COMMAND ${ICON_SRC}/configure
                       CC=${CMAKE_C_COMPILER}
                       FC=${CMAKE_Fortran_COMPILER}
+                      CUDACXX=${CMAKE_CUDA_COMPILER}
                       CFLAGS=${ICON_CFLAGS}
                       FCFLAGS=${ICON_FCFLAGS}
+                      CUDAFLAGS=${CMAKE_CUDA_FLAGS}
                       LDFLAGS=${ICON_LDFLAGS}
                       ICON_ECRAD_FCFLAGS=${ICON_ECRAD_FCFLAGS}
                       LIBS=${ICON_LIBS}
