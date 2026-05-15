@@ -100,7 +100,7 @@ list(APPEND ICON_LIBS "${ZLIB_LIBRARIES}")
 
 
 # Enable/disable model-specific features
-list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --enable-openmp --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
+list(APPEND EXTRA_CONFIG_ARGS --enable-parallel-netcdf --disable-ocean --disable-jsbach --disable-coupling --enable-ecrad --disable-mpi-checks --disable-rte-rrtmgp)
 
 # Coupling-specific options
 if( ${eCLM} OR ${CLM3.5} OR ${ParFlow} OR ${ParFlowGPU} )
@@ -113,13 +113,15 @@ endif()
 # GPU-specific options
 if(${ICONGPU})
   list(APPEND ICON_LIBS "-c++libs -nvmalloc -cuda")
-  list(APPEND EXTRA_CONFIG_ARGS --enable-gpu --enable-mpi-gpu --enable-cuda-graphs)
+  list(APPEND EXTRA_CONFIG_ARGS --enable-gpu=openacc --enable-mpi-gpu --enable-cuda-graphs --enable-pgi-inlib)
+else()
+  list(APPEND EXTRA_CONFIG_ARGS --enable-openmp)
 endif()
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
   # Use of NVHPC toolchain implies nvc++ is being used; hence
   # it is necessary to link to the C++ stdlib.
   list(APPEND ICON_LIBS "-lstdc++")
-  list(APPEND EXTRA_CONFIG_ARGS --enable-realloc-buf --enable-pgi-inlib)
+  list(APPEND EXTRA_CONFIG_ARGS --enable-realloc-buf )
 endif()
 
 # Assemble linker options
