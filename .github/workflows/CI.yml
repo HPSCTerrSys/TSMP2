@@ -5,7 +5,7 @@ on:
   push:
     branches: [ master, dev-pdaf-* ]
   pull_request:
-    branches: [ master, stages-2025-pdaf ]
+    branches: [ master ]
 
 jobs:
   eclm_build_job:
@@ -27,6 +27,11 @@ jobs:
             use_oasis: "True",
             parflow_dir: "parflow",
             model_opts: "eCLM ParFlowGPU"
+          }
+        - {
+            name: "ICON standalone",
+            use_oasis: "False",
+            model_opts: "ICON"
           }
 #        - {
 #            name: "CLM3.5-PDAF",
@@ -63,6 +68,7 @@ jobs:
       VER_HYPRE: 2.33.0
       VER_ECCODES: 2.40.0
       VER_OASIS: tsmp-patches-v0.1
+      VER_ICON_UPSTREAM: release-2026.04-public
 
     steps:
       - uses: actions/checkout@v4
@@ -321,7 +327,9 @@ jobs:
             echo "VER_ParFlow=${VER_ParFlow}" >> $GITHUB_OUTPUT
           fi
 
-          if [[ "${{ matrix.config.name }}" == *"ICON"* ]]; then
+          if [[ "${{ matrix.config.name }}" == "ICON standalone" ]]; then
+            echo "${{ env.VER_ICON_UPSTREAM }} => VER_ICON_UPSTREAM"
+          elif [[ "${{ matrix.config.name }}" == *"ICON"* ]]; then
             VER_ICON=$(cat model_versions | grep -w "icon" | cut -d' ' -f1)
             echo "${VER_ICON} => VER_ICON"
             echo "VER_ICON=${VER_ICON}" >> $GITHUB_OUTPUT
@@ -403,6 +411,30 @@ jobs:
           pwd && git submodule update --init --force .
 
       #
+      # ICON Standalone
+      #
+      - if: matrix.config.name == 'ICON standalone'
+        name: Restore cached ICON standalone ${{ env.VER_ICON_UPSTREAM }}
+        uses: actions/cache/restore@v4
+        id: cache-icon-standalone-restore
+        with:
+          path: ${{ env.TSMP2_ROOT }}/models/icon-model
+          key: ${{ matrix.config.name }}_icon-${{ env.VER_ICON_UPSTREAM }}
+
+      - if: matrix.config.name == 'ICON standalone' && steps.cache-icon-standalone-restore.outputs.cache-hit != 'true'
+        name: Update ICON standalone ${{ env.VER_ICON_UPSTREAM }}
+        working-directory: ${{ env.TSMP2_ROOT }}/models
+        run: |
+          pwd && git clone -b ${{ env.VER_ICON_UPSTREAM }} --recursive https://gitlab.dkrz.de/icon/icon-model.git
+
+      - if: matrix.config.name == 'ICON standalone' && steps.cache-icon-standalone-restore.outputs.cache-hit != 'true'
+        name: Cache ICON standalone ${{ env.VER_ICON_UPSTREAM }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.TSMP2_ROOT }}/models/icon-model
+          key: ${{ matrix.config.name }}_icon-${{ env.VER_ICON_UPSTREAM }}
+
+      #
       # Pre-build checks
       #
       - name: Check component model versions
@@ -412,6 +444,10 @@ jobs:
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
             echo "Entering 'oasis3-mct'"
             echo "$(git -C oasis3-mct describe --tags --always)"
+          fi
+          if [[ "${{ matrix.config.name }}" == "ICON standalone" ]]; then
+            echo "Entering 'models/icon-model'"
+            echo "$(git -C models/icon-model describe --tags --always)"
           fi
 
       - name: Check TSMP2 dependencies
@@ -431,6 +467,9 @@ jobs:
           MODEL_OPTS="${{ matrix.config.model_opts }}"
           if [[ "${{ matrix.config.use_oasis }}" == "True" ]]; then
             MODEL_OPTS="${MODEL_OPTS} --OASIS_SRC ${TSMP2_ROOT}/oasis3-mct"
+          fi
+          if [[ "${{ matrix.config.name }}" == "ICON standalone" ]]; then
+            MODEL_OPTS="${MODEL_OPTS} --ICON_SRC ${TSMP2_ROOT}/models/icon-model"
           fi
           BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update"
           echo $BUILD_TSMP2_CMD && echo ""

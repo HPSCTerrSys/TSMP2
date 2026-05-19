@@ -20,6 +20,7 @@ function help_tsmp2() {
   echo "Component models:"
   echo ""
   echo "  icon           Compile with ICON atmosphere model."
+  echo "  iconGPU        Compile with ICON atmosphere model (GPU-enabled)."
   echo "  eclm           Compile with eCLM land surface model."
   echo "  parflow        Compile with ParFlow subsurface model."
   echo "  parflowGPU     Compile with ParFlow subsurface model (GPU-enabled)"
@@ -48,6 +49,7 @@ function help_tsmp2() {
   echo ""
   echo "  ./build_tsmp2.sh icon eclm parflow"
   echo "  ./build_tsmp2.sh eclm parflowGPU"
+  echo "  ./build_tsmp2.sh iconGPU"
   echo "  ./build_tsmp2.sh icon eclm"
   echo "  ./build_tsmp2.sh eclm pdaf"
   echo ""
@@ -64,7 +66,7 @@ if [ "${component}" = "y" ];then
       model_id+="-${cmake_name}"
   fi # model_id
   cmake_comp_str+=" -D${cmake_name}=ON"
-  if [[ $cmake_name = @(ICON|eCLM|ParFlow|ParFlowGPU|COSMO|CLM3.5) ]]; then
+  if [[ $cmake_name = @(ICON|ICONGPU|eCLM|ParFlow|ParFlowGPU|COSMO|CLM3.5) ]]; then
      model_count=$(( $model_count + 1 ))
   fi # cmake_name
 fi # component
@@ -121,7 +123,8 @@ while [[ "$#" -gt 0 ]]; do
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
     --version) echo "$0 version 0.2.0"; exit 0;;
-    --icon|icon) icon=y;;
+    --icon|icon) icon=y iconCPU=y iconCMakeModelID="ICON";;
+    icongpu) icon=y iconGPU=y iconCMakeModelID="ICONGPU";;
     --eclm|eclm) eclm=y;;
     --parflow|parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
     --parflowgpu|parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
@@ -156,7 +159,7 @@ cmake_comp_str=""
 
 message "Setting model-id and component string..."
 # fun set_component shell_name cmake_name
-set_component icon "ICON"
+set_component icon $iconCMakeModelID
 set_component eclm "eCLM"
 set_component parflow $parflowCMakeModelID
 set_component cosmo "COSMO"
@@ -172,6 +175,11 @@ fi
 
 if [[ "${parflowCPU}" == "y" &&  "${parflowGPU}" == "y" ]];then
   echo "ABORT: Building --parflow and --parflowgpu at the same time is not supported."
+  exit 1
+fi
+
+if [[ "${iconCPU}" == "y" &&  "${iconGPU}" == "y" ]];then
+  echo "ABORT: Building icon and iconGPU at the same time is not supported."
   exit 1
 fi
 
