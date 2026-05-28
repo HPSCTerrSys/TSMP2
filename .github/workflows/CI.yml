@@ -36,7 +36,7 @@ jobs:
 #        - {
 #            name: "CLM3.5-PDAF",
 #            use_oasis: "False",
-#            model_opts: "CLM35 PDAF"
+#            model_opts: "CLM3.5 PDAF"
 #          }
         - {
             name: "eCLM-PDAF",
@@ -47,7 +47,7 @@ jobs:
             name: "CLM3.5-ParFlow-PDAF",
             use_oasis: "True",
             parflow_dir: "parflow_pdaf",
-            model_opts: "CLM35 ParFlow PDAF"
+            model_opts: "CLM3.5 ParFlow PDAF"
           }
         - {
             name: "eCLM-ParFlow-PDAF",
