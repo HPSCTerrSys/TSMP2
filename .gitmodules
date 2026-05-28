@@ -4,12 +4,12 @@
 	branch = icon-2024.07-public_coup-oas
 [submodule "models/parflow"]
 	path = models/parflow
-	url = https://github.com/parflow/parflow.git
-	branch = v3.14.1
+	url = https://github.com/HPSCTerrSys/parflow.git
+	branch = fixes-cuda13-oasis3
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
-	branch = tsmp-pdaf-patched-openmp-flag-fix
+	branch = v3.14.1-pdaf
 [submodule "models/pdaf"]
 	path = models/pdaf
 	url = https://github.com/HPSCTerrSys/pdaf.git

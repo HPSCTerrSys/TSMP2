@@ -105,6 +105,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     # Release optimization flags
     list(APPEND PDAF_FOPT "-O2")
+    # Adding `-fp-model=source` to avoid precision changes between
+    # DEBUG and RELEASE simulations
+    #
+    # Background, why `source` is chosen over `precise`:
+    # https://www.intel.com/content/www/us/en/developer/articles/guide/porting-guide-for-ifort-to-ifx.html
+    list(APPEND PDAF_FOPT "-fp-model=source")
   elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     # Debug optimization flags
     list(APPEND PDAF_FOPT "-O0")
@@ -241,6 +247,25 @@ endif()
 # Join list
 list(JOIN PDAF_CPP_DEFS " " PDAF_CPP_DEFS)
 
+# Set PDAF_MODULEOPT for Makefile header
+# ----------------------------------
+# Modules flag dependent on compiler
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+
+  list(APPEND PDAF_MODULEOPT "-module")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+  list(APPEND PDAF_MODULEOPT "-J")
+
+else()
+  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+# Join list
+list(JOIN PDAF_MODULEOPT " " PDAF_MODULEOPT)
+
 # Set env vars required by PDAF Makefiles
 # ---------------------------------------
 list(APPEND PDAF_ENV_VARS PDAF_ARCH=${PDAF_ARCH})
@@ -252,6 +277,7 @@ list(APPEND PDAF_ENV_VARS TSMPPDAFCOPT=${PDAF_COPT})
 list(APPEND PDAF_ENV_VARS TSMPPDAFDOUBLEPRECISION=${PDAF_DOUBLEPRECISION})
 list(APPEND PDAF_ENV_VARS TSMPPDAFMPI_INC=${PDAF_MPI_INC})
 list(APPEND PDAF_ENV_VARS TSMPPDAFCPP_DEFS=${PDAF_CPP_DEFS})
+list(APPEND PDAF_ENV_VARS TSMPPDAFMODULEOPT=${PDAF_MODULEOPT})
 
 list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # message(STATUS "${PDAF_ENV_VARS_STR}")
@@ -262,10 +288,10 @@ list(JOIN PDAF_ENV_VARS " " PDAF_ENV_VARS_STR)
 # make pdaf
 ExternalProject_Add(PDAF
   PREFIX            PDAF
-  SOURCE_DIR        ${PDAF_SRC}/src
+  SOURCE_DIR        ${PDAF_SRC}
   BUILD_IN_SOURCE   TRUE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean ../lib/libpdaf-d.a
+  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean directories libpdaf
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES}
 )
