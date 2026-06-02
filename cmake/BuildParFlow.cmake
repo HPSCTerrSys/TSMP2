@@ -41,11 +41,11 @@ endif()
 # Set compiler flags
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
+    set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
     if(${PDAF})
-      # PDAF: add `-Wno-unused-variable`
-      set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-unused-variable -Wno-stringop-overread")
-    else()
-      set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+      # parflow-pdaf fork currently ignores unused variables
+      string(APPEND PF_CFLAGS " -Wno-unused-function")
+      end()
     endif()
     # Silence arch-specific compiler warnings
     if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64|aarch64")
