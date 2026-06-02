@@ -44,8 +44,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
     if(${PDAF})
       # parflow-pdaf fork currently ignores unused variables
-      string(APPEND PF_CFLAGS " -Wno-unused-function")
-      end()
+      string(APPEND PF_CFLAGS " -Wno-unused-variable")
     endif()
     # Silence arch-specific compiler warnings
     if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64|aarch64")
