@@ -100,8 +100,27 @@ if(DEFINED PARFLOW_SRC)
   list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
   # GPU
   # list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
-  list(APPEND PDAF_LIBS "-L${HYPRE_ROOT}/lib -lHYPRE")
-  list(APPEND PDAF_LIBS "-L/lib64 -lslurm -lstdc++")
+
+  # HYPRE lib
+  find_library(HYPRE_LIB NAMES HYPRE
+    HINTS
+      ${HYPRE_ROOT}/lib
+      $ENV{HYPRE_ROOT}/lib
+      $ENV{EBROOTHYPRE}/lib
+  )
+  if(HYPRE_LIB)
+    list(APPEND PDAF_LIBS "${HYPRE_LIB}")
+  else()
+    message(WARNING "BuildPDAFMODEL: HYPRE library not found. Set HYPRE_ROOT or EBROOTHYPRE if needed.")
+  endif()
+
+  # Unconditional loading of stdc++
+  list(APPEND PDAF_LIBS "-lstdc++")
+
+  # SLURM library if enabled (typically on HPC-system)
+  if(ENABLE_SLURM)
+    list(APPEND PDAF_LIBS "-lslurm")
+  endif()
 endif()
 
 # Join list of libraries
