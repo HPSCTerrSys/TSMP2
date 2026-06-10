@@ -40,6 +40,7 @@ export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=$EBROOTOPENMPI
+export MPIEXEC_EXECUTABLE=$(which mpirun)
 
 # Display compiler settings
 module list
