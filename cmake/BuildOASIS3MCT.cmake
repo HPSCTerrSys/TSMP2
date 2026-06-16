@@ -1,12 +1,22 @@
 find_package(NetCDF REQUIRED)
 find_package(OpenMP REQUIRED)
 
+set(OASIS_C_COMPILER ${CMAKE_C_COMPILER})
+set(OASIS_Fortran_COMPILER ${CMAKE_Fortran_COMPILER})
+
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   set(OPTIM "-g")
   set(MCT_DEBUGFLAG "--enable-debugging")
 elseif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
   set(OPTIM "-O2")
   set(MCT_DEBUGFLAG "")
+elseif (CMAKE_BUILD_TYPE STREQUAL "PROFILE")
+  # TODO: which build flags to use for profiling?
+  set(OPTIM "-O2")
+  set(MCT_DEBUGFLAG "")
+  # Score-P MPI wrappers have problems with OpenMP; bypass it for now
+  set(OASIS_C_COMPILER mpicc)
+  set(OASIS_Fortran_COMPILER mpif90)
 else()
   # Assume CMAKE_BUILD_TYPE=RELEASE if CMAKE_BUILD_TYPE is unknown
   set(OPTIM "-O2")
@@ -29,8 +39,8 @@ file(APPEND  ${OASIS_MAKE_INC} "F90             = ${CMAKE_Fortran_COMPILER}\n")
 file(APPEND  ${OASIS_MAKE_INC} "F               = $(F90)\n")
 file(APPEND  ${OASIS_MAKE_INC} "f90             = $(F90)\n")
 file(APPEND  ${OASIS_MAKE_INC} "f               = $(F90)\n")
-file(APPEND  ${OASIS_MAKE_INC} "CC              = ${CMAKE_C_COMPILER}\n")
-file(APPEND  ${OASIS_MAKE_INC} "LD              = ${CMAKE_Fortran_COMPILER} -L${MPI_Fortran_LIB_DIR}\n")
+file(APPEND  ${OASIS_MAKE_INC} "CC              = ${OASIS_C_COMPILER}\n")
+file(APPEND  ${OASIS_MAKE_INC} "LD              = ${OASIS_Fortran_COMPILER} -L${MPI_Fortran_LIB_DIR}\n")
 file(APPEND  ${OASIS_MAKE_INC} "AR              = ar\n")
 file(APPEND  ${OASIS_MAKE_INC} "ARFLAGS         = -ruv\n")
 file(APPEND  ${OASIS_MAKE_INC} "DYNOPT          = -fPIC\n")

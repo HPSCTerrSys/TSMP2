@@ -52,6 +52,12 @@ fi
 module load ecCodes
 
 # Set default MPI compilers
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
+  module load Scalasca
+  export PROFILE_CC=scorep-mpicc
+  export PROFILE_FC=scorep-mpif90
+  export PROFILE_CXX=scorep-mpicxx
+fi
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
@@ -64,14 +70,20 @@ export SUNDIALS_ROOT=$EBROOTSUNDIALS
 # Display compiler settings
 module list
 echo "=============== COMPILER SETTINGS  ===============" 
-echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
-echo "         C: $($CC --version | head -n 1)"
-echo "       C++: $($CXX --version | head -n 1)"
-echo "   Fortran: $($FC --version | head -n 1)"
+echo "    Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "    MPI lib: OpenMPI v$EBVERSIONOPENMPI"
+echo "          C: $($CC --version | head -n 1)"
+echo "        C++: $($CXX --version | head -n 1)"
+echo "    Fortran: $($FC --version | head -n 1)"
 if [[ "$1" == "--parflowgpu" ]]; then
-  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
-  echo " CUDAARCHS: $CUDAARCHS"
+  echo "       nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo "  CUDAARCHS: $CUDAARCHS"
+fi
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
+  echo " PROFILE_CC: ${PROFILE_CC}"
+  echo " PROFILE_FC: ${PROFILE_FC}"
+  echo "PROFILE_CXX: ${PROFILE_CXX}"
+  echo "PROFILE_VER: ${EBVERSIONSCALASCA}"
 fi
 echo "=================================================="
 echo ""

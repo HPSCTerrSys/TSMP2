@@ -36,7 +36,7 @@ function help_tsmp2() {
   echo "  --OASIS_SRC      Set OASIS3-MCT directory"
   echo "  --PDAF_SRC       Set PDAF_SRC directory"
   echo "  --no_update      Skip component model download"
-  echo "  --build_type     Set build configuration: 'DEBUG' 'RELEASE'"
+  echo "  --build_type     Set build configuration: 'DEBUG', 'RELEASE', or 'PROFILE'"
   echo "  --build_dir      Set build dir cmake, if not set bld/<SYSTEMNAME>_<model-id> is used. Build artifacts will be generated in this folder."
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
@@ -207,8 +207,19 @@ if [ "${update_compsrc}" != n ]; then
   dwn_compsrc clm35 clm35_src "CLM3.5"
 fi
 
+# 2. Determine build configuration
+if [[ -z "$build_type" ]];then
+   build_type="RELEASE"
+fi
+if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" || ${build_type^^} == "PROFILE" ]]; then
+   cmake_build_type="${build_type^^}"
+else
+   echo "ABORT: Unsupported build_type=${build_type}"
+   exit 1
+fi
+
 #
-# 2. Source environment file
+# 3. Source environment file
 #
 
 if [[ ! -z "${env}" ]]; then
@@ -230,15 +241,22 @@ if [[ ! -f "${env}" ]]; then
   exit 1
 fi
 
+
 if [[ -n "${env}" ]]; then
   message "Sourcing environment..."
 
-  # TODO: Fix this GPU thing on another PR
+  # TODO: Env file parameterization is temporary and should be fixed
   if [[ "$parflowGPU" == "y" ]];then
-    source "${env}" --parflowgpu
-  else
-    source "${env}"
+    env_params="--parflowgpu"
   fi
+  if [[ ${build_type^^} == "PROFILE" ]];then
+    env_params+="${env_params} --profile"
+    if [[ ":${TSMP2_ENV_FILE}:" != *"jsc.2026.gnu.openmpi"* ]]; then 
+      message "ERROR: Profiling builds are only currently supported on jsc.2026.gnu.openmpi."
+      exit 1
+    fi	
+  fi
+  source "${env}" "${env_params}"
 fi
 
 # TSMP2_ENV_FILE should be set either (1) through --env, (2) as a shell variable,
@@ -249,9 +267,14 @@ if [[ -z "${TSMP2_ENV_FILE}" ]]; then
 fi
 
 #
-# 3. Set CMake build directory
+# 4. Set CMake build directory
 #
-BUILD_ID="${SYSTEMNAME^^}_${model_id}"
+if [[ ${build_type^^} == "RELEASE" ]]; then
+  BUILD_ID="${SYSTEMNAME^^}_${model_id}"
+else
+  BUILD_ID="${SYSTEMNAME^^}_${build_type^^}_${model_id}"
+fi
+
 if [[ -z "${build_dir}" ]]; then
   cmake_build_dir="${cmake_tsmp2_dir}/bld/${BUILD_ID}"
 else
@@ -293,18 +316,9 @@ fi
 build_log="$(dirname ${cmake_build_dir})/${BUILD_ID}_$(date +%Y-%m-%d_%H-%M).log"
 
 #
-# 4. Set the rest of the CMake options
+# 5. Set the rest of the CMake options
 #
 message "Setting CMAKE options..."
-if [[ -z "$build_type" ]];then
-   build_type="RELEASE"
-fi
-if [[ ${build_type^^} == "DEBUG" || ${build_type^^} == "RELEASE" ]]; then
-   cmake_build_type="${build_type^^}"
-else
-   echo "ABORT: Unsupported build_type=${build_type}"
-   exit 1
-fi
 
 if [ -z "${verbose_makefile}" ]; then
   cmake_verbose_makefile="OFF"
@@ -320,7 +334,7 @@ fi
 mkdir -p "${cmake_install_dir}"
 
 #
-# 5. CMake configure
+# 6. CMake configure
 #
 message ""
 message "===================="
@@ -344,7 +358,7 @@ cmake ${cmake_conf} |& tee -a "${build_log}"
 message "== CMAKE GENERATE PROJECT finished"
 
 #
-# 6. CMake build and install
+# 7. CMake build and install
 #
 message "CMAKE build:"
 message "cmake --build ${cmake_build_dir} |& tee -a $build_log"
@@ -359,7 +373,7 @@ cmake --install ${cmake_build_dir} |& tee -a $build_log
 message "== CMAKE INSTALL finished"
 
 #
-# 7. Post-installation steps
+# 8. Post-installation steps
 #
 message "Copying build log and environment file to ${cmake_install_dir}..."
 if [[ -n "${env}" ]]; then
