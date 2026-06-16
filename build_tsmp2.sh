@@ -247,16 +247,17 @@ if [[ -n "${env}" ]]; then
 
   # TODO: Env file parameterization is temporary and should be fixed
   if [[ "$parflowGPU" == "y" ]];then
-    env_params="--parflowgpu"
+    env_gpu_params="--parflowgpu"
   fi
   if [[ ${build_type^^} == "PROFILE" ]];then
-    env_params+="${env_params} --profile"
+    env_profile_params="--profile"
     if [[ ":${TSMP2_ENV_FILE}:" != *"jsc.2026.gnu.openmpi"* ]]; then 
       message "ERROR: Profiling builds are only currently supported on jsc.2026.gnu.openmpi."
       exit 1
-    fi	
+    fi
   fi
-  source "${env}" "${env_params}"
+  message "SOURCE command: source ${env} ${env_gpu_params} ${env_profile_params}"
+  source "${env}" ${env_gpu_params} ${env_profile_params}
 fi
 
 # TSMP2_ENV_FILE should be set either (1) through --env, (2) as a shell variable,
