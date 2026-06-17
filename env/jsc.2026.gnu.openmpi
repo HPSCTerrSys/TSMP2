@@ -52,7 +52,7 @@ fi
 module load ecCodes
 
 # Set default MPI compilers
-if [[ "$2" == "--profile" ]]; then
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
   module load Scalasca
   export TSMP2_PROFILE_CC=$(which scorep-mpicc)
   export TSMP2_PROFILE_FC=$(which scorep-mpif90)
@@ -79,7 +79,7 @@ if [[ "$1" == "--parflowgpu" ]]; then
   echo "       nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
   echo "  CUDAARCHS: $CUDAARCHS"
 fi
-if [[ "$2" == "--profile" ]]; then
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
   echo "   Profiler: Scalasca v${EBVERSIONSCALASCA}"
 fi
 echo "=================================================="

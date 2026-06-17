@@ -41,7 +41,10 @@ endif()
 # Set compiler flags
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
-    set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    set(PF_CFLAGS "-Wall -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    if (NOT CMAKE_BUILD_TYPE STREQUAL "PROFILE")
+      string(APPEND PF_CFLAGS " -Werror") #compile warnings not ignored for DEBUG and RELEASE builds
+    endif()
     if(${PDAF})
       # parflow-pdaf fork currently ignores unused variables
       string(APPEND PF_CFLAGS " -Wno-unused-variable")
