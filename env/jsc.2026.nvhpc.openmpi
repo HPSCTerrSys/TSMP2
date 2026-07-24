@@ -1,0 +1,66 @@
+# -----------------------------------------------------------------------------------------
+# Loads NVHPC+OpenMPI build environment for TSMP2.
+# This environment is tailored for JURECA [1]  and JUPITER [2] supercomputers.
+#
+# [1] https://apps.fz-juelich.de/jsc/software/jureca/index.xhtml
+# [2] https://apps.fz-juelich.de/jsc/software/jupiter/index.xhtml
+# 
+# Usage: source jsc.2026.nvhpc.openmpi
+# -----------------------------------------------------------------------------------------
+
+# Load compilers and MPI library
+module --force purge
+module use $OTHERSTAGES
+module load Stages/2026
+module load nvidia-compilers/25.9-CUDA-13
+module load OpenMPI
+module load ScaLAPACK
+
+# Basic scripting and build tools
+module load Python
+module load CMake
+module load git
+
+# Storage libraries
+module load HDF5
+module load netCDF/4.9.3
+module load netCDF-Fortran/4.6.2
+module load PnetCDF/1.14.1
+
+# ParFlow additional libraries
+module load CUDA
+module load UCX-settings/RC-CUDA
+module load Hypre
+module load Umpire
+module load SUNDIALS
+
+# TODO: Verify these values
+if [[ $SYSTEMNAME == "jupiter" ]]; then
+  export CUDAARCHS="90"
+else
+  export CUDAARCHS="80"
+fi
+export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
+
+# ICON additional libraries
+module load ecCodes
+
+# Set default MPI compilers
+export CC=mpicc
+export FC=mpifort
+export CXX=nvc++
+export CUDACXX=nvcc
+export MPI_HOME=$EBROOTOPENMPI
+export UMPIRE_ROOT=$EBROOTUMPIRE
+export SUNDIALS_ROOT=$EBROOTSUNDIALS
+
+# Display compiler settings
+module list
+echo "=========================== COMPILER SETTINGS  =======================" 
+echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
+echo "         C: $($CC --version | head -n 2 | tail -n 1)"
+echo "       C++: $($CXX --version | head -n 2 | tail -n 1)"
+echo "   Fortran: $($FC --version | head -n 2 | tail -n 1)"
+echo "======================================================================"
+

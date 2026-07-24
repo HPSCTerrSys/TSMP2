@@ -105,6 +105,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
   if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     # Release optimization flags
     list(APPEND PDAF_FOPT "-O2")
+    # Adding `-fp-model=source` to avoid precision changes between
+    # DEBUG and RELEASE simulations
+    #
+    # Background, why `source` is chosen over `precise`:
+    # https://www.intel.com/content/www/us/en/developer/articles/guide/porting-guide-for-ifort-to-ifx.html
+    list(APPEND PDAF_FOPT "-fp-model=source")
   elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     # Debug optimization flags
     list(APPEND PDAF_FOPT "-O0")

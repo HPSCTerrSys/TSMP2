@@ -6,6 +6,7 @@ if(DEFINED eCLM_SRC)
 elseif(DEFINED CLM35_SRC)
     list(APPEND PF_CLM_FLAGS -DPARFLOW_AMPS_LAYER=oas3
                              -DOAS3_ROOT=${OASIS_ROOT}
+                             -DPARFLOW_HAVE_ECLM=OFF
                              -DPARFLOW_HAVE_CLM=OFF)
 else()
     # use ParFlow's internal CLM
@@ -35,13 +36,16 @@ else()
   else()
     set(PF_ACC_BACKEND "none") 
   endif()
-  #TODO: Add support for 'kokkos' backend
 endif()
 
 # Set compiler flags
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
     set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    if(${PDAF})
+      # parflow-pdaf fork currently ignores unused variables
+      string(APPEND PF_CFLAGS " -Wno-unused-variable")
+    endif()
     # Silence arch-specific compiler warnings
     if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64|aarch64")
       string(APPEND PF_CFLAGS " -Wno-maybe-uninitialized")
@@ -59,6 +63,16 @@ if(SLURM_SRUN)
   set(ENABLE_SLURM "ON")
 else()
   set(ENABLE_SLURM "OFF")
+endif()
+
+# Enable Umpire if exists
+if (DEFINED ENV{UMPIRE_ROOT} AND NOT ${PDAF})
+  set(PF_UMPIRE_FLAG "-DUMPIRE_ROOT=$ENV{UMPIRE_ROOT}")
+endif()
+
+# Enable SUNDIALS if exists
+if (DEFINED ENV{SUNDIALS_ROOT} AND NOT ${PDAF})
+    set(PF_SUNDIALS_FLAG "-DSUNDIALS_ROOT=$ENV{SUNDIALS_ROOT}")
 endif()
 
 # Pass options to ParFlow CMake
@@ -80,6 +94,8 @@ ExternalProject_Add(ParFlow
                 -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
                 -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
                 -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
+                ${PF_UMPIRE_FLAG}
+                ${PF_SUNDIALS_FLAG}
                 ${PF_CLM_FLAGS}
     DEPENDS     ${MODEL_DEPENDENCIES}
 )
