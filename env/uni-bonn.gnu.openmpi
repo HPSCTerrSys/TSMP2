@@ -12,6 +12,7 @@ module --force purge
 # Primary compiler toolchain
 module load GCC/12.3.0
 module load OpenMPI/4.1.5-GCC-12.3.0
+module load ScaLAPACK/2.2.0-gompi-2023a-fb
 
 # Basic scripting and build tools
 module load Python/3.11.3-GCCcore-12.3.0
@@ -32,7 +33,7 @@ module load Tcl/8.6.13-GCCcore-12.3.0
 module load ecCodes/2.31.0-gompi-2023a
 
 # Set SYSTEMNAME and STAGE for Marvin
-export SYSTEMNAME="Marvin"
+export SYSTEMNAME="marvin"
 export STAGE="${EBVERSIONGOMPI}${EBVERSIONIIMPI}"
 
 # Set default compilers
