@@ -30,3 +30,4 @@
 	path = models/cosmo5.01_fresh
 	url = https://gitlab.jsc.fz-juelich.de/sdlts/tsmp_components_mirrors/cosmo5.01_fresh.git
 	branch = tsmp-oasis
+	shallow = true
