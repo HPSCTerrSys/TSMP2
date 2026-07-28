@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+title: Terrestrial Systems Modelling Platform v2 (TSMP2)
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Stefan
+    family-names: Poll
+    orcid: 'https://orcid.org/0000-0003-2527-0747'
+  - given-names: Paul
+    family-names: Rigor
+    orcid: 'https://orcid.org/0009-0003-5256-9215'
+  - given-names: Johannes
+    family-names: Keller
+    orcid: 'https://orcid.org/0000-0003-0813-7493'
+  - given-names: Ana
+    family-names: González-Nicolás
+    orcid: 'https://orcid.org/0000-0003-2869-8255'
+  - given-names: Marco
+    family-names: van Hulten
+    orcid: 'https://orcid.org/0000-0002-3045-4949'
+  - given-names: Daniel
+    family-names: Caviedes-Voullieme
+    orcid: 'https://orcid.org/0000-0001-7871-7544'
+  - given-names: Harrie-Jan
+    family-names: Hendricks-Franssen
+    orcid: 'https://orcid.org/0000-0002-0004-8114'
+  - given-names: Klaus
+    family-names: Goergen
+    orcid: 'https://orcid.org/0000-0002-4208-3444'
+  - given-names: Stefan
+    family-names: Kollet
+    orcid: 'https://orcid.org/0000-0003-0095-1554'
+identifiers:
+  - type: doi
+    value: 10.5194/egusphere-2025-5468
+    description: The new TSMP2 coupled Earth system model
+  - type: swh
+    value: 'swh:1:dir:de483517587dba81b26968db6391a49459b8a811'
+    description: Software Heritage ID
+  - type: url
+    value: 'https://helmholtz.software/software/tsmp2'
+    description: Helmholtz Research Software Directory
+repository-code: 'https://github.com/HPSCTerrSys/TSMP2'
+url: 'https://helmholtz.software/software/tsmp2'
+repository: 'https://hpscterrsys.github.io/TSMP2'
+keywords:
+  - 'regional Earth system model, Fortran, HPC'
+license: MIT
