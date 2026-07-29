@@ -381,7 +381,7 @@ jobs:
         name: Update CLM3.5 submodule ${{ steps.model-versions.outputs.VER_CLM35 }}
         working-directory: ${{ env.TSMP2_ROOT }}/models/CLM3.5
         run: |
-          pwd && git submodule update --init --force .
+          pwd && git submodule update --init --checkout --force .
 
       #
       # ParFlow
