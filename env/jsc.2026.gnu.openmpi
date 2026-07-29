@@ -52,6 +52,12 @@ fi
 module load ecCodes
 
 # Set default MPI compilers
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
+  module load Scalasca
+  export TSMP2_PROFILE_CC=$(which scorep-mpicc)
+  export TSMP2_PROFILE_FC=$(which scorep-mpif90)
+  export TSMP2_PROFILE_CXX=$(which scorep-mpicxx)
+fi
 export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
@@ -64,14 +70,17 @@ export SUNDIALS_ROOT=$EBROOTSUNDIALS
 # Display compiler settings
 module list
 echo "=============== COMPILER SETTINGS  ===============" 
-echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
-echo "         C: $($CC --version | head -n 1)"
-echo "       C++: $($CXX --version | head -n 1)"
-echo "   Fortran: $($FC --version | head -n 1)"
+echo "    Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "    MPI lib: OpenMPI v$EBVERSIONOPENMPI"
+echo "          C: ${CC} (GCC ${EBVERSIONGCCCORE})"
+echo "        C++: ${CXX} (GCC ${EBVERSIONGCCCORE})"
+echo "    Fortran: ${FC} (GCC ${EBVERSIONGCCCORE})"
 if [[ "$1" == "--parflowgpu" ]]; then
-  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
-  echo " CUDAARCHS: $CUDAARCHS"
+  echo "       nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo "  CUDAARCHS: $CUDAARCHS"
+fi
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
+  echo "   Profiler: Scalasca v${EBVERSIONSCALASCA}"
 fi
 echo "=================================================="
 echo ""
