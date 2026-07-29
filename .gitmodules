@@ -26,7 +26,9 @@
 	path = models/CLM3.5
 	url = https://github.com/HPSCTerrSys/CLM3.5.git
 	branch = tsmp-patches-v0.4
+        update = none
 [submodule "models/cosmo5.01_fresh"]
 	path = models/cosmo5.01_fresh
 	url = https://gitlab.jsc.fz-juelich.de/sdlts/tsmp_components_mirrors/cosmo5.01_fresh.git
 	branch = tsmp-oasis
+        update = none
