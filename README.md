@@ -9,7 +9,7 @@ The [Terrestrial System Modeling Platform v2 (TSMP2)] is an open source scale-co
 
 TSMP2 allows for a physically-based representation of transport processes of mass, energy and momentum and interactions between the different compartments of the geo-ecosystem across scales, explicitly reproducing feedbacks in the hydrological cycle from the groundwater into the atmosphere.
 
-TSMP2-PDAF describes the build commands of TSMP2 that can introduce data assimilation for an ensemble of TSMP2 simulations using the Parallel Data Assimilation Framework ([PDAF]). For more information, see the [TSMP-PDAF](https://hpscterrsys.github.io/pdaf) documentation.
+TSMP2-PDAF describes the build commands of TSMP2 that can introduce data assimilation for an ensemble of TSMP2 simulations using the Parallel Data Assimilation Framework ([PDAF]). For more information, see the [TSMP-PDAF] documentation.
 
 TSMP2 development has been driven by groups within the [Center for High-Performance Scientific Computing in Terrestrial Systems] (HPSC-TerrSys).
 
@@ -34,7 +34,7 @@ TSMP2 is open source software and is licensed under the [MIT-License](https://gi
 [ICON]: https://www.icon-model.org
 [eCLM]: https://github.com/HPSCTerrSys/eCLM
 [ParFlow]: https://www.parflow.org
-[OASIS3-MCT]: https://oasis.cerfacs.fr/en/homehttps://oasis.cerfacs.fr/en/home/
+[OASIS3-MCT]: https://oasis.cerfacs.fr/en/home
 [PDAF]: https://pdaf.awi.de/trac/wiki
 [TSMP-PDAF]: https://hpscterrsys.github.io/pdaf
 [Center for High-Performance Scientific Computing in Terrestrial Systems]: http://www.hpsc-terrsys.de
