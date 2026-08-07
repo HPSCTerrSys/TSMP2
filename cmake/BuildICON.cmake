@@ -24,8 +24,14 @@ set(ICON_ECRAD_FCFLAGS "-D__ECRAD_LITTLE_ENDIAN")
 
 # Control compiler optimization depending on CMAKE_BUILD_TYPE
 if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-  string(PREPEND ICON_CFLAGS "-g ")
-  string(PREPEND ICON_FCFLAGS "-g ")
+  string(PREPEND ICON_CFLAGS "-O0 -g ")
+  string(PREPEND ICON_FCFLAGS "-O0 -g ")
+  # Runtime diagnostics: bounds checking, trap FP exceptions, uninitialized reals with NaN
+  if (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
+    string(APPEND ICON_FCFLAGS " -check bounds -check uninit -fpe0 -init=snan")
+  elseif (CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
+    string(APPEND ICON_FCFLAGS " -fcheck=bounds -ffpe-trap=invalid,zero,overflow -finit-real=snan")
+  endif()
 elseif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
   string(PREPEND ICON_CFLAGS "-O2 ")
   string(PREPEND ICON_FCFLAGS "-O2 ")
