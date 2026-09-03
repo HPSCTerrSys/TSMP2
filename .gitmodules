@@ -16,8 +16,8 @@
 	branch = tsmp-pdaf-patched
 [submodule "models/eCLM"]
 	path = models/eCLM
-	url = https://github.com/HPSCTerrSys/eCLM.git
-	branch = beta-0.7
+	url = https://github.com/tboas/eCLM.git
+	branch = eCLM_FYM
 [submodule "models/oasis3-mct"]
         path = models/oasis3-mct
         url = https://icg4geo.icg.kfa-juelich.de/ExternalReposPublic/oasis3-mct
