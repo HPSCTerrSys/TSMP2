@@ -54,13 +54,14 @@ module load ecCodes
 # Set default MPI compilers
 if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
   module load Scalasca
-  export TSMP2_PROFILE_CC=$(which scorep-mpicc)
-  export TSMP2_PROFILE_FC=$(which scorep-mpif90)
-  export TSMP2_PROFILE_CXX=$(which scorep-mpicxx)
+  export CC=$(which scorep-mpicc)
+  export FC=$(which scorep-mpif90)
+  export CXX=$(which scorep-mpicxx)
+else
+  export CC=mpicc
+  export FC=mpif90
+  export CXX=mpicxx
 fi
-export CC=mpicc
-export FC=mpif90
-export CXX=mpicxx
 
 # Variables read by TSMP2 cmake scripts
 export MPI_HOME=$EBROOTOPENMPI
