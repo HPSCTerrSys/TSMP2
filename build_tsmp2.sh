@@ -311,8 +311,14 @@ fi
 mkdir -p "${cmake_install_dir}"
 
 if [[ -z "${parallel_jobs}" ]]; then
-  parallel_jobs=1
+  if [[ ! -z "${TSMP2_PARALLEL_JOBS}" ]]; then
+    parallel_jobs=${TSMP2_PARALLEL_JOBS}
+  else
+    parallel_jobs=1
+  fi
 fi
+message "Parallel make jobs set to ${parallel_jobs}"
+
 #
 # 5. CMake configure
 #
