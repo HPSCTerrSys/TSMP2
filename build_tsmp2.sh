@@ -41,7 +41,17 @@ function help_tsmp2() {
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --env            Set model environment."
-  echo "  --parallel, -j   Set the maximum number of jobs to build the code, if not set compilation is serial."
+  echo "  -j, --parallel   Set the maximum number of jobs to build the code, if not set compilation is serial."
+  echo "  -q, --quiet      Write less output during shell execution"
+  echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
+  echo ""
+  echo "Examples:"
+  echo ""
+  echo "  ./build_tsmp2.sh icon eclm parflow"
+  echo "  ./build_tsmp2.sh eclm parflowGPU"
+  echo "  ./build_tsmp2.sh iconGPU"
+  echo "  ./build_tsmp2.sh icon eclm"
+  echo "  ./build_tsmp2.sh eclm pdaf"
   echo ""
   exit 1
 }
