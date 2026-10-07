@@ -26,7 +26,8 @@ ExternalProject_Add(eCLM
                       ${COUP_OAS_FLAGS}
 		              ${PDAF_FLAGS}
     BUILD_ALWAYS      YES
-    BUILD_COMMAND     make -j ${PARALLEL_JOBS} install 
+    BUILD_COMMAND     ""
+    INSTALL_COMMAND   make -j ${PARALLEL_JOBS} install 
     DEPENDS           ${MODEL_DEPENDENCIES}
 )
 
