@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.29.3)
+cmake_minimum_required (VERSION 3.28)
 project(TSMP2 LANGUAGES C CXX Fortran)
 include(ExternalProject)
 
