@@ -24,7 +24,7 @@ file(APPEND  ${OASIS_MAKE_INC} "ARCHDIR         = ${OASIS_INSTALL_PREFIX}\n")
 file(APPEND  ${OASIS_MAKE_INC} "NETCDF_INCLUDE  = ${NetCDF_F90_ROOT}/include\n")
 file(APPEND  ${OASIS_MAKE_INC} "NETCDF_LIBRARY  = ${NetCDF_LIBRARIES}\n")
 file(APPEND  ${OASIS_MAKE_INC} "MPI_INCLUDE     = ${MPI_Fortran_INCLUDE_DIRS}\n")
-file(APPEND  ${OASIS_MAKE_INC} "MAKE            = make -j ${PARALLEL_JOBS}\n")
+file(APPEND  ${OASIS_MAKE_INC} "MAKE            = make\n")
 file(APPEND  ${OASIS_MAKE_INC} "F90             = ${CMAKE_Fortran_COMPILER}\n")
 file(APPEND  ${OASIS_MAKE_INC} "F               = $(F90)\n")
 file(APPEND  ${OASIS_MAKE_INC} "f90             = $(F90)\n")
@@ -68,7 +68,7 @@ ExternalProject_Add(OASIS3_MCT
   SOURCE_DIR        ${OASIS_SRC}
   BUILD_IN_SOURCE   FALSE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
+  BUILD_COMMAND     make -j ${PARALLEL_JOBS} -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
   INSTALL_COMMAND   ""
 )
 

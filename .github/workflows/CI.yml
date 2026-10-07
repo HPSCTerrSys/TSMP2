@@ -476,12 +476,6 @@ jobs:
           echo $BUILD_TSMP2_CMD && echo ""
           eval $BUILD_TSMP2_CMD
 
-      - if: always() && matrix.config.name == 'ICON-eCLM-ParFlow'
-        name: Debug ICON-eCLM-Parflow failure
-        run: |
-          cat /home/runner/work/TSMP2/TSMP2/bld/UBUNTU_ICON-eCLM-ParFlow/OASIS3_MCT/bld/COMP.log
-          cat /home/runner/work/TSMP2/TSMP2/bld/UBUNTU_ICON-eCLM-ParFlow/OASIS3_MCT/bld/COMP.err
-
       - name: Check installed binaries
         working-directory: ${{ env.TSMP2_ROOT }}/bin
         run: |
