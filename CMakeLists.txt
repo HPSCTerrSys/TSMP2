@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.21.1)
+cmake_minimum_required (VERSION 3.29.3)
 project(TSMP2 LANGUAGES C CXX Fortran)
 include(ExternalProject)
 
@@ -22,6 +22,10 @@ option(PDAF "Compile PDAF within TSMP2 framework" OFF)
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "Choose the type of build." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "DEBUG" "RELEASE")
+endif()
+
+if(NOT DEFINED PARALLEL_JOBS)
+  set(PARALLEL_JOBS "1" CACHE STRING "Number of parallel make jobs for building model components." FORCE)
 endif()
 
 # init CMAKE internal variables
@@ -144,5 +148,3 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 print_model_versions("${COMPONENT_MODELS}" "${TSMP2_MODEL_VERSIONS}")
-
-#message(FATAL_ERROR "at the end of script")

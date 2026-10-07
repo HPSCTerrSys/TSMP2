@@ -41,7 +41,7 @@ function help_tsmp2() {
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --env            Set model environment."
-  echo "  --max_jobs       Set the maximum number of jobs to build the code, if not set compilation is serial."
+  echo "  --parallel, -j   Set the maximum number of jobs to build the code, if not set compilation is serial."
   echo ""
   exit 1
 }
@@ -134,7 +134,7 @@ while [[ "$#" -gt 0 ]]; do
     --build_dir) build_dir="$2"; shift ;;
     --install_dir) install_dir="$2"; shift ;;
     --env) env="$2"; shift ;;
-    --max_jobs) max_jobs="$2"; shift ;;
+    -j|--parallel) parallel_jobs="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
@@ -310,10 +310,9 @@ else
 fi
 mkdir -p "${cmake_install_dir}"
 
-if [ -v max_jobs ]; then
-  export CMAKE_BUILD_PARALLEL_LEVEL=${max_jobs}
+if [[ -z "${parallel_jobs}" ]]; then
+  parallel_jobs=1
 fi
-
 #
 # 5. CMake configure
 #
@@ -331,6 +330,7 @@ cmake_conf="-S ${cmake_tsmp2_dir} -B ${cmake_build_dir}"
 cmake_conf+=" -DCMAKE_BUILD_TYPE=${cmake_build_type}"
 cmake_conf+=" -DCMAKE_INSTALL_PREFIX=${cmake_install_dir}"
 cmake_conf+=" -DCMAKE_VERBOSE_MAKEFILE=${cmake_verbose_makefile}"
+cmake_conf+=" -DPARALLEL_JOBS=${parallel_jobs}"
 cmake_conf+=" ${cmake_comp_str}"
 cmake_conf+=" ${cmake_compsrc_str}"
 message "cmake ${cmake_conf}" |& tee "${build_log}"
