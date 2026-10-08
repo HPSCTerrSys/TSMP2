@@ -278,8 +278,8 @@ ExternalProject_Add(PDAF
   PREFIX            PDAF
   SOURCE_DIR        ${PDAF_SRC}
   BUILD_IN_SOURCE   TRUE
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean directories libpdaf
+  CONFIGURE_COMMAND make ${PDAF_ENV_VARS} clean directories
+  BUILD_COMMAND     make ${PDAF_ENV_VARS} -j ${PARALLEL_JOBS} libpdaf
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES}
 )
