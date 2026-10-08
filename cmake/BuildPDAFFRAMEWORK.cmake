@@ -33,8 +33,8 @@ ExternalProject_Add(PDAF-Framework
   PREFIX            PDAF-Framework
   SOURCE_DIR        ${PDAF_SRC}/interface/framework
   BUILD_IN_SOURCE   TRUE
-  CONFIGURE_COMMAND make ${PDAFFRAMEWORK_ENV_VARS} clean
-  BUILD_COMMAND     make ${PDAFFRAMEWORK_ENV_VARS} -j ${PARALLEL_JOBS} all
+  CONFIGURE_COMMAND $(MAKE) ${PDAFFRAMEWORK_ENV_VARS} clean
+  BUILD_COMMAND     $(MAKE) ${PDAFFRAMEWORK_ENV_VARS} all
   INSTALL_COMMAND   ""
   DEPENDS           PDAF-Model
 )
