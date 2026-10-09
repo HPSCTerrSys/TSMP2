@@ -95,12 +95,12 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
      read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
-        git submodule update --init --force -- ${submodule_name}
+        git submodule update --init --checkout --force -- ${submodule_name}
      else
         message "Do not overwrite submodule ${submodule_name}"
      fi
   else
-     git submodule update --init -- ${submodule_name}
+     git submodule update --init --checkout -- ${submodule_name}
   fi
 fi # compsrc
 }
