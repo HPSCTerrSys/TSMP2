@@ -1,0 +1,82 @@
+# --------------------------------------------------------------------------
+# Loads IntelLLVM+ParaStationMPI build environment for TSMP2.
+# This environment is tailored for JURECA [1] and JUWELS [2] supercomputers.
+#
+# [1] https://apps.fz-juelich.de/jsc/software/jureca/index.xhtml
+# [2] https://apps.fz-juelich.de/jsc/software/juwels/index.xhtml
+# 
+# Usage: source jsc.2026.intel.psmpi
+# --------------------------------------------------------------------------
+
+# Load Stages/2026
+module --force purge
+module use $OTHERSTAGES
+module load Stages/2026
+
+# Primary compiler toolchain
+if [[ "$1" == "--parflowgpu" ]]; then
+  # TODO: Use a generic GPU switch instead of --parflowgpu
+  module load CUDA
+fi
+module load Intel
+module load ParaStationMPI
+
+# Basic scripting and build tools
+module load Python
+module load CMake
+module load git
+
+# Storage libraries
+module load HDF5
+module load netCDF
+module load netCDF-Fortran
+module load PnetCDF
+
+# ParFlow additional libraries
+if [[ "$1" == "--parflowgpu" ]]; then
+  module load CUDA
+  module load UCX-settings/RC-CUDA
+  module load Hypre/3.0.0
+  module load Umpire
+
+  # TODO: Verify these values
+  export CUDAARCHS="80"
+  export CMAKE_CUDA_RUNTIME_LIBRARY="Shared"
+else
+  module load Hypre/3.0.0-cpu
+  module load Umpire
+fi
+module load Tcl
+
+# ICON additional libraries
+module load ecCodes
+
+# Set default MPI compilers
+export OMPI_CC=icx
+export OMPI_CXX=icpx
+export OMPI_FC=ifx
+export CC=mpicc
+export FC=mpif90
+export CXX=mpicxx
+export MPI_HOME=$EBROOTPSMPI
+export TSMP2_PARALLEL_JOBS=16
+
+# Display compiler settings
+module list
+echo "====================================== COMPILER SETTINGS ======================================"
+echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "   MPI lib: $(mpichversion | head -n 1 | tr -d =)"
+echo "         C: $($CC --version | head -n 1)"
+echo "       C++: $($CXX --version | head -n 1)"
+echo "   Fortran: $($FC --version | head -n 1)"
+if [[ "$1" == "--parflowgpu" ]]; then
+  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo " CUDAARCHS: $CUDAARCHS"
+fi
+echo "==============================================================================================="
+echo ""
+if [[ "$1" == "--parflowgpu" ]]; then
+  echo "WARNING: ParFlowGPU doesn't work on Intel toolchain due to missing Intel-built Hypre-CUDA library."
+  echo "         Load the 'jsc.2025.gnu.openmpi' env file instead to build ParFlowGPU."
+fi
+echo ""
