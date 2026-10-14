@@ -62,5 +62,7 @@ echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
 echo "         C: $($CC --version | head -n 2 | tail -n 1)"
 echo "       C++: $($CXX --version | head -n 2 | tail -n 1)"
 echo "   Fortran: $($FC --version | head -n 2 | tail -n 1)"
+echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+echo " CUDAARCHS: $CUDAARCHS"
 echo "======================================================================"
 
