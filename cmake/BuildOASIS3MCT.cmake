@@ -13,6 +13,15 @@ else()
   message(WARNING "CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}' is not supported by OASIS3-MCT")
 endif()
 
+set(CPPDEF_EXTRAS "")
+if(${PDAF})
+  string(APPEND CPPDEF_EXTRAS " -DUSE_PDAF")
+endif()
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+  # NVHPC doesn't support quad precision. https://forums.developer.nvidia.com/t/real-16-implementation/129969
+  string(APPEND CPPDEF_EXTRAS " -D__NO_16BYTE_REALS")
+endif()
+
 set(OASIS_BLD_DIR ${CMAKE_CURRENT_BINARY_DIR}/OASIS3_MCT/bld)
 set(OASIS_MAKE_INC ${OASIS_BLD_DIR}/make.inc)
 set(OASIS_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/OASIS3-MCT)
@@ -35,15 +44,13 @@ file(APPEND  ${OASIS_MAKE_INC} "AR              = ar\n")
 file(APPEND  ${OASIS_MAKE_INC} "ARFLAGS         = -ruv\n")
 file(APPEND  ${OASIS_MAKE_INC} "DYNOPT          = -fPIC\n")
 file(APPEND  ${OASIS_MAKE_INC} "LDDYNOPT        = -shared\n")
-if(${PDAF})
-  file(APPEND  ${OASIS_MAKE_INC} "CPPDEF          = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY -DUSE_PDAF\n")
-else()
-  file(APPEND  ${OASIS_MAKE_INC} "CPPDEF          = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY\n")
-endif()
+file(APPEND  ${OASIS_MAKE_INC} "CPPDEF          = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY ${CPPDEF_EXTRAS}\n")
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
   file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OPTIM} -I. -ffree-line-length-none -fallow-argument-mismatch ${OpenMP_Fortran_FLAGS}\n")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
   file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OPTIM} -I. -xCORE-AVX2 -assume byterecl -mt_mpi ${OpenMP_Fortran_FLAGS}\n")
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+  file(APPEND  ${OASIS_MAKE_INC} "FCBASEFLAGS     = ${OPTIM} -I. -fPIC ${OpenMP_Fortran_FLAGS}\n")
 else()
   message(FATAL_ERROR "Fortran compiler '${CMAKE_Fortran_COMPILER_ID}' is not supported.")
 endif()
@@ -68,7 +75,7 @@ ExternalProject_Add(OASIS3_MCT
   SOURCE_DIR        ${OASIS_SRC}
   BUILD_IN_SOURCE   FALSE
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 static-libs -C ${OASIS_BLD_DIR}
+  BUILD_COMMAND     make -f ${OASIS_SRC}/util/make_dir/TopMakefileOasis3 realclean static-libs -C ${OASIS_BLD_DIR}
   INSTALL_COMMAND   ""
 )
 
