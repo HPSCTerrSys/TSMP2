@@ -32,7 +32,7 @@ module load CUDA
 module load UCX-settings/RC-CUDA
 module load Hypre
 module load Umpire
-module load SUNDIALS
+#module load SUNDIALS
 
 # TODO: Verify these values
 if [[ $SYSTEMNAME == "jupiter" ]]; then
