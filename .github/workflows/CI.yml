@@ -69,6 +69,7 @@ jobs:
       VER_ECCODES: 2.40.0
       VER_OASIS: tsmp-patches-v0.1
       VER_ICON_UPSTREAM: release-2026.04-public
+      MAKE_JOBS: 4
 
     steps:
       - uses: actions/checkout@v4
@@ -131,7 +132,7 @@ jobs:
           export CPPFLAGS=-I/usr/include/hdf5/openmpi
           export LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi
           ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
-          make -j4 install
+          make -j${MAKE_JOBS} install
 
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}
@@ -166,7 +167,7 @@ jobs:
           export CPPFLAGS=-I${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/include
           export LDFLAGS=-L${DEPENDENCIES_ROOT}/netcdf-c-${VER_NETCDF_C}/lib
           ./configure --prefix=${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
-          make -j4 install
+          make -j${MAKE_JOBS} install
 
           # Verify
           tree -L 2 ${DEPENDENCIES_ROOT}/netcdf-f90-${VER_NETCDF_F90}
@@ -204,7 +205,7 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"  \
                 -DMPI_INCLUDE_DIR="${MPI_HOME}/include"  \
                 -DHYPRE_ENABLE_OPENMP="ON"
-          cmake --build bld --parallel 4
+          cmake --build bld --parallel ${MAKE_JOBS} 
           cmake --install bld
 
           # Verify
@@ -243,7 +244,7 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"  \
                 -DMPI_INCLUDE_DIR="${MPI_HOME}/include"  \
                 -DHYPRE_ENABLE_CUDA="ON"
-          cmake --build bld --parallel 4
+          cmake --build bld --parallel ${MAKE_JOBS} 
           cmake --install bld
 
           # Verify
@@ -278,7 +279,7 @@ jobs:
 
           # Install
           cmake -S . -B bld -DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_ROOT}/eccodes-${VER_ECCODES}
-          cmake --build bld --parallel 4
+          cmake --build bld --parallel ${MAKE_JOBS}
           cmake --install bld
 
           # Verify
@@ -471,7 +472,7 @@ jobs:
           if [[ "${{ matrix.config.name }}" == "ICON standalone" ]]; then
             MODEL_OPTS="${MODEL_OPTS} --ICON_SRC ${TSMP2_ROOT}/models/icon-model"
           fi
-          BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update"
+          BUILD_TSMP2_CMD="./build_tsmp2.sh ${MODEL_OPTS} --no_update --parallel ${MAKE_JOBS}"
           echo $BUILD_TSMP2_CMD && echo ""
           eval $BUILD_TSMP2_CMD
 

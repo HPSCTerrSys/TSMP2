@@ -213,8 +213,8 @@ ExternalProject_Add(PDAF-Model
   PREFIX            PDAF-Model
   SOURCE_DIR        ${PDAF_SRC}/interface/model
   BUILD_IN_SOURCE   TRUE
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAFMODEL_ENV_VARS} clean all
+  CONFIGURE_COMMAND $(MAKE) ${PDAFMODEL_ENV_VARS} clean
+  BUILD_COMMAND     $(MAKE) ${PDAFMODEL_ENV_VARS} -j ${PARALLEL_JOBS} all
   INSTALL_COMMAND   ""
   DEPENDS           PDAF
 )

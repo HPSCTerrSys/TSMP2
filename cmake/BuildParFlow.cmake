@@ -77,27 +77,29 @@ endif()
 
 # Pass options to ParFlow CMake
 ExternalProject_Add(ParFlow
-    PREFIX      ParFlow
-    SOURCE_DIR  ${PARFLOW_SRC}
-    CMAKE_ARGS  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                -DCMAKE_C_FLAGS=${PF_CFLAGS}
-                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
-                -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
-                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                -DPARFLOW_ENABLE_HYPRE=ON
-                -DPARFLOW_ENABLE_NETCDF=ON
-                -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
-                -DPARFLOW_ENABLE_TIMING=TRUE
-                -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
-                -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
-                -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
-                -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
-                ${PF_UMPIRE_FLAG}
-                ${PF_SUNDIALS_FLAG}
-                ${PF_CLM_FLAGS}
-    DEPENDS     ${MODEL_DEPENDENCIES}
+    PREFIX           ParFlow
+    SOURCE_DIR       ${PARFLOW_SRC}
+    CMAKE_ARGS       -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                     -DCMAKE_C_FLAGS=${PF_CFLAGS}
+                     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+                     -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                     -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
+                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                     -DPARFLOW_ENABLE_HYPRE=ON
+                     -DPARFLOW_ENABLE_NETCDF=ON
+                     -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
+                     -DPARFLOW_ENABLE_TIMING=TRUE
+                     -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
+                     -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
+                     -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
+                     -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
+                     ${PF_UMPIRE_FLAG}
+                     ${PF_SUNDIALS_FLAG}
+                     ${PF_CLM_FLAGS}
+    BUILD_COMMAND    make -j ${PARALLEL_JOBS} install
+    INSTALL_COMMAND  ""
+    DEPENDS          ${MODEL_DEPENDENCIES}
 )
 
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)
