@@ -53,6 +53,7 @@ export CUDACXX=nvcc
 export MPI_HOME=$EBROOTOPENMPI
 export UMPIRE_ROOT=$EBROOTUMPIRE
 export SUNDIALS_ROOT=$EBROOTSUNDIALS
+export TSMP2_PARALLEL_JOBS=16
 
 # Display compiler settings
 module list

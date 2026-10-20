@@ -67,6 +67,7 @@ export FC=mpif90
 export CXX=mpicxx
 export MPI_HOME=$EBROOTPSMPI
 export MPIEXEC_EXECUTABLE=$(which srun)
+export TSMP2_PARALLEL_JOBS=16
 
 # Display compiler settings
 module list
