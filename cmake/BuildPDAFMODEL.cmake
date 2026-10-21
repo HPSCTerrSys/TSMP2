@@ -120,6 +120,11 @@ if(DEFINED PARFLOW_SRC)
   # Unconditional loading of stdc++
   list(APPEND PDAF_LIBS "-lstdc++")
 
+  # GPU: libpfsimulator contains CUDA objects and requires libcudart.
+  if(${ParFlowGPU})
+    list(APPEND PDAF_LIBS "-lcudart")
+  endif()
+
   # SLURM library if enabled (typically on HPC-system)
   if(ENABLE_SLURM)
     list(APPEND PDAF_LIBS "-lslurm")
