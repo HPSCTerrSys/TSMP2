@@ -112,7 +112,16 @@ endif()
 
 # GPU-specific options
 if(${ICONGPU})
-  list(APPEND ICON_LIBS "-c++libs -nvmalloc -cuda")
+  # TODO: below flags only work for NVHPC
+  #find_package(OpenACC REQUIRED)
+  #string(APPEND ICON_FCFLAGS " ${OpenACC_Fortran_FLAGS}")
+  #message(STATUS "OpenACC_Fortran_FLAGS=${OpenACC_Fortran_FLAGS}")
+
+  if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
+    list(APPEND ICON_LIBS "-lcudart")
+  elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+    list(APPEND ICON_LIBS "-c++libs -nvmalloc -cuda")
+  endif()
   list(APPEND EXTRA_CONFIG_ARGS --enable-gpu=openacc --enable-mpi-gpu --enable-cuda-graphs --enable-pgi-inlib)
 else()
   list(APPEND EXTRA_CONFIG_ARGS --enable-openmp)

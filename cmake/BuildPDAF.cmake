@@ -141,6 +141,24 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_FOPT "-fallow-argument-mismatch")
   list(APPEND PDAF_FOPT "-fcommon")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # using NVIDIA HPC SDK
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    list(APPEND PDAF_FOPT "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    list(APPEND PDAF_FOPT "-O0")
+    list(APPEND PDAF_FOPT "-g")
+    list(APPEND PDAF_FOPT "-traceback")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_FOPT "-Msave")
+  list(APPEND PDAF_FOPT "-Mlarge_arrays")
+  list(APPEND PDAF_FOPT "-Mbyteswapio")
+  list(APPEND PDAF_FOPT "-Mfreeform")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -189,6 +207,19 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_COPT "-mcmodel=large")
   list(APPEND PDAF_COPT "-fcommon")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # using NVIDIA HPC SDK
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    list(APPEND PDAF_COPT "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    list(APPEND PDAF_COPT "-O0")
+    list(APPEND PDAF_COPT "-g")
+    list(APPEND PDAF_COPT "-traceback")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -206,6 +237,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   list(APPEND PDAF_DOUBLEPRECISION "-fdefault-real-8")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  list(APPEND PDAF_DOUBLEPRECISION "-r8")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -246,6 +281,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   list(APPEND PDAF_MODULEOPT "-J")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  list(APPEND PDAF_MODULEOPT "-module")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
