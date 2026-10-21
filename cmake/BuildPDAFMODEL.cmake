@@ -97,7 +97,10 @@ endif()
 
 # ParFlow libraries
 if(DEFINED PARFLOW_SRC)
-  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lcjson")
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    list(APPEND PDAF_LIBS "-lgfortran")
+  endif()
   # GPU
   # list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
 
