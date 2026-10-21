@@ -56,6 +56,11 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "Int
 elseif(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
     set(PF_CFLAGS "-Werror -Wno-unused --diag_suppress=unsigned_compare_with_negative,vla_treated_as_fixed_size_array,code_is_unreachable")
     #set(PF_CFLAGS "-Werror -Wno-unused")
+    if(NOT ${ParFlowGPU})
+      message(FATAL_ERROR "BuildParFlow: NVHPC compiler detected but ParFlowGPU is not enabled. "
+        "NVHPC should for now  only be used for GPU-accelerated ParFlow builds (parflowGPU). "
+        "Use a GNU or Intel compiler for CPU-only ParFlow, or enable parflowGPU.")
+    endif()
 else()
   message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
 endif()
