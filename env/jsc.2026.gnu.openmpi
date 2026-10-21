@@ -56,6 +56,10 @@ export CC=mpicc
 export FC=mpif90
 export CXX=mpicxx
 
+# OMPI_* variables affect OpenMPI backend compilers. They should be
+# unset so that the correct default backend compilers are selected.
+unset OMPI_CC OMPI_FC OMPI_CXX
+
 # Variables read by TSMP2 cmake scripts
 export MPI_HOME=$EBROOTOPENMPI
 export UMPIRE_ROOT=$EBROOTUMPIRE
