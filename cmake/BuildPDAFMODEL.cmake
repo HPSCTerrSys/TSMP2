@@ -97,7 +97,10 @@ endif()
 
 # ParFlow libraries
 if(DEFINED PARFLOW_SRC)
-  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lgfortran -lcjson")
+  list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/lib -lpfsimulator -lamps -lpfkinsol -lcjson")
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    list(APPEND PDAF_LIBS "-lgfortran")
+  endif()
   # GPU
   # list(APPEND PDAF_LIBS "-L${CMAKE_INSTALL_PREFIX}/rmm/lib -lstdc++ -lcudart -lrmm -lnvToolsExt")
 
@@ -116,6 +119,28 @@ if(DEFINED PARFLOW_SRC)
 
   # Unconditional loading of stdc++
   list(APPEND PDAF_LIBS "-lstdc++")
+
+  # GPU: libpfsimulator and libHYPRE (nvofbf toolchain) contain GPU objects
+  # requiring CUDA and Umpire libraries at final link of tsmp-pdaf.
+  if(${ParFlowGPU})
+    list(APPEND PDAF_LIBS "-lcudart")
+    # CUDA math libraries needed by GPU-enabled HYPRE (nvofbf toolchain)
+    list(APPEND PDAF_LIBS "-lcurand")
+    list(APPEND PDAF_LIBS "-lcublas")
+    list(APPEND PDAF_LIBS "-lcusparse")
+    # Umpire memory manager needed by libamps and libHYPRE (nvofbf toolchain)
+    find_library(UMPIRE_LIB NAMES umpire
+      HINTS
+        ${UMPIRE_ROOT}/lib
+        $ENV{UMPIRE_ROOT}/lib
+        $ENV{EBROOTUMPIRE}/lib
+    )
+    if(UMPIRE_LIB)
+      list(APPEND PDAF_LIBS "${UMPIRE_LIB}")
+    else()
+      message(WARNING "BuildPDAFMODEL: Umpire library not found. Set UMPIRE_ROOT or EBROOTUMPIRE if needed.")
+    endif()
+  endif()
 
   # SLURM library if enabled (typically on HPC-system)
   if(ENABLE_SLURM)

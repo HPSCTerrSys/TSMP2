@@ -74,7 +74,7 @@ else()
 endif()
 
 # Enable Umpire if exists
-if (DEFINED ENV{UMPIRE_ROOT} AND NOT ${PDAF})
+if (DEFINED ENV{UMPIRE_ROOT} AND (NOT ${PDAF} OR ${ParFlowGPU}))
   list(APPEND PF_UMPIRE_FLAG -DUMPIRE_ROOT=$ENV{UMPIRE_ROOT})
   if(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
     # Umpire leaks wrong OpenMP compile/linker flags when on NVHPC toolchain.

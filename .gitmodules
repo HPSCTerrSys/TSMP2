@@ -9,7 +9,7 @@
 [submodule "models/parflow_pdaf"]
 	path = models/parflow_pdaf
 	url = https://github.com/HPSCTerrSys/parflow
-	branch = v3.14.1-pdaf
+	branch = v3.15.0-pdaf
 [submodule "models/pdaf"]
 	path = models/pdaf
 	url = https://github.com/HPSCTerrSys/pdaf.git
