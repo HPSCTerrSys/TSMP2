@@ -120,9 +120,26 @@ if(DEFINED PARFLOW_SRC)
   # Unconditional loading of stdc++
   list(APPEND PDAF_LIBS "-lstdc++")
 
-  # GPU: libpfsimulator contains CUDA objects and requires libcudart.
+  # GPU: libpfsimulator and libHYPRE (nvofbf toolchain) contain GPU objects
+  # requiring CUDA and Umpire libraries at final link of tsmp-pdaf.
   if(${ParFlowGPU})
     list(APPEND PDAF_LIBS "-lcudart")
+    # CUDA math libraries needed by GPU-enabled HYPRE (nvofbf toolchain)
+    list(APPEND PDAF_LIBS "-lcurand")
+    list(APPEND PDAF_LIBS "-lcublas")
+    list(APPEND PDAF_LIBS "-lcusparse")
+    # Umpire memory manager needed by libamps and libHYPRE (nvofbf toolchain)
+    find_library(UMPIRE_LIB NAMES umpire
+      HINTS
+        ${UMPIRE_ROOT}/lib
+        $ENV{UMPIRE_ROOT}/lib
+        $ENV{EBROOTUMPIRE}/lib
+    )
+    if(UMPIRE_LIB)
+      list(APPEND PDAF_LIBS "${UMPIRE_LIB}")
+    else()
+      message(WARNING "BuildPDAFMODEL: Umpire library not found. Set UMPIRE_ROOT or EBROOTUMPIRE if needed.")
+    endif()
   endif()
 
   # SLURM library if enabled (typically on HPC-system)
