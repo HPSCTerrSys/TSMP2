@@ -32,7 +32,11 @@ module load CUDA
 module load UCX-settings/RC-CUDA
 module load Hypre
 module load Umpire
-#module load SUNDIALS
+#
+# TODO: Make Parflow+SUNDIALS work on NVHPC.
+# Currently Parflow+SUNDIALS produces build errors.
+# module load SUNDIALS
+#
 
 # TODO: Verify these values
 if [[ $SYSTEMNAME == "jupiter" ]]; then
@@ -58,7 +62,7 @@ unset OMPI_CC OMPI_FC OMPI_CXX
 export CUDACXX=$(which nvcc)
 export MPI_HOME=$EBROOTOPENMPI
 export UMPIRE_ROOT=$EBROOTUMPIRE
-export SUNDIALS_ROOT=$EBROOTSUNDIALS
+#export SUNDIALS_ROOT=$EBROOTSUNDIALS
 export TSMP2_PARALLEL_JOBS=16
 
 # Display compiler settings
