@@ -347,7 +347,7 @@ jobs:
         run: |
           pwd
           wget --quiet https://datapub.fz-juelich.de/slts/sw_hpscterrys/oasis3-mct-${VER_OASIS}.tar.gz
-          echo "${CHECKSUM_OASIS}  oasis3-mct-tsmp-patches-v0.1.tar.gz" | sha256sum -c
+          echo "${CHECKSUM_OASIS}  oasis3-mct-${VER_OASIS}.tar.gz" | sha256sum -c
           tar xf oasis3-mct-${VER_OASIS}.tar.gz
           mv oasis3-mct-${VER_OASIS} oasis3-mct
 
