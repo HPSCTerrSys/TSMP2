@@ -57,8 +57,8 @@ jobs:
       VER_NETCDF_F90: 4.6.1
       VER_HYPRE: 2.33.0
       VER_ECCODES: 2.40.0
-      VER_OASIS: tsmp-patches-v0.1
-      CHECKSUM_OASIS: 9b1d8d24efbff1ce7d2b2e4fd75249ea3a9c647c57e4c0a652dc7de695c5ec49
+      VER_OASIS: tsmp-patches-v0.2
+      CHECKSUM_OASIS: d5c2618563c4883bd309b196be63313e4f60dd0f58c3d926d3ed6bebad685039
       MAKE_JOBS: 4
 
     steps:
