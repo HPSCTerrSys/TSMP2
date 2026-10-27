@@ -58,7 +58,7 @@ jobs:
       VER_HYPRE: 2.33.0
       VER_ECCODES: 2.40.0
       VER_OASIS: tsmp-patches-v0.2
-      CHECKSUM_OASIS: d5c2618563c4883bd309b196be63313e4f60dd0f58c3d926d3ed6bebad685039
+      CHECKSUM_OASIS: f409288fe16a5bd5e78bf934030a54b0c053152ec70ed03017155ef4485607a0
       MAKE_JOBS: 4
 
     steps:
@@ -339,7 +339,7 @@ jobs:
         id: cache-oasis-restore
         with:
           path: ${{ env.TSMP2_ROOT }}/oasis3-mct
-          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}
+          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}-${{ env.CHECKSUM_OASIS }}
 
       - if: matrix.config.use_oasis == 'True' && steps.cache-oasis-restore.outputs.cache-hit != 'true'
         name: Update OASIS3-MCT submodule ${{ steps.model-versions.outputs.VER_OASIS }}
@@ -356,7 +356,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.TSMP2_ROOT }}/oasis3-mct
-          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}
+          key: ${{ matrix.config.name }}_oasis-${{ env.VER_OASIS }}-${{ env.CHECKSUM_OASIS }}
 
       #
       # eCLM
