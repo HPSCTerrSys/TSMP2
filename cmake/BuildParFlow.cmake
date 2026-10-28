@@ -53,6 +53,13 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
     set(PF_CFLAGS "-Wall -Werror -Wno-unused-function -Wno-unused-variable")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
+    set(PF_CFLAGS "-Werror -Wno-unused --diag_suppress=unsigned_compare_with_negative,vla_treated_as_fixed_size_array,code_is_unreachable")
+    if(NOT ${ParFlowGPU})
+      message(FATAL_ERROR "BuildParFlow: NVHPC compiler detected but ParFlowGPU is not enabled. "
+        "NVHPC should for now  only be used for GPU-accelerated ParFlow builds (parflowGPU). "
+        "Use a GNU or Intel compiler for CPU-only ParFlow, or enable parflowGPU.")
+    endif()
 else()
   message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
 endif()
@@ -66,8 +73,14 @@ else()
 endif()
 
 # Enable Umpire if exists
-if (DEFINED ENV{UMPIRE_ROOT} AND NOT ${PDAF})
-  set(PF_UMPIRE_FLAG "-DUMPIRE_ROOT=$ENV{UMPIRE_ROOT}")
+if (DEFINED ENV{UMPIRE_ROOT} AND (NOT ${PDAF} OR ${ParFlowGPU}))
+  list(APPEND PF_UMPIRE_FLAG -DUMPIRE_ROOT=$ENV{UMPIRE_ROOT})
+  if(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
+    # Umpire leaks wrong OpenMP compile/linker flags when on NVHPC toolchain.
+    # See https://github.com/HPSCTerrSys/TSMP2/issues/148
+    list(APPEND PF_UMPIRE_FLAG -DBLT_OPENMP_COMPILE_FLAGS=-fopenmp
+                               -DBLT_OPENMP_LINK_FLAGS=-fopenmp)
+  endif()
 endif()
 
 # Enable SUNDIALS if exists

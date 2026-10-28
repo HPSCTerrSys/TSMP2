@@ -112,7 +112,9 @@ endif()
 
 # GPU-specific options
 if(${ICONGPU})
-  list(APPEND ICON_LIBS "-c++libs -nvmalloc -cuda")
+  if(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+    list(APPEND ICON_LIBS "-c++libs -nvmalloc -cuda")
+  endif()
   list(APPEND EXTRA_CONFIG_ARGS --enable-gpu=openacc --enable-mpi-gpu --enable-cuda-graphs --enable-pgi-inlib)
 else()
   list(APPEND EXTRA_CONFIG_ARGS --enable-openmp)

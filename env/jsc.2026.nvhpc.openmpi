@@ -32,7 +32,11 @@ module load CUDA
 module load UCX-settings/RC-CUDA
 module load Hypre
 module load Umpire
-module load SUNDIALS
+#
+# TODO: Make Parflow+SUNDIALS work on NVHPC.
+# Currently Parflow+SUNDIALS produces build errors.
+# module load SUNDIALS
+#
 
 # TODO: Verify these values
 if [[ $SYSTEMNAME == "jupiter" ]]; then
@@ -48,11 +52,17 @@ module load ecCodes
 # Set default MPI compilers
 export CC=mpicc
 export FC=mpifort
-export CXX=nvc++
-export CUDACXX=nvcc
+export CXX=mpicxx
+
+# OMPI_* variables affect OpenMPI backend compilers. They should be
+# unset so that the correct default backend compilers are selected.
+unset OMPI_CC OMPI_FC OMPI_CXX
+
+# Variables read by TSMP2 cmake scripts
+export CUDACXX=$(which nvcc)
 export MPI_HOME=$EBROOTOPENMPI
 export UMPIRE_ROOT=$EBROOTUMPIRE
-export SUNDIALS_ROOT=$EBROOTSUNDIALS
+#export SUNDIALS_ROOT=$EBROOTSUNDIALS
 export TSMP2_PARALLEL_JOBS=16
 
 # Display compiler settings
@@ -63,5 +73,7 @@ echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
 echo "         C: $($CC --version | head -n 2 | tail -n 1)"
 echo "       C++: $($CXX --version | head -n 2 | tail -n 1)"
 echo "   Fortran: $($FC --version | head -n 2 | tail -n 1)"
+echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+echo " CUDAARCHS: $CUDAARCHS"
 echo "======================================================================"
 

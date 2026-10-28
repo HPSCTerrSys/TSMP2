@@ -123,14 +123,14 @@ while [[ "$#" -gt 0 ]]; do
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
     --version) echo "$0 version 0.2.0"; exit 0;;
-    --icon|icon) icon=y iconCPU=y iconCMakeModelID="ICON";;
+    icon) icon=y iconCPU=y iconCMakeModelID="ICON";;
     icongpu) icon=y iconGPU=y iconCMakeModelID="ICONGPU";;
-    --eclm|eclm) eclm=y;;
-    --parflow|parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
-    --parflowgpu|parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
-    --pdaf|pdaf) pdaf=y;;
-    --cosmo|cosmo) cosmo=y;;
-    --clm35|--clm3.5|clm3.5) clm35=y;;
+    eclm) eclm=y;;
+    parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
+    parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
+    pdaf) pdaf=y;;
+    cosmo) cosmo=y;;
+    clm3.5) clm35=y;;
     --no_update) update_compsrc=n;;
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
@@ -234,9 +234,11 @@ fi
 if [[ -n "${env}" ]]; then
   message "Sourcing environment..."
 
-  # TODO: Fix this GPU thing on another PR
+  # TODO: Fix this messy GPU env parameterization on another PR
   if [[ "$parflowGPU" == "y" ]];then
     source "${env}" --parflowgpu
+  elif [[ "$iconGPU" == "y" ]];then
+    source "${env}" --icongpu
   else
     source "${env}"
   fi
