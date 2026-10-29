@@ -41,7 +41,7 @@ function help_tsmp2() {
   echo "  --install_dir    Set install dir cmake, if not set bin/<SYSTEMNAME>_<model-id> is used. Model executables and libraries will be installed here"
   echo "  --clean_first    Delete build_dir if it already exists"
   echo "  --env            Set model environment."
-  echo "  --version        Print $0 scipt version"
+  echo "  -j, --parallel   Set the maximum number of jobs to build the code, if not set compilation is serial."
   echo "  -q, --quiet      Write less output during shell execution"
   echo "  -v, --verbose    Enable verbose output from Makefile builds using CMAKE_VERBOSE_MAKEFILE"
   echo ""
@@ -95,12 +95,12 @@ if [ -n "${comp_name}" ] && [ -z "${comp_srcname}" ];then
      read -p "submodule ${submodule_name} already exists. Do you want to overwrite it? (y/N) " yn
      if [ "${yn,}" = "y" ];then
         message "Overwrite submodule ${submodule_name}"
-        git submodule update --init --force -- ${submodule_name}
+        git submodule update --init --checkout --force -- ${submodule_name}
      else
         message "Do not overwrite submodule ${submodule_name}"
      fi
   else
-     git submodule update --init -- ${submodule_name}
+     git submodule update --init --checkout -- ${submodule_name}
   fi
 fi # compsrc
 }
@@ -123,14 +123,14 @@ while [[ "$#" -gt 0 ]]; do
     -q|--quiet) quiet=y;;
     -v|--verbose) verbose_makefile=y;;
     --version) echo "$0 version 0.2.0"; exit 0;;
-    --icon|icon) icon=y iconCPU=y iconCMakeModelID="ICON";;
+    icon) icon=y iconCPU=y iconCMakeModelID="ICON";;
     icongpu) icon=y iconGPU=y iconCMakeModelID="ICONGPU";;
-    --eclm|eclm) eclm=y;;
-    --parflow|parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
-    --parflowgpu|parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
-    --pdaf|pdaf) pdaf=y;;
-    --cosmo|cosmo) cosmo=y;;
-    --clm35|--clm3.5|clm3.5) clm35=y;;
+    eclm) eclm=y;;
+    parflow) parflow=y parflowCPU=y parflowCMakeModelID="ParFlow";;
+    parflowgpu) parflow=y parflowGPU=y parflowCMakeModelID="ParFlowGPU";;
+    pdaf) pdaf=y;;
+    cosmo) cosmo=y;;
+    clm3.5) clm35=y;;
     --no_update) update_compsrc=n;;
     --clean_first) clean_first=y;;
     --icon_src) icon_src="$2"; shift ;;
@@ -144,6 +144,7 @@ while [[ "$#" -gt 0 ]]; do
     --build_dir) build_dir="$2"; shift ;;
     --install_dir) install_dir="$2"; shift ;;
     --env) env="$2"; shift ;;
+    -j|--parallel) parallel_jobs="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
@@ -245,9 +246,13 @@ fi
 if [[ -n "${env}" ]]; then
   message "Sourcing environment..."
 
-  # TODO: Env file parameterization is temporary and should be fixed
+  # TODO: Fix this messy GPU env parameterization on another PR
   if [[ "$parflowGPU" == "y" ]];then
-    env_gpu_params="--parflowgpu"
+    source "${env}" --parflowgpu
+  elif [[ "$iconGPU" == "y" ]];then
+    source "${env}" --icongpu
+  else
+    source "${env}"
   fi
   if [[ ${build_type^^} == "PROFILE" ]];then
     env_profile_params="--profile"
@@ -334,6 +339,15 @@ else
 fi
 mkdir -p "${cmake_install_dir}"
 
+if [[ -z "${parallel_jobs}" ]]; then
+  if [[ ! -z "${TSMP2_PARALLEL_JOBS}" ]]; then
+    parallel_jobs=${TSMP2_PARALLEL_JOBS}
+  else
+    parallel_jobs=1
+  fi
+fi
+message "Parallel make jobs set to ${parallel_jobs}"
+
 #
 # 6. CMake configure
 #
@@ -351,6 +365,7 @@ cmake_conf="-S ${cmake_tsmp2_dir} -B ${cmake_build_dir}"
 cmake_conf+=" -DCMAKE_BUILD_TYPE=${cmake_build_type}"
 cmake_conf+=" -DCMAKE_INSTALL_PREFIX=${cmake_install_dir}"
 cmake_conf+=" -DCMAKE_VERBOSE_MAKEFILE=${cmake_verbose_makefile}"
+cmake_conf+=" -DPARALLEL_JOBS=${parallel_jobs}"
 cmake_conf+=" ${cmake_comp_str}"
 cmake_conf+=" ${cmake_compsrc_str}"
 message "cmake ${cmake_conf}" |& tee "${build_log}"

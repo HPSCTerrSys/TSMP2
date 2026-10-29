@@ -56,6 +56,13 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(PF_FFLAGS "-ffree-line-length-none -ffixed-line-length-none")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
     set(PF_CFLAGS "-Wall -Werror -Wno-unused-function -Wno-unused-variable")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
+    set(PF_CFLAGS "-Werror -Wno-unused --diag_suppress=unsigned_compare_with_negative,vla_treated_as_fixed_size_array,code_is_unreachable")
+    if(NOT ${ParFlowGPU})
+      message(FATAL_ERROR "BuildParFlow: NVHPC compiler detected but ParFlowGPU is not enabled. "
+        "NVHPC should for now  only be used for GPU-accelerated ParFlow builds (parflowGPU). "
+        "Use a GNU or Intel compiler for CPU-only ParFlow, or enable parflowGPU.")
+    endif()
 else()
   message(FATAL_ERROR "C compiler '${CMAKE_C_COMPILER_ID}' is not supported.")
 endif()
@@ -69,8 +76,14 @@ else()
 endif()
 
 # Enable Umpire if exists
-if (DEFINED ENV{UMPIRE_ROOT} AND NOT ${PDAF})
-  set(PF_UMPIRE_FLAG "-DUMPIRE_ROOT=$ENV{UMPIRE_ROOT}")
+if (DEFINED ENV{UMPIRE_ROOT} AND (NOT ${PDAF} OR ${ParFlowGPU}))
+  list(APPEND PF_UMPIRE_FLAG -DUMPIRE_ROOT=$ENV{UMPIRE_ROOT})
+  if(CMAKE_C_COMPILER_ID STREQUAL "NVHPC")
+    # Umpire leaks wrong OpenMP compile/linker flags when on NVHPC toolchain.
+    # See https://github.com/HPSCTerrSys/TSMP2/issues/148
+    list(APPEND PF_UMPIRE_FLAG -DBLT_OPENMP_COMPILE_FLAGS=-fopenmp
+                               -DBLT_OPENMP_LINK_FLAGS=-fopenmp)
+  endif()
 endif()
 
 # Enable SUNDIALS if exists
@@ -91,27 +104,29 @@ endif()
 
 # Pass options to ParFlow CMake
 ExternalProject_Add(ParFlow
-    PREFIX      ParFlow
-    SOURCE_DIR  ${PARFLOW_SRC}
-    CMAKE_ARGS  -DCMAKE_C_COMPILER=${PF_C_COMPILER}
-                -DCMAKE_C_FLAGS=${PF_CFLAGS}
-		-DCMAKE_CXX_COMPILER=${PF_CXX_COMPILER}
-		-DCMAKE_Fortran_COMPILER=${PF_Fortran_COMPILER}
-                -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
-                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                -DPARFLOW_ENABLE_HYPRE=ON
-                -DPARFLOW_ENABLE_NETCDF=ON
-                -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
-                -DPARFLOW_ENABLE_TIMING=TRUE
-                -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
-                -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
-                -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
-                -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
-                ${PF_UMPIRE_FLAG}
-                ${PF_SUNDIALS_FLAG}
-                ${PF_CLM_FLAGS}
-    DEPENDS     ${MODEL_DEPENDENCIES}
+    PREFIX           ParFlow
+    SOURCE_DIR       ${PARFLOW_SRC}
+    CMAKE_ARGS       -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                     -DCMAKE_C_FLAGS=${PF_CFLAGS}
+                     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+                     -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                     -DCMAKE_Fortran_FLAGS=${PF_FFLAGS}
+                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                     -DPARFLOW_ENABLE_HYPRE=ON
+                     -DPARFLOW_ENABLE_NETCDF=ON
+                     -DPARFLOW_AMPS_SEQUENTIAL_IO=ON
+                     -DPARFLOW_ENABLE_TIMING=TRUE
+                     -DPARFLOW_ACCELERATOR_BACKEND=${PF_ACC_BACKEND}
+                     -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
+                     -DMPIEXEC_NUMPROC_FLAG=${MPIEXEC_NUMPROC_FLAG}
+                     -DPARFLOW_ENABLE_SLURM=${ENABLE_SLURM}
+                     ${PF_UMPIRE_FLAG}
+                     ${PF_SUNDIALS_FLAG}
+                     ${PF_CLM_FLAGS}
+    BUILD_COMMAND    make -j ${PARALLEL_JOBS} install
+    INSTALL_COMMAND  ""
+    DEPENDS          ${MODEL_DEPENDENCIES}
 )
 
 get_model_version(${PARFLOW_SRC} PARFLOW_VERSION)

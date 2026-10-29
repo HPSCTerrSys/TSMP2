@@ -24,7 +24,10 @@ endif()
 # LAPACK is required
 # For eCLM-PDAF, this setting has to be consistent with MKL/LAPACK
 # loading in `eCLM/src/clm5/CMakelists.txt`
+# https://cmake.org/cmake/help/latest/module/FindLAPACK.html
 find_package(LAPACK REQUIRED)
+message(STATUS "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+message(STATUS "LAPACK_LINKER_FLAGS: ${LAPACK_LINKER_FLAGS}")
 
 # OpenMP is required
 find_package(OpenMP REQUIRED)
@@ -60,23 +63,8 @@ set(PDAF_DIR "${PDAF_SRC}")
 
 # Set PDAF_LINK_LIBS for Makefile header
 # --------------------------------------
-# --start-group: libraries inside the group are recalled until, such
-# --that order does not matter in the linking command
-list(APPEND PDAF_LINK_LIBS "-Wl,--start-group")
-list(APPEND PDAF_LINK_LIBS "${mkl_intel_ilp64_file}")
-list(APPEND PDAF_LINK_LIBS "${mkl_intel_thread_file}")
-list(APPEND PDAF_LINK_LIBS "${mkl_core_file}")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
-    OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-  list(APPEND PDAF_LINK_LIBS "-qmkl")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  list(APPEND PDAF_LINK_LIBS "-mkl")
-  list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
-  message(WARNING "LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
-else()
-  message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
-endif()
-list(APPEND PDAF_LINK_LIBS "-Wl,--end-group")
+list(APPEND PDAF_LINK_LIBS "${LAPACK_LIBRARIES}")
+list(APPEND PDAF_LINK_LIBS "${LAPACK_LINKER_FLAGS}")
 
 # Explicit libraries named in comments should be handed over by the
 # variables. For checking this, search `$BUILD_DIR/CMakeCache.txt`.
@@ -153,6 +141,24 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_FOPT "-fallow-argument-mismatch")
   list(APPEND PDAF_FOPT "-fcommon")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # using NVIDIA HPC SDK
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    list(APPEND PDAF_FOPT "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    list(APPEND PDAF_FOPT "-O0")
+    list(APPEND PDAF_FOPT "-g")
+    list(APPEND PDAF_FOPT "-traceback")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
+  list(APPEND PDAF_FOPT "-Msave")
+  list(APPEND PDAF_FOPT "-Mlarge_arrays")
+  list(APPEND PDAF_FOPT "-Mbyteswapio")
+  list(APPEND PDAF_FOPT "-Mfreeform")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -201,6 +207,19 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND PDAF_COPT "-mcmodel=large")
   list(APPEND PDAF_COPT "-fcommon")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  # using NVIDIA HPC SDK
+  if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    list(APPEND PDAF_COPT "-O2")
+  elseif (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    list(APPEND PDAF_COPT "-O0")
+    list(APPEND PDAF_COPT "-g")
+    list(APPEND PDAF_COPT "-traceback")
+  else()
+    message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  endif()
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -218,6 +237,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   list(APPEND PDAF_DOUBLEPRECISION "-fdefault-real-8")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  list(APPEND PDAF_DOUBLEPRECISION "-r8")
 
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -259,6 +282,10 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   list(APPEND PDAF_MODULEOPT "-J")
 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+
+  list(APPEND PDAF_MODULEOPT "-module")
+
 else()
   message(FATAL_ERROR "Unsupported CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -290,8 +317,8 @@ ExternalProject_Add(PDAF
   PREFIX            PDAF
   SOURCE_DIR        ${PDAF_SRC}
   BUILD_IN_SOURCE   TRUE
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND     make ${PDAF_ENV_VARS} clean directories libpdaf
+  CONFIGURE_COMMAND $(MAKE) ${PDAF_ENV_VARS} clean directories
+  BUILD_COMMAND     $(MAKE) ${PDAF_ENV_VARS} -j ${PARALLEL_JOBS} libpdaf
   INSTALL_COMMAND   ""
   DEPENDS           ${PDAF_DEPENDENCIES}
 )

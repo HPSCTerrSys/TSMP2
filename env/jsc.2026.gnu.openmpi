@@ -32,7 +32,7 @@ module load PnetCDF
 module load Umpire
 module load SUNDIALS
 module load Tcl
-if [[ "$1" == "--parflowgpu" ]]; then
+if [[ "$1" == "--parflowgpu" || "$1" == "--icongpu" ]]; then
   module load CUDA
   module load UCX-settings/RC-CUDA
   module load Hypre/3.0.0
@@ -63,25 +63,27 @@ else
   export CXX=mpicxx
 fi
 
+# OMPI_* variables affect OpenMPI backend compilers. They should be
+# unset so that the correct default backend compilers are selected.
+unset OMPI_CC OMPI_FC OMPI_CXX
+
 # Variables read by TSMP2 cmake scripts
 export MPI_HOME=$EBROOTOPENMPI
 export UMPIRE_ROOT=$EBROOTUMPIRE
 export SUNDIALS_ROOT=$EBROOTSUNDIALS
+export TSMP2_PARALLEL_JOBS=16
 
 # Display compiler settings
 module list
 echo "=============== COMPILER SETTINGS  ===============" 
-echo "    Machine: ${SYSTEMNAME} on Stages/$STAGE"
-echo "    MPI lib: OpenMPI v$EBVERSIONOPENMPI"
-echo "          C: ${CC} (GCC ${EBVERSIONGCCCORE})"
-echo "        C++: ${CXX} (GCC ${EBVERSIONGCCCORE})"
-echo "    Fortran: ${FC} (GCC ${EBVERSIONGCCCORE})"
-if [[ "$1" == "--parflowgpu" ]]; then
-  echo "       nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
-  echo "  CUDAARCHS: $CUDAARCHS"
-fi
-if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
-  echo "   Profiler: Scalasca v${EBVERSIONSCALASCA}"
+echo "   Machine: ${SYSTEMNAME} on Stages/$STAGE"
+echo "   MPI lib: OpenMPI v$EBVERSIONOPENMPI"
+echo "         C: $($CC --version | head -n 1)"
+echo "       C++: $($CXX --version | head -n 1)"
+echo "   Fortran: $($FC --version | head -n 1)"
+if [[ "$1" == "--parflowgpu" || "$1" == "--icongpu" ]]; then
+  echo "      nvcc: $(nvcc --version | tail -n 1 | cut -d" " -f2)"
+  echo " CUDAARCHS: $CUDAARCHS"
 fi
 echo "=================================================="
 echo ""
