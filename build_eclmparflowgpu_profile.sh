@@ -4,18 +4,35 @@
 #
 set -eo pipefail
 
-TSMP2_ROOT=`git rev-parse --show-toplevel`
-MODEL_ID=${SYSTEMNAME^^}_eCLM-ParflowGPU_S${STAGE}_GNU-OPENMPI_SCALASCA
-BUILD_DIR=${TSMP2_ROOT}/bld_manual/${MODEL_ID}
-INSTALL_DIR=${TSMP2_ROOT}/bin/${MODEL_ID}
+if [[ $1 == "gnu" ]]; then
+  COMPILER="GNU"
+  ENV_FILE=jsc.2026.gnu.openmpi  
+elif [[ $1 == "nvhpc" ]]; then
+  COMPILER="NVHPC"
+  ENV_FILE=jsc.2026.nvhpc.openmpi
+else
+  COMPILER="NVHPC"
+  ENV_FILE=jsc.2026.nvhpc.openmpi
+fi
 
-rm -rf ${INSTALL_DIR}
+MAKE_JOBS=32
+TSMP2_ROOT=`git rev-parse --show-toplevel`
+BUILD_DIR=${TSMP2_ROOT}/bld_manual/${MODEL_ID}
+
 #
 # Source env for eCLM and Parflow build
 #
 cd ${TSMP2_ROOT}
-echo "Sourcing env file ..."
-source env/jsc.2026.gnu.openmpi --parflowgpu --profile
+echo "Sourcing ${ENV_FILE} ..."
+source env/${ENV_FILE} --parflowgpu --profile
+
+MODEL_ID=${SYSTEMNAME^^}_eCLM-ParflowGPU_S${STAGE}_${COMPILER}-OPENMPI_SCALASCA
+if [[ -z ${INSTALL_DIR// } ]]; then
+  INSTALL_DIR=${TSMP2_ROOT}/bin/${MODEL_ID}
+else
+  INSTALL_DIR=${INSTALL_DIR}/${MODEL_ID}
+fi
+echo "TSMP2 binaries will be installed to ${INSTALL_DIR}"
 
 #
 # Build OASIS3-MCT
@@ -24,12 +41,16 @@ echo ""
 echo "Building OASIS3-MCT with Score-P ..."
 echo ""
 cd ${TSMP2_ROOT}/models/oasis3-mct
-CC=$(which mpicc) FC=$(which mpif90) INSTALL_PREFIX=${INSTALL_DIR} ./build
+export OASIS_ROOT=$(pwd) INSTALL_PREFIX=${INSTALL_DIR}
+cd util/make_dir
+make realclean -f TopMakefileOasis3
+INSTALL_PREFIX=${INSTALL_DIR} make -f TopMakefileOasis3 -j${MAKE_JOBS} static-libs
 echo "Successfully built OASIS3-MCT!"
 
 echo ""
 echo "Building Parflow with Score-P ..."
 echo ""
+cd ${TSMP2_ROOT}
 BLD_ParFlow=${BUILD_DIR}/ParFlow
 rm -rf ${BLD_ParFlow}
 if [[ ! -d ${BLD_ParFlow} ]]; then
@@ -56,7 +77,7 @@ if [[ ! -d ${BLD_ParFlow} ]]; then
 			   -DPARFLOW_HAVE_ECLM=ON
 fi
 cd ${BLD_ParFlow}
-make SCOREP_WRAPPER_INSTRUMENTER_FLAGS="--thread=pthread --verbose" VERBOSE=1 -j8 install
+make SCOREP_WRAPPER_INSTRUMENTER_FLAGS="--thread=pthread --verbose" VERBOSE=1 -j${MAKE_JOBS} install
 echo "Successfully built ParFlowGPU!"
 
 #
@@ -65,6 +86,7 @@ echo "Successfully built ParFlowGPU!"
 echo ""
 echo "Building eCLM with Score-P ..."
 echo ""
+cd ${TSMP2_ROOT}
 rm -rf ${BLD_eCLM}
 BLD_eCLM=${BUILD_DIR}/eCLM
 if [[ ! -d ${BLD_eCLM} ]]; then
@@ -78,9 +100,14 @@ if [[ ! -d ${BLD_eCLM} ]]; then
                            -DCOUP_OAS_PFL=True
 fi
 cd ${BLD_eCLM}
-make SCOREP_WRAPPER_INSTRUMENTER_FLAGS="--thread=pthread --verbose" VERBOSE=1 -j8 install
+make SCOREP_WRAPPER_INSTRUMENTER_FLAGS="--thread=pthread --verbose" VERBOSE=1 -j${MAKE_JOBS} install
 echo "Successfully built eCLM!"
 
+#
+# Copy env file to INSTALL_DIR
+#
+cp ${TSMP2_ROOT}/env/${ENV_FILE} ${INSTALL_DIR}
+
 echo ""
-echo "SUccessfully built eCLM-ParflowGPU to ${INSTALL_DIR}"
+echo "Successfully built eCLM-ParflowGPU to ${INSTALL_DIR}"
 echo ""
