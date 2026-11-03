@@ -66,7 +66,15 @@ set(HDF5_PREFER_PARALLEL "TRUE")
 set(HDF5_USE_STATIC_LIBRARIES "TRUE")
 set(HDF5_NO_FIND_PACKAGE_CONFIG_FILE "TRUE")
 find_package(HDF5 REQUIRED COMPONENTS C)
-list(APPEND ICON_LIBS "${HDF5_LIBRARIES}")
+foreach(lib IN LISTS HDF5_LIBRARIES)
+  if(lib MATCHES "^[-/]")
+    list(APPEND ICON_LIBS "${lib}")
+  else()
+    find_library(HDF5_EXTRA_LIB_${lib} NAMES ${lib} REQUIRED
+                 HINTS ${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+    list(APPEND ICON_LIBS "${HDF5_EXTRA_LIB_${lib}}")
+  endif()
+endforeach()
 
 # libXML2 - XML parsing library
 find_package(LibXml2 REQUIRED)
