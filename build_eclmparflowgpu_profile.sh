@@ -9,7 +9,7 @@ if [[ $1 == "nvhpc" ]]; then
   ENV_FILE=jsc.2026.nvhpc.openmpi
 else
   COMPILER="GNU"
-  ENV_FILE=jsc.2026.gnu.openmpi  
+  ENV_FILE=jsc.2025.gnu.openmpi  
 fi
 
 MAKE_JOBS=32
@@ -38,7 +38,7 @@ echo ""
 echo "Building OASIS3-MCT with Score-P ..."
 echo ""
 cd ${TSMP2_ROOT}/models/oasis3-mct
-git pull && git checkout tsmp-patches-v0.2
+git pull origin v5.0_patched && git checkout tsmp-patches-v0.2
 export OASIS_ROOT=$(pwd) INSTALL_PREFIX=${INSTALL_DIR}
 cd util/make_dir
 make realclean -f TopMakefileOasis3
@@ -51,29 +51,27 @@ echo ""
 cd ${TSMP2_ROOT}
 BLD_ParFlow=${BUILD_DIR}/ParFlow
 rm -rf ${BLD_ParFlow}
-if [[ ! -d ${BLD_ParFlow} ]]; then
-  SCOREP_WRAPPER=off cmake -S ${TSMP2_ROOT}/models/parflow        \
-                           -B ${BLD_ParFlow}                      \
-                           -DCMAKE_BUILD_TYPE="RELEASE"           \
-                           -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}  \
-                           -DCMAKE_PREFIX_PATH=${INSTALL_DIR}     \
-                           -DCMAKE_C_COMPILER=$CC                 \
-                           -DCMAKE_Fortran_COMPILER=$FC           \
-                           -DCMAKE_CXX_COMPILER=$CXX              \
-                           -DPARFLOW_ENABLE_HYPRE=ON              \
-                           -DPARFLOW_ENABLE_NETCDF=ON             \
-                           -DPARFLOW_AMPS_SEQUENTIAL_IO=ON        \
-                           -DPARFLOW_ENABLE_TIMING=TRUE           \
-                           -DPARFLOW_ACCELERATOR_BACKEND="cuda"   \
-                           -DMPIEXEC_EXECUTABLE=$(which srun)     \
-                           -DMPIEXEC_NUMPROC_FLAG="--ntasks"      \
-                           -DPARFLOW_ENABLE_SLURM=TRUE            \
-                           -DUMPIRE_ROOT=${EBROOTUMPIRE}          \
-                           -DSUNDIALS_ROOT=${EBROOTSUNDIALS}      \
-			   -DPARFLOW_AMPS_LAYER=oas3              \
-			   -DOAS3_ROOT=${INSTALL_DIR}             \
-			   -DPARFLOW_HAVE_ECLM=ON
-fi
+SCOREP_WRAPPER=off cmake -S ${TSMP2_ROOT}/models/parflow        \
+                         -B ${BLD_ParFlow}                      \
+                         -DCMAKE_BUILD_TYPE="RELEASE"           \
+                         -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}  \
+                         -DCMAKE_PREFIX_PATH=${INSTALL_DIR}     \
+                         -DCMAKE_C_COMPILER=$CC                 \
+                         -DCMAKE_Fortran_COMPILER=$FC           \
+                         -DCMAKE_CXX_COMPILER=$CXX              \
+                         -DPARFLOW_ENABLE_HYPRE=ON              \
+                         -DPARFLOW_ENABLE_NETCDF=ON             \
+                         -DPARFLOW_AMPS_SEQUENTIAL_IO=ON        \
+                         -DPARFLOW_ENABLE_TIMING=TRUE           \
+                         -DPARFLOW_ACCELERATOR_BACKEND="cuda"   \
+                         -DMPIEXEC_EXECUTABLE=$(which srun)     \
+                         -DMPIEXEC_NUMPROC_FLAG="--ntasks"      \
+                         -DPARFLOW_ENABLE_SLURM=TRUE            \
+                         -DUMPIRE_ROOT=${EBROOTUMPIRE}          \
+                         -DSUNDIALS_ROOT=${EBROOTSUNDIALS}      \
+                         -DPARFLOW_AMPS_LAYER=oas3              \
+                         -DOAS3_ROOT=${INSTALL_DIR}             \
+                         -DPARFLOW_HAVE_ECLM=ON
 cd ${BLD_ParFlow}
 make SCOREP_WRAPPER_INSTRUMENTER_FLAGS="--thread=pthread --verbose" VERBOSE=1 -j${MAKE_JOBS} install
 echo "Successfully built ParFlowGPU!"
@@ -87,16 +85,15 @@ echo ""
 cd ${TSMP2_ROOT}
 rm -rf ${BLD_eCLM}
 BLD_eCLM=${BUILD_DIR}/eCLM
-if [[ ! -d ${BLD_eCLM} ]]; then
-  SCOREP_WRAPPER=off cmake -S ${TSMP2_ROOT}/models/eCLM/src       \
-                           -B ${BLD_eCLM}                         \
-                           -DCMAKE_BUILD_TYPE="PROFILE"           \
-                           -DCMAKE_PREFIX_PATH=${INSTALL_DIR}     \
-                           -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}  \
-                           -DCMAKE_C_COMPILER=$CC                 \
-                           -DCMAKE_Fortran_COMPILER=$FC           \
-                           -DCOUP_OAS_PFL=True
-fi
+SCOREP_WRAPPER=off cmake -S ${TSMP2_ROOT}/models/eCLM/src       \
+                         -B ${BLD_eCLM}                         \
+                         -DCMAKE_BUILD_TYPE="PROFILE"           \
+                         -DCMAKE_PREFIX_PATH=${INSTALL_DIR}     \
+                         -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}  \
+                         -DCMAKE_C_COMPILER=$CC                 \
+                         -DCMAKE_Fortran_COMPILER=$FC           \
+                         -DCOUP_OAS_PFL=True
+
 cd ${BLD_eCLM}
 make SCOREP_WRAPPER_INSTRUMENTER_FLAGS="--thread=pthread --verbose" VERBOSE=1 -j${MAKE_JOBS} install
 echo "Successfully built eCLM!"
