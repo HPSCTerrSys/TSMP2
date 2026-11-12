@@ -4,15 +4,12 @@
 #
 set -eo pipefail
 
-if [[ $1 == "gnu" ]]; then
-  COMPILER="GNU"
-  ENV_FILE=jsc.2026.gnu.openmpi  
-elif [[ $1 == "nvhpc" ]]; then
+if [[ $1 == "nvhpc" ]]; then
   COMPILER="NVHPC"
   ENV_FILE=jsc.2026.nvhpc.openmpi
 else
-  COMPILER="NVHPC"
-  ENV_FILE=jsc.2026.nvhpc.openmpi
+  COMPILER="GNU"
+  ENV_FILE=jsc.2026.gnu.openmpi  
 fi
 
 MAKE_JOBS=32
@@ -41,6 +38,7 @@ echo ""
 echo "Building OASIS3-MCT with Score-P ..."
 echo ""
 cd ${TSMP2_ROOT}/models/oasis3-mct
+git pull && git checkout tsmp-patches-v0.2
 export OASIS_ROOT=$(pwd) INSTALL_PREFIX=${INSTALL_DIR}
 cd util/make_dir
 make realclean -f TopMakefileOasis3
