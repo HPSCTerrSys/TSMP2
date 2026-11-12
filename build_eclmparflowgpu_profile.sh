@@ -9,7 +9,7 @@ if [[ $1 == "nvhpc" ]]; then
   ENV_FILE=jsc.2026.nvhpc.openmpi
 else
   COMPILER="GNU"
-  ENV_FILE=jsc.2025.gnu.openmpi  
+  ENV_FILE=jsc.2026.gnu.openmpi  
 fi
 
 MAKE_JOBS=32
