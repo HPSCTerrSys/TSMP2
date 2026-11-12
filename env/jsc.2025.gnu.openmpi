@@ -53,12 +53,20 @@ module load Tcl
 module load ecCodes
 
 # Set default MPI compilers
-export OMPI_CC=gcc
-export OMPI_CXX=g++
-export OMPI_FC=gfortran
-export CC=mpicc
-export FC=mpif90
-export CXX=mpicxx
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
+  module load Scalasca
+  export CC=$(which scorep-mpicc)
+  export FC=$(which scorep-mpif90)
+  export CXX=$(which scorep-mpicxx)
+  unset OMPI_CC OMPI_FC OMPI_CXX
+else
+  export OMPI_CC=gcc
+  export OMPI_CXX=g++
+  export OMPI_FC=gfortran
+  export CC=mpicc
+  export FC=mpif90
+  export CXX=mpicxx
+fi
 export MPI_HOME=$EBROOTOPENMPI
 export MPIEXEC_EXECUTABLE=$(which srun)
 export TSMP2_PARALLEL_JOBS=16

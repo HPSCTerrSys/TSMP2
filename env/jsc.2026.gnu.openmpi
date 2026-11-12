@@ -52,9 +52,16 @@ fi
 module load ecCodes
 
 # Set default MPI compilers
-export CC=mpicc
-export FC=mpif90
-export CXX=mpicxx
+if [[ "$1" == "--profile" || "$2" == "--profile" ]]; then
+  module load Scalasca
+  export CC=$(which scorep-mpicc)
+  export FC=$(which scorep-mpif90)
+  export CXX=$(which scorep-mpicxx)
+else
+  export CC=mpicc
+  export FC=mpif90
+  export CXX=mpicxx
+fi
 
 # OMPI_* variables affect OpenMPI backend compilers. They should be
 # unset so that the correct default backend compilers are selected.

@@ -41,7 +41,10 @@ endif()
 # Set compiler flags
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     # Flags were based from https://github.com/parflow/parflow/blob/c8aa8d7140db19153194728b8fa9136b95177b6d/.github/workflows/linux.yml#L486
-    set(PF_CFLAGS "-Wall -Werror -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    set(PF_CFLAGS "-Wall -Wno-unused-result -Wno-unused-function -Wno-stringop-overread")
+    if (NOT CMAKE_BUILD_TYPE STREQUAL "PROFILE")
+      string(APPEND PF_CFLAGS " -Werror") #compile warnings not ignored for DEBUG and RELEASE builds
+    endif()
     if(${PDAF})
       # parflow-pdaf fork currently ignores unused variables
       string(APPEND PF_CFLAGS " -Wno-unused-variable")
@@ -86,6 +89,17 @@ endif()
 # Enable SUNDIALS if exists
 if (DEFINED ENV{SUNDIALS_ROOT} AND NOT ${PDAF})
     set(PF_SUNDIALS_FLAG "-DSUNDIALS_ROOT=$ENV{SUNDIALS_ROOT}")
+endif()
+
+# Profiling build (Experimental)
+if (CMAKE_BUILD_TYPE STREQUAL "PROFILE")
+  set(PF_C_COMPILER $ENV{TSMP2_PROFILE_CC})
+  set(PF_CXX_COMPILER $ENV{TSMP2_PROFILE_CXX})
+  set(PF_Fortran_COMPILER $ENV{TSMP2_PROFILE_FC})
+else()
+  set(PF_C_COMPILER ${CMAKE_C_COMPILER})
+  set(PF_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  set(PF_Fortran_COMPILER ${CMAKE_Fortran_COMPILER})
 endif()
 
 # Pass options to ParFlow CMake
