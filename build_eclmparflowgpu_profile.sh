@@ -14,7 +14,6 @@ fi
 
 MAKE_JOBS=32
 TSMP2_ROOT=`git rev-parse --show-toplevel`
-BUILD_DIR=${TSMP2_ROOT}/bld_manual/${MODEL_ID}
 
 #
 # Source env for eCLM and Parflow build
@@ -24,6 +23,7 @@ echo "Sourcing ${ENV_FILE} ..."
 source env/${ENV_FILE} --parflowgpu --profile
 
 MODEL_ID=${SYSTEMNAME^^}_eCLM-ParflowGPU_S${STAGE}_${COMPILER}-OPENMPI_SCALASCA
+BUILD_DIR=${TSMP2_ROOT}/bld_manual/${MODEL_ID}
 if [[ -z ${INSTALL_DIR// } ]]; then
   INSTALL_DIR=${TSMP2_ROOT}/bin/${MODEL_ID}
 else
